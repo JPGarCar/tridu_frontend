@@ -2,40 +2,45 @@ import {
     AppBar,
     Autocomplete,
     Box,
-    IconButton,
     InputAdornment,
     TextField,
     Toolbar,
     Typography
 } from "@mui/material";
-import {AccountCircle, Search} from "@mui/icons-material";
+import {Search} from "@mui/icons-material";
+import UserIconMenu from "./UserIconMenu.tsx";
+import {useAuthServiceContext} from "../context/AuthContext.tsx";
 
 
 const PrimaryAppBar = () => {
 
+    const { isLoggedIn } = useAuthServiceContext();
+
     return (
-        <AppBar>
+        <AppBar position="sticky">
             <Toolbar>
                 <Typography variant="h6" component="div" flexGrow={1}>
-                    TriDu
+                    TriDu App
                 </Typography>
                 <Box flexGrow={1/3}>
-                    <Autocomplete
-                        sx={{ my: 1 }}
-                        freeSolo={true}
-                        filterOptions={(x) => x}
-                        options={[]}
-                        renderInput={
-                            (params) =>
-                                <TextField {...params} size="small" variant="outlined" label="Search" InputProps={{ ...params.InputProps, endAdornment: <InputAdornment position="end"> <Search /> </InputAdornment> }} />
-                        }
-                    />
+                    {
+                        isLoggedIn ?
+                            <Autocomplete
+                                sx={{ my: 1 }}
+                                freeSolo={true}
+                                filterOptions={(x) => x}
+                                options={[]}
+                                renderInput={
+                                    (params) =>
+                                        <TextField {...params} size="small" variant="outlined" label="Search" InputProps={{ ...params.InputProps, endAdornment: <InputAdornment position="end"> <Search /> </InputAdornment> }} />
+                                }
+                            />
+                        :
+                            <></>
+                    }
                 </Box>
                 <Box sx={{ ml: { xs: 0, sm: 0.5, md: 2}, flexGrow: 0 }}>
-                    <IconButton size="large">
-                        <AccountCircle />
-                    </IconButton>
-
+                    { isLoggedIn ? <UserIconMenu /> : <> </>}
                 </Box>
             </Toolbar>
         </AppBar>
