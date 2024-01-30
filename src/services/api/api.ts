@@ -9,7 +9,7 @@ const api = new OpenAPIClientAxios({
     }
 });
 
-export const getApiClient = async () => {
+export const getApiClient = async () :Promise<Client> => {
 
     const client = await api.getClient<Client>();
 
@@ -38,7 +38,7 @@ export const getApiClient = async () => {
 
                 try {
                     const refreshToken = localStorage.getItem('jwt_refreshToken');
-                    const response = await axios.post('http://localhost:8000/api/token/refresh/', { refreshToken });
+                    const response = await axios.post('http://localhost:8000/api/token/refresh/', { "refresh": refreshToken });
                     const { access } = response.data;
 
                     localStorage.setItem('jwt_token', access);

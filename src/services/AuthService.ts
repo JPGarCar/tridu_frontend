@@ -43,9 +43,11 @@ export function useAuthService(): AuthServiceProps {
             await getUserDetails();
 
             setIsLoggedIn(true);
+            localStorage.setItem("isLoggedIn", "true");
             return true;
         } catch (e) {
             setIsLoggedIn(false);
+            localStorage.setItem("isLoggedIn", "false");
             return false;
         }
     }
