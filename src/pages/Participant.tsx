@@ -4,7 +4,16 @@ import {
     Card,
     CardActions,
     CardContent,
-    Divider, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, Skeleton,
+    Divider,
+    FormControl,
+    IconButton,
+    InputAdornment,
+    InputLabel,
+    MenuItem,
+    OutlinedInput,
+    Select,
+    SelectChangeEvent,
+    Skeleton,
     Stack,
     Switch,
     TextField,
@@ -14,10 +23,11 @@ import Grid from "@mui/material/Unstable_Grid2";
 import {useParams} from "react-router-dom";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import {getApiClient} from "../services/api/api.ts";
-import type { Components } from "../services/api/openapi";
-import {ChangeEventHandler, useState} from "react";
+import type {Components} from "../services/api/openapi";
+import {ChangeEventHandler, ReactNode, useState} from "react";
 import {useFormik} from "formik";
 import {Send} from "@mui/icons-material";
+import {DateTime, Duration} from "luxon";
 
 
 function EditableRowStackTextField(props: {
@@ -25,12 +35,55 @@ function EditableRowStackTextField(props: {
     data: string | null | undefined,
     editing: boolean,
     id: string,
+    onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined
+}) {
+    return (
+        <Stack direction={"row"} spacing={2} alignItems={"center"}>
+            <Typography>{props.label}</Typography>
+            {
+                props.editing ?
+                    <TextField id={props.id} label={props.label} value={props.data} onChange={props.onChange}
+                               variant="outlined" size={'small'}/> : <Typography>{props.data ?? ""}</Typography>
+            }
+        </Stack>
+    );
+}
+
+function EditableRowStackSelectField<T extends number | string>(props: {
+    label: string,
+    data: T | null | undefined,
+    editing: boolean,
+    id: string,
+    options: { key: string; value: T; }[],
+    onChange: ((event: SelectChangeEvent<T | null>, child: ReactNode) => void) | undefined
+}) {
+    return (
+        <Stack direction={"row"} spacing={2} alignItems={"center"}>
+            <Typography>{props.label}</Typography>
+            {
+                props.editing ? <Select name={props.id} id={props.id} label={props.label} value={props.data} onChange={props.onChange} variant="outlined" size={'small'} >
+                    {
+                        props.options.map(({key, value}) => {
+                            return <MenuItem value={value}>{key}</MenuItem>
+                        })
+                    }
+                </Select> : <Typography>{props.data}</Typography>
+            }
+        </Stack>
+    );
+}
+
+function EditableRowStackNumberField(props: {
+    label: string,
+    data: number | null | undefined,
+    editing: boolean,
+    id: string,
     onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined}) {
     return (
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
             <Typography>{props.label}</Typography>
             {
-                props.editing ? <TextField id={props.id} label={props.label} value={props.data} onChange={props.onChange} variant="outlined" size={'small'} /> : <Typography>{props.data ?? ""}</Typography>
+                props.editing ? <TextField type={"number"} id={props.id} label={props.label} value={props.data} onChange={props.onChange} variant="outlined" size={'small'} /> : <Typography>{props.data ?? ""}</Typography>
             }
         </Stack>
     );
@@ -122,13 +175,13 @@ function ParticipantPICard(props: {userId: string}) {
                             <EditableRowStackTextField label={"Last Name:"} data={formik.values.lastName} id={"lastName"}
                                                        editing={isEditing} onChange={formik.handleChange}/>
                             <Stack direction={"row"} spacing={4}>
-                                <EditableRowStackTextField label={"Date of Birth:"} data={formik.values.dob} id={"dob"}
+                                <EditableRowStackTextField label={"DOB (Y-M-D):"} data={formik.values.dob} id={"dob"}
                                                            editing={isEditing} onChange={formik.handleChange}/>
-                                <EditableRowStackTextField label={"Age:"} data={"TODO"} editing={false} id={"age"}
+                                <EditableRowStackTextField label={"Age:"} data={Math.abs(DateTime.fromISO(formik.values.dob ?? "").minus({year: 2023}).year).toString()} editing={false} id={"age"}
                                                            onChange={formik.handleChange}/>
                             </Stack>
-                            <EditableRowStackTextField label={"Gender:"} data={formik.values.gender} id={"gender"} editing={isEditing}
-                                                       onChange={formik.handleChange}/>
+                            <EditableRowStackSelectField label={"Gender:"} data={formik.values.gender} id={"gender"} editing={isEditing}
+                                                       onChange={formik.handleChange} options={[{value: "U", key: "Undefined"}, {value: "M", key: "Male"}, {value: "F", key: "Female"}]}/>
                             <EditableRowStackTextField label={"Email:"} data={formik.values.email} id={"email"} editing={isEditing}
                                                        onChange={formik.handleChange}/>
                             <EditableRowStackTextField label={"Phone #:"} data={formik.values.phone} id={"phone"} editing={isEditing}
@@ -253,7 +306,7 @@ function ParticipantRaceCard(props: {participant: Components.Schemas.Participant
             bib_num: props.participant.bib_number,
             is_ftt: props.participant.is_ftt,
             team: props.participant.team,
-            swimTime: props.participant.swim_time,
+            swimTime: Duration.fromISO(props.participant.swim_time ?? "").shiftTo('minutes').minutes,
             city: props.participant.origin.city,
             province: props.participant.origin.province,
             country: props.participant.origin.country,
@@ -269,7 +322,7 @@ function ParticipantRaceCard(props: {participant: Components.Schemas.Participant
                     bib_number: values.bib_num,
                     is_ftt: values.is_ftt,
                     team: values.team,
-                    swim_time: values.swimTime,
+                    swim_time: Duration.fromObject({ minutes: values.swimTime }).toISO(),
                     origin: {
                         city: values.city,
                         province: values.province,
@@ -313,7 +366,7 @@ function ParticipantRaceCard(props: {participant: Components.Schemas.Participant
                                         <EditableRowStackTextField label={"Team:"} data={formik.values.team}
                                                                    editing={isEditing} id={"team"}
                                                                    onChange={formik.handleChange}/>
-                                        <EditableRowStackTextField label={"Swim Time:"} data={formik.values.swimTime}
+                                        <EditableRowStackNumberField label={"Swim Time (Minutes):"} data={formik.values.swimTime}
                                                                    editing={isEditing} id={"swimTime"}
                                                                    onChange={formik.handleChange}/>
                                     </Stack>
