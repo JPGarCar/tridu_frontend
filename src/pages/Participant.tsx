@@ -1,4 +1,5 @@
 import {
+    Alert,
     Box,
     Button,
     Card,
@@ -10,7 +11,7 @@ import {
     InputAdornment,
     InputLabel,
     OutlinedInput,
-    Skeleton,
+    Skeleton, Snackbar,
     Stack,
     Typography
 } from "@mui/material";
@@ -21,7 +22,7 @@ import {getApiClient} from "../services/api/api.ts";
 import type {Components} from "../services/api/openapi";
 import {useState} from "react";
 import {useFormik} from "formik";
-import {Send} from "@mui/icons-material";
+import {Error, Send} from "@mui/icons-material";
 import {DateTime, Duration} from "luxon";
 import {
     EditableRowStackNumberField,
@@ -227,6 +228,8 @@ function ParticipantRaceCard(props: {participant: Components.Schemas.Participant
 
     const [isEditing, setIsEditing] = useState(false);
 
+    const [isActive, setIsActive] = useState(props.participant.is_active);
+
     const formik = useFormik({
         initialValues: {
             bib_num: props.participant.bib_number,
@@ -268,11 +271,32 @@ function ParticipantRaceCard(props: {participant: Components.Schemas.Participant
         void commentsQuery.refetch();
     }
 
+    const deactivateParticipant = async () => {
+        const api = await getApiClient();
+        const response = await api.participants_api_deactivate_participant(props.participant.id);
+
+        if (response.status == 201) {
+            setIsActive(false);
+        }
+    }
+
+    const reactivateParticipant = async () => {
+        const api = await getApiClient();
+        const response = await api.participants_api_reactivate_participant(props.participant.id);
+
+        if (response.status == 201) {
+            setIsActive(true);
+        }
+    }
+
     return (
         <Card variant={"outlined"} sx={{height: "100%", display: "flex", flexDirection: "column"}}>
             <Box textAlign={"center"} sx={{p: 0.75}}>
                 <Typography variant={"h5"}
                             component={"div"}>{props.participant.race.name} - {props.participant.bib_number}</Typography>
+                {
+                    isActive ? null : <Alert sx={{ m: 2 }} icon={<Error />} severity={"error"}>Inactive participant! Participant will not show up on heat or other exports.</Alert>
+                }
             </Box>
             <Divider/>
             <Grid container flexGrow={1}>
@@ -311,7 +335,7 @@ function ParticipantRaceCard(props: {participant: Components.Schemas.Participant
                                     </Stack>
                                 </Grid>
                             </Grid>
-                            <Grid xs={2}>
+                            <Grid xs>
                                 <CardActions>
                                     <Button onClick={() => {
                                         if (isEditing) {
@@ -323,6 +347,9 @@ function ParticipantRaceCard(props: {participant: Components.Schemas.Participant
                                     }}>{isEditing ? "Cancel" : "Edit"}</Button>
                                     {
                                         isEditing ? <Button type={"submit"} color={"success"}>Save</Button> : null
+                                    }
+                                    {
+                                        isActive ? <Button color={"error"} onClick={deactivateParticipant}>De-Activate</Button> : <Button color={"success"} onClick={reactivateParticipant}>Re-Activate</Button>
                                     }
                                 </CardActions>
                             </Grid>
@@ -369,8 +396,33 @@ const Participant = () => {
 
     const [activeParticipant, setActiveParticipant] = useState<Components.Schemas.ParticipantSchema | null>(null);
 
+    const [snackbarState, setSnackbarState] = useState({
+        isOpen: false,
+        message: "",
+        autoHideDuration: 5000,
+        severity: "info"
+    });
+
+    const handleSnackbarClose = () => {
+        setSnackbarState({
+            isOpen: false,
+            message: "",
+            autoHideDuration: 5000,
+            severity: "info"
+        });
+    }
+
+    const openAlert = (message: string) => {
+        setSnackbarState((state) => ({...state, isOpen: true, message: message}));
+    }
+
     return (
         <Box sx={{ height: "100%", px: 5 }}>
+            <Snackbar open={snackbarState.isOpen} autoHideDuration={5000} onClose={handleSnackbarClose}>
+                <Alert onClose={handleSnackbarClose} severity={snackbarState.severity}>
+                    {snackbarState.message}
+                </Alert>
+            </Snackbar>
             <Grid container spacing={4} sx={{ height: "100%", mt: 2 }}>
                 <Grid xs={4}>
                     <Stack spacing={2}>
@@ -378,7 +430,7 @@ const Participant = () => {
                         <ParticipantRaceListCard userId={userId ?? ""} activeParticipantId={activeParticipant?.id ?? null} setActiveParticipant={setActiveParticipant}/>
                     </Stack>
                 </Grid>
-                <Grid xs={8}>
+                <Grid xs>
                     {
                         activeParticipant != null ? <ParticipantRaceCard participant={activeParticipant}/> : <div>Select a race first!</div>
                     }

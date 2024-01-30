@@ -141,6 +141,14 @@ declare namespace Components {
              * Swim Time
              */
             swim_time?: /* Swim Time */ string /* duration */ | null;
+            /**
+             * Date Changed
+             */
+            date_changed: string; // date-time
+            /**
+             * Is Active
+             */
+            is_active?: boolean;
         }
         /**
          * PatchParticipantSchema
@@ -371,6 +379,20 @@ declare namespace Paths {
             export type $500 = string;
         }
     }
+    namespace ParticipantsApiDeactivateParticipant {
+        namespace Parameters {
+            /**
+             * Participant Id
+             */
+            export type ParticipantId = number;
+        }
+        export interface PathParameters {
+            participant_id: /* Participant Id */ Parameters.ParticipantId;
+        }
+        namespace Responses {
+            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+        }
+    }
     namespace ParticipantsApiGetParticipantComments {
         namespace Parameters {
             /**
@@ -409,6 +431,20 @@ declare namespace Paths {
             }
         }
     }
+    namespace ParticipantsApiReactivateParticipant {
+        namespace Parameters {
+            /**
+             * Participant Id
+             */
+            export type ParticipantId = number;
+        }
+        export interface PathParameters {
+            participant_id: /* Participant Id */ Parameters.ParticipantId;
+        }
+        namespace Responses {
+            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+        }
+    }
     namespace ParticipantsApiUpdateParticipant {
         namespace Parameters {
             /**
@@ -421,8 +457,7 @@ declare namespace Paths {
         }
         export type RequestBody = /* PatchParticipantSchema */ Components.Schemas.PatchParticipantSchema;
         namespace Responses {
-            export interface $200 {
-            }
+            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
         }
     }
 }
@@ -475,7 +510,23 @@ export interface OperationMethods {
     parameters?: Parameters<Paths.ParticipantsApiUpdateParticipant.PathParameters> | null,
     data?: Paths.ParticipantsApiUpdateParticipant.RequestBody,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiUpdateParticipant.Responses.$200>
+  ): OperationResponse<Paths.ParticipantsApiUpdateParticipant.Responses.$201>
+  /**
+   * participants_api_reactivate_participant - Reactivate Participant
+   */
+  'participants_api_reactivate_participant'(
+    parameters?: Parameters<Paths.ParticipantsApiReactivateParticipant.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiReactivateParticipant.Responses.$201>
+  /**
+   * participants_api_deactivate_participant - Deactivate Participant
+   */
+  'participants_api_deactivate_participant'(
+    parameters?: Parameters<Paths.ParticipantsApiDeactivateParticipant.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiDeactivateParticipant.Responses.$201>
   /**
    * participants_api_get_participant_comments - Get Participant Comments
    */
@@ -551,7 +602,27 @@ export interface PathsDictionary {
       parameters?: Parameters<Paths.ParticipantsApiUpdateParticipant.PathParameters> | null,
       data?: Paths.ParticipantsApiUpdateParticipant.RequestBody,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiUpdateParticipant.Responses.$200>
+    ): OperationResponse<Paths.ParticipantsApiUpdateParticipant.Responses.$201>
+  }
+  ['/api/participants/{participant_id}/reactivate']: {
+    /**
+     * participants_api_reactivate_participant - Reactivate Participant
+     */
+    'patch'(
+      parameters?: Parameters<Paths.ParticipantsApiReactivateParticipant.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiReactivateParticipant.Responses.$201>
+  }
+  ['/api/participants/{participant_id}/deactivate']: {
+    /**
+     * participants_api_deactivate_participant - Deactivate Participant
+     */
+    'patch'(
+      parameters?: Parameters<Paths.ParticipantsApiDeactivateParticipant.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiDeactivateParticipant.Responses.$201>
   }
   ['/api/participants/{participant_id}/comments']: {
     /**
