@@ -22,7 +22,8 @@ function EditableRowStackTextField(props: {
 
 function EditableRowStackSelectField<T extends number | string>(props: {
     label: string,
-    data: T | null | undefined,
+    value: T | null | undefined,
+    valueLabel: string | null | undefined,
     editing: boolean,
     id: string,
     options: { key: string; value: T; }[],
@@ -32,13 +33,13 @@ function EditableRowStackSelectField<T extends number | string>(props: {
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
             <Typography>{props.label}</Typography>
             {
-                props.editing ? <Select name={props.id} id={props.id} label={props.label} value={props.data} onChange={props.onChange} variant="outlined" size={'small'} >
+                props.editing ? <Select name={props.id} id={props.id} label={props.label} value={props.value} onChange={props.onChange} variant="outlined" size={'small'} >
                     {
                         props.options.map(({key, value}) => {
-                            return <MenuItem value={value}>{key}</MenuItem>
+                            return <MenuItem key={value} value={value}>{key}</MenuItem>
                         })
                     }
-                </Select> : <Typography>{props.data}</Typography>
+                </Select> : <Typography>{props.valueLabel}</Typography>
             }
         </Stack>
     );
