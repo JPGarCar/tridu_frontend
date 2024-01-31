@@ -25,7 +25,6 @@ import {useFormik} from "formik";
 import {Error, Send} from "@mui/icons-material";
 import {DateTime, Duration} from "luxon";
 import {
-    EditableRowStackNumberField,
     EditableRowStackSelectField,
     EditableRowStackSwitch,
     EditableRowStackTextField
@@ -33,6 +32,7 @@ import {
 import {getAxiosError} from "../services/api/apiError.ts";
 import SnackbarServiceProvider, {useSnackbarServiceContext} from "../context/SnackbarContext.tsx";
 import {CommentCard} from "../components/Comments.tsx";
+import * as Yup from 'yup';
 
 
 function ParticipantPICard(props: {userId: string}) {
@@ -50,6 +50,15 @@ function ParticipantPICard(props: {userId: string}) {
 
     const [isEditing, setIsEditing] = useState(false);
 
+    const UserFormSchema = Yup.object({
+        firstName: Yup.string().required(),
+        lastName: Yup.string().required(),
+        dob: Yup.string().required().matches(/^\d{4}-\d{2}-\d{2}$/, "Must format YYYY-MM-DD"),
+        gender: Yup.string().required(),
+        email: Yup.string().required().email("Must be an email!"),
+        phone: Yup.string().required(),
+    });
+
     const formik = useFormik({
         initialValues: userQuery.isLoading ? {
             firstName: "",
@@ -66,6 +75,7 @@ function ParticipantPICard(props: {userId: string}) {
             email: user.email,
             phone: user.phone_number
         },
+        validationSchema: UserFormSchema,
         enableReinitialize: true,
         onSubmit: async (values, formikHelpers) => {
             formikHelpers.setSubmitting(true);
@@ -111,21 +121,22 @@ function ParticipantPICard(props: {userId: string}) {
                 <CardContent>
                     <Stack spacing={2} sx={{ ml: 2 }}>
                         <EditableRowStackTextField label={"First Name:"} data={formik.values.firstName} id={"firstName"}
-                                                   editing={isEditing} onChange={formik.handleChange}/>
+                                                   editing={isEditing} onChange={formik.handleChange} error={formik.errors.firstName}/>
                         <EditableRowStackTextField label={"Last Name:"} data={formik.values.lastName} id={"lastName"}
-                                                   editing={isEditing} onChange={formik.handleChange}/>
+                                                   editing={isEditing} onChange={formik.handleChange} error={formik.errors.lastName}/>
                         <Stack direction={"row"} spacing={4}>
                             <EditableRowStackTextField label={"DOB (Y-M-D):"} data={formik.values.dob} id={"dob"}
-                                                       editing={isEditing} onChange={formik.handleChange}/>
+                                                       editing={isEditing} onChange={formik.handleChange} error={formik.errors.dob}/>
                             <EditableRowStackTextField label={"Age:"} data={Math.abs(DateTime.fromISO(formik.values.dob ?? "").minus({year: 2023}).year).toString()} editing={false} id={"age"}
-                                                       onChange={formik.handleChange}/>
+                                                       onChange={formik.handleChange} error={undefined}/>
                         </Stack>
                         <EditableRowStackSelectField label={"Gender:"} value={formik.values.gender} valueLabel={formik.values.gender} id={"gender"} editing={isEditing}
-                                                     onChange={formik.handleChange} options={[{value: "U", key: "Undefined"}, {value: "M", key: "Male"}, {value: "F", key: "Female"}]}/>
+                                                     onChange={formik.handleChange} error={formik.errors.gender}
+                                                     options={[{value: "U", key: "Undefined"}, {value: "M", key: "Male"}, {value: "F", key: "Female"}]}/>
                         <EditableRowStackTextField label={"Email:"} data={formik.values.email} id={"email"} editing={isEditing}
-                                                   onChange={formik.handleChange}/>
+                                                   onChange={formik.handleChange} error={formik.errors.email}/>
                         <EditableRowStackTextField label={"Phone #:"} data={formik.values.phone} id={"phone"} editing={isEditing}
-                                                   onChange={formik.handleChange}/>
+                                                   onChange={formik.handleChange} error={formik.errors.phone}/>
                     </Stack>
                 </CardContent>
                 <Divider/>
@@ -231,17 +242,41 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
 
     const { pushAlert } = useSnackbarServiceContext();
 
+    const swimTimeCreator = (swimTime: string): string => {
+        const duration = Duration.fromISO(swimTime).shiftTo('minutes', 'seconds')
+
+        return duration.toFormat("mm:ss")
+    }
+
+    const swimTimeDestructor = (swimTime: string): Duration => {
+        const minutes = swimTime.substring(0, swimTime.indexOf(":"));
+        const seconds = swimTime.substring(swimTime.indexOf(":") + 1);
+
+        return Duration.fromObject({minutes: minutes, second: seconds});
+    }
+
+    const ParticipantFormSchema = Yup.object({
+        bib_num: Yup.number().required().positive("Must be positive!").integer("Must be a full integer!"),
+        is_ftt: Yup.boolean().required(),
+        team: Yup.string().required(),
+        swimTime: Yup.string().matches(/^\d{2}:\d{2}$/, "Must be in format MM:SS"),
+        city: Yup.string().required(),
+        province: Yup.string().required(),
+        country: Yup.string().required(),
+    })
+
     const formik = useFormik({
         initialValues: {
             bib_num: props.participant.bib_number,
             is_ftt: props.participant.is_ftt,
             team: props.participant.team,
-            swimTime: Duration.fromISO(props.participant.swim_time ?? "").shiftTo('minutes').minutes,
+            swimTime: swimTimeCreator(props.participant.swim_time),
             city: props.participant.origin.city,
             province: props.participant.origin.province,
             country: props.participant.origin.country,
         },
         enableReinitialize: true,
+        validationSchema: ParticipantFormSchema,
         onSubmit: async (values, formikHelpers) => {
             formikHelpers.setSubmitting(true);
 
@@ -252,7 +287,7 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
                     bib_number: values.bib_num,
                     is_ftt: values.is_ftt,
                     team: values.team,
-                    swim_time: Duration.fromObject({minutes: values.swimTime}).toISO(),
+                    swim_time: swimTimeDestructor(values.swimTime).toISO(),
                     origin: {
                         city: values.city,
                         province: values.province,
@@ -311,29 +346,29 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
                             <EditableRowStackTextField label={"Bib #:"}
                                                        data={formik.values.bib_num.toString()}
                                                        editing={isEditing} id={"bib_num"}
-                                                       onChange={formik.handleChange}/>
+                                                       onChange={formik.handleChange} error={formik.errors.bib_num}/>
                             <EditableRowStackSwitch label={"Is FTT:"} checked={formik.values.is_ftt}
                                                     editing={isEditing} id={"is_ftt"}
-                                                    onChange={formik.handleChange}/>
+                                                    onChange={formik.handleChange} error={formik.errors.is_ftt}/>
                             <EditableRowStackTextField label={"Team:"} data={formik.values.team}
                                                        editing={isEditing} id={"team"}
-                                                       onChange={formik.handleChange}/>
-                            <EditableRowStackNumberField label={"Swim Time (Minutes):"} data={formik.values.swimTime}
+                                                       onChange={formik.handleChange} error={formik.errors.team}/>
+                            <EditableRowStackTextField label={"Swim Time (MM:SS):"} data={formik.values.swimTime}
                                                          editing={isEditing} id={"swimTime"}
-                                                         onChange={formik.handleChange}/>
+                                                         onChange={formik.handleChange} error={formik.errors.swimTime} />
                         </Stack>
                     </Grid>
                     <Grid xs={6}>
                         <Stack spacing={2}>
                             <EditableRowStackTextField label={"City:"} data={formik.values.city}
                                                        editing={isEditing} id={"city"}
-                                                       onChange={formik.handleChange}/>
+                                                       onChange={formik.handleChange} error={formik.errors.city}/>
                             <EditableRowStackTextField label={"Province:"} data={formik.values.province}
                                                        editing={isEditing} id={"province"}
-                                                       onChange={formik.handleChange}/>
+                                                       onChange={formik.handleChange} error={formik.errors.province} />
                             <EditableRowStackTextField label={"Country:"} data={formik.values.country}
                                                        editing={isEditing} id={"country"}
-                                                       onChange={formik.handleChange}/>
+                                                       onChange={formik.handleChange} error={formik.errors.country}/>
                         </Stack>
                     </Grid>
                 </Grid>
@@ -430,6 +465,7 @@ function ParticipantRaceType(props: {setParticipant: (arg0: Components.Schemas.P
                                                      key: racetype.name,
                                                  }))}
                                                  onChange={formik.handleChange}
+                                                 error={formik.errors.raceTypeId}
                     />
             }
             <Button  onClick={handleEditButton}>
@@ -537,6 +573,7 @@ function ParticipantRaceHeat(props: {setParticipant: (arg0: Components.Schemas.P
                                                      key: heat.name,
                                                  }))}
                                                  onChange={formik.handleChange}
+                                                 error={formik.errors.heatId}
                     />
             }
             {

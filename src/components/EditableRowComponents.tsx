@@ -6,14 +6,17 @@ function EditableRowStackTextField(props: {
     data: string | null | undefined,
     editing: boolean,
     id: string,
+    error: string | undefined,
     onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined
 }) {
+    const isError = props.error != undefined;
     return (
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
             <Typography>{props.label}</Typography>
             {
                 props.editing ?
                     <TextField id={props.id} label={props.label} value={props.data} onChange={props.onChange}
+                               error={isError} helperText={isError ? props.error : ""}
                                variant="outlined" size={'small'}/> : <Typography>{props.data ?? ""}</Typography>
             }
         </Stack>
@@ -26,14 +29,16 @@ function EditableRowStackSelectField<T extends number | string>(props: {
     valueLabel: string | null | undefined,
     editing: boolean,
     id: string,
+    error: string | undefined
     options: { key: string; value: T; }[],
     onChange: ((event: SelectChangeEvent<T | null>, child: ReactNode) => void) | undefined
 }) {
+    const isError = props.error != undefined;
     return (
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
             <Typography>{props.label}</Typography>
             {
-                props.editing ? <Select name={props.id} id={props.id} label={props.label} value={props.value} onChange={props.onChange} variant="outlined" size={'small'} >
+                props.editing ? <Select name={props.id} id={props.id} error={isError} label={props.label} value={props.value} onChange={props.onChange} variant="outlined" size={'small'} >
                     {
                         props.options.map(({key, value}) => {
                             return <MenuItem key={value} value={value}>{key}</MenuItem>
@@ -50,12 +55,15 @@ function EditableRowStackNumberField(props: {
     data: number | null | undefined,
     editing: boolean,
     id: string,
+    error: string | undefined
     onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined}) {
+
+    const isError = props.error != undefined;
     return (
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
             <Typography>{props.label}</Typography>
             {
-                props.editing ? <TextField type={"number"} id={props.id} label={props.label} value={props.data} onChange={props.onChange} variant="outlined" size={'small'} /> : <Typography>{props.data ?? ""}</Typography>
+                props.editing ? <TextField type={"number"} id={props.id} error={isError} label={props.label} helperText={isError ? props.error : ""} value={props.data} onChange={props.onChange} variant="outlined" size={'small'} /> : <Typography>{props.data ?? ""}</Typography>
             }
         </Stack>
     );
