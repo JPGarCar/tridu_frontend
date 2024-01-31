@@ -1,14 +1,18 @@
-import { Navigate } from "react-router-dom";
+import {Navigate, Outlet} from "react-router-dom";
 import { useAuthServiceContext } from "../context/AuthContext.tsx";
 
-const ProtectedRoute = ({ children }: {children: React.ReactNode}) => {
+const ProtectedRoute = () => {
     const { isLoggedIn } = useAuthServiceContext();
 
     if (!isLoggedIn) {
         return <Navigate to="/login" />;
     }
 
-    return <>{children}</>;
+    return (
+        <>
+            <Outlet />
+        </>
+    );
 }
 
 export default ProtectedRoute;

@@ -302,16 +302,21 @@ declare namespace Paths {
              */
             export type Limit = number;
             /**
+             * Name
+             */
+            export type Name = string;
+            /**
              * Offset
              */
             export type Offset = number;
         }
         export interface QueryParameters {
+            name?: /* Name */ Parameters.Name;
             limit?: /* Limit */ Parameters.Limit;
             offset?: /* Offset */ Parameters.Offset;
         }
         namespace Responses {
-            export type $201 = /* PagedUserSchema */ Components.Schemas.PagedUserSchema;
+            export type $200 = /* PagedUserSchema */ Components.Schemas.PagedUserSchema;
         }
     }
     namespace AccountsApiGetUserById {
@@ -325,7 +330,7 @@ declare namespace Paths {
             user_id: /* User Id */ Parameters.UserId;
         }
         namespace Responses {
-            export type $201 = /* UserSchema */ Components.Schemas.UserSchema;
+            export type $200 = /* UserSchema */ Components.Schemas.UserSchema;
             export interface $204 {
             }
         }
@@ -341,7 +346,7 @@ declare namespace Paths {
             username: /* Username */ Parameters.Username;
         }
         namespace Responses {
-            export type $201 = /* UserSchema */ Components.Schemas.UserSchema;
+            export type $200 = /* UserSchema */ Components.Schemas.UserSchema;
             export interface $204 {
             }
         }
@@ -582,7 +587,7 @@ export interface OperationMethods {
     parameters?: Parameters<Paths.AccountsApiGetUserById.PathParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AccountsApiGetUserById.Responses.$201 | Paths.AccountsApiGetUserById.Responses.$204>
+  ): OperationResponse<Paths.AccountsApiGetUserById.Responses.$200 | Paths.AccountsApiGetUserById.Responses.$204>
   /**
    * accounts_api_update_user - Update User
    */
@@ -598,7 +603,7 @@ export interface OperationMethods {
     parameters?: Parameters<Paths.AccountsApiGetUserByUsername.PathParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$201 | Paths.AccountsApiGetUserByUsername.Responses.$204>
+  ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$200 | Paths.AccountsApiGetUserByUsername.Responses.$204>
   /**
    * accounts_api_get_active_non_staff_users - Get Active Non Staff Users
    */
@@ -606,7 +611,7 @@ export interface OperationMethods {
     parameters?: Parameters<Paths.AccountsApiGetActiveNonStaffUsers.QueryParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AccountsApiGetActiveNonStaffUsers.Responses.$201>
+  ): OperationResponse<Paths.AccountsApiGetActiveNonStaffUsers.Responses.$200>
   /**
    * participants_api_get_participants_for_user - Get Participants For User
    */
@@ -722,7 +727,7 @@ export interface PathsDictionary {
       parameters?: Parameters<Paths.AccountsApiGetUserById.PathParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AccountsApiGetUserById.Responses.$201 | Paths.AccountsApiGetUserById.Responses.$204>
+    ): OperationResponse<Paths.AccountsApiGetUserById.Responses.$200 | Paths.AccountsApiGetUserById.Responses.$204>
     /**
      * accounts_api_update_user - Update User
      */
@@ -740,7 +745,7 @@ export interface PathsDictionary {
       parameters?: Parameters<Paths.AccountsApiGetUserByUsername.PathParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$201 | Paths.AccountsApiGetUserByUsername.Responses.$204>
+    ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$200 | Paths.AccountsApiGetUserByUsername.Responses.$204>
   }
   ['/api/users/active/non-staff']: {
     /**
@@ -750,7 +755,7 @@ export interface PathsDictionary {
       parameters?: Parameters<Paths.AccountsApiGetActiveNonStaffUsers.QueryParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AccountsApiGetActiveNonStaffUsers.Responses.$201>
+    ): OperationResponse<Paths.AccountsApiGetActiveNonStaffUsers.Responses.$200>
   }
   ['/api/participants/user/{user_id}/participants']: {
     /**
