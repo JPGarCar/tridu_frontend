@@ -109,26 +109,24 @@ function ParticipantPICard(props: {userId: string}) {
             <Divider/>
             <form onSubmit={formik.handleSubmit}>
                 <CardContent>
-                    <Box sx={{pl: 2}}>
-                        <Stack spacing={2}>
-                            <EditableRowStackTextField label={"First Name:"} data={formik.values.firstName} id={"firstName"}
+                    <Stack spacing={2} sx={{ ml: 2 }}>
+                        <EditableRowStackTextField label={"First Name:"} data={formik.values.firstName} id={"firstName"}
+                                                   editing={isEditing} onChange={formik.handleChange}/>
+                        <EditableRowStackTextField label={"Last Name:"} data={formik.values.lastName} id={"lastName"}
+                                                   editing={isEditing} onChange={formik.handleChange}/>
+                        <Stack direction={"row"} spacing={4}>
+                            <EditableRowStackTextField label={"DOB (Y-M-D):"} data={formik.values.dob} id={"dob"}
                                                        editing={isEditing} onChange={formik.handleChange}/>
-                            <EditableRowStackTextField label={"Last Name:"} data={formik.values.lastName} id={"lastName"}
-                                                       editing={isEditing} onChange={formik.handleChange}/>
-                            <Stack direction={"row"} spacing={4}>
-                                <EditableRowStackTextField label={"DOB (Y-M-D):"} data={formik.values.dob} id={"dob"}
-                                                           editing={isEditing} onChange={formik.handleChange}/>
-                                <EditableRowStackTextField label={"Age:"} data={Math.abs(DateTime.fromISO(formik.values.dob ?? "").minus({year: 2023}).year).toString()} editing={false} id={"age"}
-                                                           onChange={formik.handleChange}/>
-                            </Stack>
-                            <EditableRowStackSelectField label={"Gender:"} value={formik.values.gender} valueLabel={formik.values.gender} id={"gender"} editing={isEditing}
-                                                       onChange={formik.handleChange} options={[{value: "U", key: "Undefined"}, {value: "M", key: "Male"}, {value: "F", key: "Female"}]}/>
-                            <EditableRowStackTextField label={"Email:"} data={formik.values.email} id={"email"} editing={isEditing}
-                                                       onChange={formik.handleChange}/>
-                            <EditableRowStackTextField label={"Phone #:"} data={formik.values.phone} id={"phone"} editing={isEditing}
+                            <EditableRowStackTextField label={"Age:"} data={Math.abs(DateTime.fromISO(formik.values.dob ?? "").minus({year: 2023}).year).toString()} editing={false} id={"age"}
                                                        onChange={formik.handleChange}/>
                         </Stack>
-                    </Box>
+                        <EditableRowStackSelectField label={"Gender:"} value={formik.values.gender} valueLabel={formik.values.gender} id={"gender"} editing={isEditing}
+                                                     onChange={formik.handleChange} options={[{value: "U", key: "Undefined"}, {value: "M", key: "Male"}, {value: "F", key: "Female"}]}/>
+                        <EditableRowStackTextField label={"Email:"} data={formik.values.email} id={"email"} editing={isEditing}
+                                                   onChange={formik.handleChange}/>
+                        <EditableRowStackTextField label={"Phone #:"} data={formik.values.phone} id={"phone"} editing={isEditing}
+                                                   onChange={formik.handleChange}/>
+                    </Stack>
                 </CardContent>
                 <Divider/>
                 <CardActions>
@@ -564,7 +562,7 @@ function ParticipantRaceCard(props: { participant: Components.Schemas.Participan
 
     const [participant, setParticipant] = useState(props.participant);
 
-    const onCommentSubmit = () => {
+    const refreshComments = () => {
         void commentsQuery.refetch();
     }
 
@@ -598,7 +596,7 @@ function ParticipantRaceCard(props: { participant: Components.Schemas.Participan
                                 {
                                     (commentsQuery.data as Components.Schemas.ParticipantCommentSchema[]).map(comment => {
                                             return (
-                                                <CommentCard key={comment.id} comment={comment} />
+                                                <CommentCard key={comment.id} comment={comment} onCommentDelete={refreshComments} />
                                             );
                                         }
                                     )
@@ -608,7 +606,7 @@ function ParticipantRaceCard(props: { participant: Components.Schemas.Participan
                     </Grid>
                     <Divider flexItem/>
                     <Grid flexWrap={"nowrap"} sx={{ p: 1 }}>
-                        <CommentInput participant_id={participant.id ?? 0} onCommentSubmit={onCommentSubmit}/>
+                        <CommentInput participant_id={participant.id ?? 0} onCommentSubmit={refreshComments}/>
                     </Grid>
                 </Grid>
             </Grid>

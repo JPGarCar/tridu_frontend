@@ -452,6 +452,25 @@ declare namespace Paths {
             export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
         }
     }
+    namespace ParticipantsApiDeleteParticipantComment {
+        namespace Parameters {
+            /**
+             * Comment Id
+             */
+            export type CommentId = number;
+        }
+        export interface PathParameters {
+            comment_id: /* Comment Id */ Parameters.CommentId;
+        }
+        namespace Responses {
+            export interface $200 {
+            }
+            /**
+             * Response
+             */
+            export type $404 = string;
+        }
+    }
     namespace ParticipantsApiGetParticipantComments {
         namespace Parameters {
             /**
@@ -661,6 +680,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiCreateParticipantComment.Responses.$201>
   /**
+   * participants_api_delete_participant_comment - Delete Participant Comment
+   */
+  'participants_api_delete_participant_comment'(
+    parameters?: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiDeleteParticipantComment.Responses.$200>
+  /**
    * race_api_get_race_types - Get Race Types
    */
   'race_api_get_race_types'(
@@ -812,6 +839,16 @@ export interface PathsDictionary {
       data?: Paths.ParticipantsApiCreateParticipantComment.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiCreateParticipantComment.Responses.$201>
+  }
+  ['/api/participants/comment/{comment_id}']: {
+    /**
+     * participants_api_delete_participant_comment - Delete Participant Comment
+     */
+    'delete'(
+      parameters?: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiDeleteParticipantComment.Responses.$200>
   }
   ['/api/races/racetypes']: {
     /**
