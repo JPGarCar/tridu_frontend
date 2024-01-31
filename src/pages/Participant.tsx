@@ -32,9 +32,12 @@ import {
 } from "../components/EditableRowComponents.tsx";
 import {getAxiosError} from "../services/api/apiError.ts";
 import SnackbarServiceProvider, {useSnackbarServiceContext} from "../context/SnackbarContext.tsx";
+import {CommentCard} from "../components/Comments.tsx";
 
 
 function ParticipantPICard(props: {userId: string}) {
+
+    const { pushAlert } = useSnackbarServiceContext();
 
     const queryClient = useQueryClient();
 
@@ -85,9 +88,18 @@ function ParticipantPICard(props: {userId: string}) {
                 formikHelpers.resetForm();
                 queryClient.setQueryData(['getUserById', props.userId], response.data);
                 setIsEditing(false);
+                pushAlert("Edits saved successfully!", "success");
             }
         }
     })
+
+    const handleEditButton = () => {
+        if (isEditing) {
+            formik.resetForm();
+            pushAlert("Changes canceled!", "warning");
+        }
+        setIsEditing((prevState) => !prevState);
+    }
 
     return (
         userQuery.isLoading ? <Skeleton /> : <Card>
@@ -120,14 +132,7 @@ function ParticipantPICard(props: {userId: string}) {
                 </CardContent>
                 <Divider/>
                 <CardActions>
-                    <Button onClick={() => {
-                        if (isEditing) {
-                            formik.resetForm();
-                            setIsEditing(false);
-                        } else {
-                            setIsEditing(true);
-                        }
-                    }}>{ isEditing ? "Cancel" : "Edit"}</Button>
+                    <Button onClick={handleEditButton}>{ isEditing ? "Cancel" : "Edit"}</Button>
                     {
                         isEditing ? <Button type={"submit"} color={"success"}>Save</Button> : null
                     }
@@ -179,6 +184,8 @@ function ParticipantRaceListCard(props: {
 
 function CommentInput(props: {participant_id: number, onCommentSubmit: () => void}) {
 
+    const { pushAlert } = useSnackbarServiceContext();
+
     const formik = useFormik({
         initialValues: {
             commentText: '',
@@ -198,6 +205,7 @@ function CommentInput(props: {participant_id: number, onCommentSubmit: () => voi
                 props.onCommentSubmit();
                 formikHelpers.setSubmitting(false);
                 formikHelpers.resetForm();
+                pushAlert("Comment added!", "success");
             } else {
                 // todo
             }
@@ -206,7 +214,7 @@ function CommentInput(props: {participant_id: number, onCommentSubmit: () => voi
 
     return (
         <form onSubmit={formik.handleSubmit}>
-            <FormControl variant={"outlined"}>
+            <FormControl variant={"outlined"} fullWidth>
                 <InputLabel htmlFor={"commentText"}>Comment</InputLabel>
                 <OutlinedInput
                     id={"commentText"} type={"text"} label={"Comment"} multiline
@@ -222,6 +230,8 @@ function CommentInput(props: {participant_id: number, onCommentSubmit: () => voi
 }
 
 function ParticipantInformation(props: {setParticipant: (arg0: Components.Schemas.ParticipantSchema) => void, participant: Components.Schemas.ParticipantSchema }) {
+
+    const { pushAlert } = useSnackbarServiceContext();
 
     const formik = useFormik({
         initialValues: {
@@ -257,6 +267,7 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
                 formikHelpers.setSubmitting(false);
                 props.setParticipant(response.data);
                 setIsEditing(false);
+                pushAlert("Edits saved successfully!", "success");
             }
         }
     });
@@ -285,6 +296,13 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
         return null;
     }
 
+    const handleEditButton = () => {
+        if (isEditing) {
+            formik.resetForm();
+            pushAlert("Changes canceled!", "warning");
+        }
+        setIsEditing((prevState) => !prevState);
+    }
 
     return (
         <form onSubmit={formik.handleSubmit}>
@@ -322,14 +340,7 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
                     </Grid>
                 </Grid>
                 <Grid xs>
-                    <Button onClick={() => {
-                        if (isEditing) {
-                            formik.resetForm();
-                            setIsEditing(false);
-                        } else {
-                            setIsEditing(true);
-                        }
-                    }}>{isEditing ? "Cancel" : "Edit"}</Button>
+                    <Button onClick={handleEditButton}>{isEditing ? "Cancel" : "Edit"}</Button>
                     {
                         isEditing ? <Button type={"submit"} color={"success"}>Save</Button> : null
                     }
@@ -359,6 +370,7 @@ function ParticipantRaceType(props: {setParticipant: (arg0: Components.Schemas.P
         initialValues: {
             raceTypeId: props.participant.race_type.id
         },
+        enableReinitialize: true,
         onSubmit: async (values, formikHelpers) => {
             formikHelpers.setSubmitting(true);
 
@@ -371,10 +383,11 @@ function ParticipantRaceType(props: {setParticipant: (arg0: Components.Schemas.P
                     {participant_id: props.participant.id ?? 0},
                     raceType,
                 );
+
+                setIsEditing(false);
                 props.setParticipant(response.data);
                 formikHelpers.setSubmitting(false);
-                formikHelpers.resetForm();
-                setIsEditing(false);
+                pushAlert("Race type edit saved successfully!", "success");
             } catch (e) {
                 const error = getAxiosError(e);
 
@@ -386,6 +399,14 @@ function ParticipantRaceType(props: {setParticipant: (arg0: Components.Schemas.P
             return null;
         }
     })
+
+    const handleEditButton = () => {
+        if (isEditing) {
+            formik.resetForm();
+            pushAlert("Changes canceled!", "warning");
+        }
+        setIsEditing((prevState) => !prevState);
+    }
 
     const getRaceType = (id: number): Components.Schemas.RaceTypeSchema | undefined => {
         if (raceTypesQuery.data == undefined) {
@@ -413,10 +434,7 @@ function ParticipantRaceType(props: {setParticipant: (arg0: Components.Schemas.P
                                                  onChange={formik.handleChange}
                     />
             }
-            <Button  onClick={() => {
-                setIsEditing((prevState) => !prevState);
-                formik.resetForm();
-            }}>
+            <Button  onClick={handleEditButton}>
                 { isEditing ? "Cancel" : "Edit" }
             </Button>
             {
@@ -439,12 +457,13 @@ function ParticipantRaceHeat(props: {setParticipant: (arg0: Components.Schemas.P
 
     const formik = useFormik({
         initialValues: {
-            heatId: props.participant.heat?.id ?? null
+            heatId: props.participant.heat?.id ?? -1
         },
+        enableReinitialize: true,
         onSubmit: async (values, formikHelpers) => {
             formikHelpers.setSubmitting(true);
 
-            const heat = getHeat(values.heatId ?? 0);
+            const heat = getHeat(values.heatId);
 
             const api = await getApiClient();
 
@@ -455,8 +474,8 @@ function ParticipantRaceHeat(props: {setParticipant: (arg0: Components.Schemas.P
                 );
                 props.setParticipant(response.data);
                 formikHelpers.setSubmitting(false);
-                formikHelpers.resetForm();
                 setIsEditing(false);
+                pushAlert("Heat saved successfully!", "success");
             } catch (e) {
                 const error = getAxiosError(e);
 
@@ -482,6 +501,7 @@ function ParticipantRaceHeat(props: {setParticipant: (arg0: Components.Schemas.P
     const handleEditButton = () => {
         if (isEditing) {
             formik.resetForm();
+            pushAlert("Changes canceled!", "warning");
         }
         setIsEditing((prevState) => !prevState);
     }
@@ -494,12 +514,15 @@ function ParticipantRaceHeat(props: {setParticipant: (arg0: Components.Schemas.P
                 {participant_id: props.participant.id ?? 0},
             );
             props.setParticipant(response.data);
+            pushAlert("Removed from heat!", "success");
         } catch (e) {
             const error = getAxiosError(e);
             if (error != null) {
                 pushAlert(error.response?.data ?? "There was an error", "error");
             }
         }
+
+        return null;
     }
 
     return (
@@ -531,7 +554,6 @@ function ParticipantRaceHeat(props: {setParticipant: (arg0: Components.Schemas.P
         </form>
     );
 }
-
 
 function ParticipantRaceCard(props: { participant: Components.Schemas.ParticipantSchema }) {
 
@@ -576,14 +598,7 @@ function ParticipantRaceCard(props: { participant: Components.Schemas.Participan
                                 {
                                     (commentsQuery.data as Components.Schemas.ParticipantCommentSchema[]).map(comment => {
                                             return (
-                                                <Card key={comment.id}>
-                                                    <CardContent>
-                                                        {comment.comment}
-                                                    </CardContent>
-                                                    <CardActions>
-                                                        <Typography variant={"caption"}>By: {comment.writer_name} | {comment.creation_date}</Typography>
-                                                    </CardActions>
-                                                </Card>
+                                                <CommentCard key={comment.id} comment={comment} />
                                             );
                                         }
                                     )
@@ -592,7 +607,7 @@ function ParticipantRaceCard(props: { participant: Components.Schemas.Participan
                         }
                     </Grid>
                     <Divider flexItem/>
-                    <Grid flexWrap={"nowrap"} sx={{p: 1}}>
+                    <Grid flexWrap={"nowrap"} sx={{ p: 1 }}>
                         <CommentInput participant_id={participant.id ?? 0} onCommentSubmit={onCommentSubmit}/>
                     </Grid>
                 </Grid>
