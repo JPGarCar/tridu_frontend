@@ -159,7 +159,7 @@ function ParticipantRaceListCard(props: {
         queryFn: () => getApiClient().then(client => client.participants_api_get_participants_for_user(props.userId)).then(res => res.data)
     });
 
-    const participants = (participantsQuery.data as Components.Schemas.ParticipantSchema[]);
+    const participants = participantsQuery.isLoading ? null : (participantsQuery.data as Components.Schemas.ParticipantSchema[]);
 
     if (participants && participants.length == 1) {
         props.setActiveParticipant(participants[0]);
@@ -174,7 +174,7 @@ function ParticipantRaceListCard(props: {
             <CardContent>
 
                 {
-                    participants.length > 0 ? <Stack spacing={2}>
+                    participants ? participants.length > 0 ? <Stack spacing={2}>
                         {
                             participants.map(participant => {
                                 return (
@@ -186,7 +186,7 @@ function ParticipantRaceListCard(props: {
                                 )
                             })
                         }
-                    </Stack> : <div>No races!</div>
+                    </Stack> : <div>No races!</div> : <div>Loading...</div>
                 }
 
 
