@@ -161,6 +161,10 @@ function ParticipantRaceListCard(props: {
 
     const participants = (participantsQuery.data as Components.Schemas.ParticipantSchema[]);
 
+    if (participants && participants.length == 1) {
+        props.setActiveParticipant(participants[0]);
+    }
+
     return (
         participantsQuery.isLoading ? <Skeleton /> : <Card>
             <Box textAlign={"center"} sx={{p: 0.75}}>
