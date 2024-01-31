@@ -11,12 +11,14 @@ export function useSnackbarService(): SnackbarServiceProps {
         severity: "info",
     })
 
-    const handleSnackbarClose = () => {
-        setSnackbarState({
-            isOpen: false,
-            message: "",
-            severity: "info",
-        });
+    const handleSnackbarClose = (_event: React.SyntheticEvent | Event, reason: string) => {
+        if (reason === "timeout") {
+            setSnackbarState((state) => ({
+                ...state,
+                isOpen: false,
+            }));
+        }
+
     }
 
     const pushAlert = (message: string, severity: AlertColor

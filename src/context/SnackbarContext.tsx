@@ -13,7 +13,7 @@ export function SnackbarServiceProvider(props: React.PropsWithChildren<{}>) {
     return (
         <SnackbarServiceContext.Provider value={snackbarServices}>
             <Snackbar open={snackbarServices.snackbarState.isOpen} autoHideDuration={5000} onClose={snackbarServices.handleSnackbarClose}>
-                <Alert onClose={snackbarServices.handleSnackbarClose} severity={snackbarServices.snackbarState.severity}>
+                <Alert onClose={(event) => {snackbarServices.handleSnackbarClose(event, "timeout" )}} severity={snackbarServices.snackbarState.severity}>
                     {snackbarServices.snackbarState.message}
                 </Alert>
             </Snackbar>
