@@ -8,6 +8,8 @@ import UserIconMenu from "./UserIconMenu.tsx";
 import {useAuthServiceContext} from "../context/AuthContext.tsx";
 import SearchAutocomplete from "../components/SearchAutocomplete.tsx";
 import {useNavigate} from "react-router-dom";
+import Grid from "@mui/material/Unstable_Grid2";
+import {name} from "axios";
 
 
 const PrimaryAppBar = () => {
@@ -19,13 +21,22 @@ const PrimaryAppBar = () => {
     return (
         <AppBar position="sticky">
             <Toolbar>
-                <Box flexGrow={1}>
-                    <ButtonBase onClick={() => {navigator("/")}}>
-                        <Typography variant="h6">
-                            TriDu App
-                        </Typography>
-                    </ButtonBase>
-                </Box>
+                <Grid flexGrow={1} container spacing={3} alignItems={"center"} flexWrap={"nowrap"}>
+                    <Grid>
+                        <ButtonBase onClick={() => {navigator("/")}}>
+                            <Typography variant="h6">
+                                TriDu App
+                            </Typography>
+                        </ButtonBase>
+                    </Grid>
+                    <Grid>
+                        <ButtonBase onClick={() => {navigator("/heats")}}>
+                            <Typography variant="button">
+                                Heats
+                            </Typography>
+                        </ButtonBase>
+                    </Grid>
+                </Grid>
                 <Box flexGrow={1/3}>
                     {
                         isLoggedIn ?

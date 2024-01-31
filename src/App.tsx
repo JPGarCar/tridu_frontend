@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import ProtectedRoute from "./services/ProtectedRoute..tsx";
 import Participant from "./pages/Participant.tsx";
 import MainLayout from "./layouts/MainLayout.tsx";
+import Heats from "./pages/Heats.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -12,6 +13,7 @@ const router = createBrowserRouter(
             <Route path="/login" element={<Login />} />
             <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Dashboard />} />
+                <Route path="/heats" element={<Heats />} />
                 <Route path="/participants/:userId" element={<Participant />} />
             </Route>
         </Route>
