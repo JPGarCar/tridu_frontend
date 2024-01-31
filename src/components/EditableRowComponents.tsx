@@ -1,5 +1,15 @@
 import {ChangeEventHandler, ReactNode} from "react";
-import {MenuItem, Select, SelectChangeEvent, Stack, Switch, TextField, Typography} from "@mui/material";
+import {
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    Stack,
+    Switch,
+    TextField,
+    Typography
+} from "@mui/material";
 
 function EditableRowStackTextField(props: {
     label: string,
@@ -38,13 +48,18 @@ function EditableRowStackSelectField<T extends number | string>(props: {
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
             <Typography>{props.label}</Typography>
             {
-                props.editing ? <Select name={props.id} id={props.id} error={isError} label={props.label} value={props.value} onChange={props.onChange} variant="outlined" size={'small'} >
-                    {
-                        props.options.map(({key, value}) => {
-                            return <MenuItem key={value} value={value}>{key}</MenuItem>
-                        })
-                    }
-                </Select> : <Typography>{props.valueLabel}</Typography>
+                props.editing
+                    ? <FormControl>
+                        <InputLabel id={`label-for-${props.id}`}>{props.label}</InputLabel>
+                        <Select name={props.id} id={props.id} labelId={`label-for-${props.id}`} error={isError} label={props.label} value={props.value} onChange={props.onChange} variant="outlined" size={'small'} >
+                            {
+                                props.options.map(({key, value}) => {
+                                    return <MenuItem key={value} value={value}>{key}</MenuItem>
+                                })
+                            }
+                        </Select>
+                    </FormControl>
+                    : <Typography>{props.valueLabel}</Typography>
             }
         </Stack>
     );
