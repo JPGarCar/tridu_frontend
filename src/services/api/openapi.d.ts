@@ -9,6 +9,44 @@ import type {
 declare namespace Components {
     namespace Schemas {
         /**
+         * CreateHeatSchema
+         */
+        export interface CreateHeatSchema {
+            /**
+             * ID
+             */
+            id?: /* ID */ number | null;
+            /**
+             * Termination
+             */
+            termination: string;
+            /**
+             * Start Datetime
+             */
+            start_datetime: string; // date-time
+            /**
+             * HEX Color Code
+             * Color hex code with #
+             */
+            color?: /**
+             * HEX Color Code
+             * Color hex code with #
+             */
+            string | null;
+            /**
+             * Ideal Capacity
+             */
+            ideal_capacity?: /* Ideal Capacity */ number | null;
+            /**
+             * Race
+             */
+            race_id: number;
+            /**
+             * Race Type
+             */
+            race_type_id: number;
+        }
+        /**
          * HeatSchema
          */
         export interface HeatSchema {
@@ -18,6 +56,14 @@ declare namespace Components {
              * Name
              */
             name: string;
+            /**
+             * Participant Count
+             */
+            participant_count: number;
+            /**
+             * Avg Swim Time
+             */
+            avg_swim_time: string; // duration
             /**
              * ID
              */
@@ -35,6 +81,10 @@ declare namespace Components {
              * Color hex code with #
              */
             color: string;
+            /**
+             * Ideal Capacity
+             */
+            ideal_capacity?: number;
         }
         /**
          * Input
@@ -125,6 +175,7 @@ declare namespace Components {
             race: /* RaceSchema */ RaceSchema;
             race_type: /* RaceTypeSchema */ RaceTypeSchema;
             heat: /* HeatSchema */ HeatSchema | null;
+            user: /* UserSchema */ UserSchema;
             /**
              * ID
              */
@@ -153,6 +204,28 @@ declare namespace Components {
              * Is Active
              */
             is_active?: boolean;
+        }
+        /**
+         * PatchHeatSchema
+         */
+        export interface PatchHeatSchema {
+            /**
+             * Termination
+             */
+            termination: string;
+            /**
+             * Start Datetime
+             */
+            start_datetime: string; // date-time
+            /**
+             * HEX Color Code
+             * Color hex code with #
+             */
+            color: string;
+            /**
+             * Ideal Capacity
+             */
+            ideal_capacity?: number;
         }
         /**
          * PatchParticipantSchema
@@ -366,6 +439,26 @@ declare namespace Paths {
             export type $201 = /* UserSchema */ Components.Schemas.UserSchema;
         }
     }
+    namespace HeatsApiCreateHeat {
+        export type RequestBody = /* CreateHeatSchema */ Components.Schemas.CreateHeatSchema;
+        namespace Responses {
+            export type $201 = /* HeatSchema */ Components.Schemas.HeatSchema;
+        }
+    }
+    namespace HeatsApiGetHeat {
+        namespace Parameters {
+            /**
+             * Heat Id
+             */
+            export type HeatId = number;
+        }
+        export interface PathParameters {
+            heat_id: /* Heat Id */ Parameters.HeatId;
+        }
+        namespace Responses {
+            export type $200 = /* HeatSchema */ Components.Schemas.HeatSchema;
+        }
+    }
     namespace HeatsApiGetHeatsForRace {
         namespace Parameters {
             /**
@@ -381,6 +474,21 @@ declare namespace Paths {
              * Response
              */
             export type $200 = /* HeatSchema */ Components.Schemas.HeatSchema[];
+        }
+    }
+    namespace HeatsApiUpdateHeat {
+        namespace Parameters {
+            /**
+             * Heat Id
+             */
+            export type HeatId = number;
+        }
+        export interface PathParameters {
+            heat_id: /* Heat Id */ Parameters.HeatId;
+        }
+        export type RequestBody = /* PatchHeatSchema */ Components.Schemas.PatchHeatSchema;
+        namespace Responses {
+            export type $201 = /* HeatSchema */ Components.Schemas.HeatSchema;
         }
     }
     namespace ParticipantsApiChangeParticipantHeat {
@@ -495,6 +603,23 @@ declare namespace Paths {
             }
         }
     }
+    namespace ParticipantsApiGetParticipantsForHeat {
+        namespace Parameters {
+            /**
+             * Heat Id
+             */
+            export type HeatId = number;
+        }
+        export interface PathParameters {
+            heat_id: /* Heat Id */ Parameters.HeatId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
+        }
+    }
     namespace ParticipantsApiGetParticipantsForUser {
         namespace Parameters {
             /**
@@ -584,7 +709,7 @@ export interface OperationMethods {
    * accounts_api_get_user_by_id - Get User By Id
    */
   'accounts_api_get_user_by_id'(
-    parameters?: Parameters<Paths.AccountsApiGetUserById.PathParameters> | null,
+    parameters: Parameters<Paths.AccountsApiGetUserById.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AccountsApiGetUserById.Responses.$200 | Paths.AccountsApiGetUserById.Responses.$204>
@@ -592,7 +717,7 @@ export interface OperationMethods {
    * accounts_api_update_user - Update User
    */
   'accounts_api_update_user'(
-    parameters?: Parameters<Paths.AccountsApiUpdateUser.PathParameters> | null,
+    parameters: Parameters<Paths.AccountsApiUpdateUser.PathParameters>,
     data?: Paths.AccountsApiUpdateUser.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AccountsApiUpdateUser.Responses.$201>
@@ -600,7 +725,7 @@ export interface OperationMethods {
    * accounts_api_get_user_by_username - Get User By Username
    */
   'accounts_api_get_user_by_username'(
-    parameters?: Parameters<Paths.AccountsApiGetUserByUsername.PathParameters> | null,
+    parameters: Parameters<Paths.AccountsApiGetUserByUsername.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$200 | Paths.AccountsApiGetUserByUsername.Responses.$204>
@@ -616,15 +741,23 @@ export interface OperationMethods {
    * participants_api_get_participants_for_user - Get Participants For User
    */
   'participants_api_get_participants_for_user'(
-    parameters?: Parameters<Paths.ParticipantsApiGetParticipantsForUser.PathParameters> | null,
+    parameters: Parameters<Paths.ParticipantsApiGetParticipantsForUser.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiGetParticipantsForUser.Responses.$201 | Paths.ParticipantsApiGetParticipantsForUser.Responses.$204>
   /**
+   * participants_api_get_participants_for_heat - Get Participants For Heat
+   */
+  'participants_api_get_participants_for_heat'(
+    parameters: Parameters<Paths.ParticipantsApiGetParticipantsForHeat.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiGetParticipantsForHeat.Responses.$200>
+  /**
    * participants_api_update_participant - Update Participant
    */
   'participants_api_update_participant'(
-    parameters?: Parameters<Paths.ParticipantsApiUpdateParticipant.PathParameters> | null,
+    parameters: Parameters<Paths.ParticipantsApiUpdateParticipant.PathParameters>,
     data?: Paths.ParticipantsApiUpdateParticipant.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiUpdateParticipant.Responses.$201>
@@ -632,7 +765,7 @@ export interface OperationMethods {
    * participants_api_reactivate_participant - Reactivate Participant
    */
   'participants_api_reactivate_participant'(
-    parameters?: Parameters<Paths.ParticipantsApiReactivateParticipant.PathParameters> | null,
+    parameters: Parameters<Paths.ParticipantsApiReactivateParticipant.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiReactivateParticipant.Responses.$201>
@@ -640,7 +773,7 @@ export interface OperationMethods {
    * participants_api_change_participant_race_type - Change Participant Race Type
    */
   'participants_api_change_participant_race_type'(
-    parameters?: Parameters<Paths.ParticipantsApiChangeParticipantRaceType.PathParameters> | null,
+    parameters: Parameters<Paths.ParticipantsApiChangeParticipantRaceType.PathParameters>,
     data?: Paths.ParticipantsApiChangeParticipantRaceType.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiChangeParticipantRaceType.Responses.$201>
@@ -648,7 +781,7 @@ export interface OperationMethods {
    * participants_api_change_participant_heat - Change Participant Heat
    */
   'participants_api_change_participant_heat'(
-    parameters?: Parameters<Paths.ParticipantsApiChangeParticipantHeat.PathParameters> | null,
+    parameters: Parameters<Paths.ParticipantsApiChangeParticipantHeat.PathParameters>,
     data?: Paths.ParticipantsApiChangeParticipantHeat.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiChangeParticipantHeat.Responses.$201>
@@ -656,7 +789,7 @@ export interface OperationMethods {
    * participants_api_remove_participant_heat - Remove Participant Heat
    */
   'participants_api_remove_participant_heat'(
-    parameters?: Parameters<Paths.ParticipantsApiRemoveParticipantHeat.PathParameters> | null,
+    parameters: Parameters<Paths.ParticipantsApiRemoveParticipantHeat.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiRemoveParticipantHeat.Responses.$201>
@@ -664,7 +797,7 @@ export interface OperationMethods {
    * participants_api_deactivate_participant - Deactivate Participant
    */
   'participants_api_deactivate_participant'(
-    parameters?: Parameters<Paths.ParticipantsApiDeactivateParticipant.PathParameters> | null,
+    parameters: Parameters<Paths.ParticipantsApiDeactivateParticipant.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiDeactivateParticipant.Responses.$201>
@@ -672,7 +805,7 @@ export interface OperationMethods {
    * participants_api_get_participant_comments - Get Participant Comments
    */
   'participants_api_get_participant_comments'(
-    parameters?: Parameters<Paths.ParticipantsApiGetParticipantComments.PathParameters> | null,
+    parameters: Parameters<Paths.ParticipantsApiGetParticipantComments.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiGetParticipantComments.Responses.$200 | Paths.ParticipantsApiGetParticipantComments.Responses.$204>
@@ -680,7 +813,7 @@ export interface OperationMethods {
    * participants_api_create_participant_comment - Create Participant Comment
    */
   'participants_api_create_participant_comment'(
-    parameters?: Parameters<Paths.ParticipantsApiCreateParticipantComment.PathParameters> | null,
+    parameters: Parameters<Paths.ParticipantsApiCreateParticipantComment.PathParameters>,
     data?: Paths.ParticipantsApiCreateParticipantComment.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiCreateParticipantComment.Responses.$201>
@@ -688,7 +821,7 @@ export interface OperationMethods {
    * participants_api_delete_participant_comment - Delete Participant Comment
    */
   'participants_api_delete_participant_comment'(
-    parameters?: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters> | null,
+    parameters: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiDeleteParticipantComment.Responses.$200>
@@ -712,10 +845,34 @@ export interface OperationMethods {
    * heats_api_get_heats_for_race - Get Heats For Race
    */
   'heats_api_get_heats_for_race'(
-    parameters?: Parameters<Paths.HeatsApiGetHeatsForRace.PathParameters> | null,
+    parameters: Parameters<Paths.HeatsApiGetHeatsForRace.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.HeatsApiGetHeatsForRace.Responses.$200>
+  /**
+   * heats_api_get_heat - Get Heat
+   */
+  'heats_api_get_heat'(
+    parameters: Parameters<Paths.HeatsApiGetHeat.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.HeatsApiGetHeat.Responses.$200>
+  /**
+   * heats_api_update_heat - Update Heat
+   */
+  'heats_api_update_heat'(
+    parameters: Parameters<Paths.HeatsApiUpdateHeat.PathParameters>,
+    data?: Paths.HeatsApiUpdateHeat.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.HeatsApiUpdateHeat.Responses.$201>
+  /**
+   * heats_api_create_heat - Create Heat
+   */
+  'heats_api_create_heat'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: Paths.HeatsApiCreateHeat.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.HeatsApiCreateHeat.Responses.$201>
 }
 
 export interface PathsDictionary {
@@ -724,7 +881,7 @@ export interface PathsDictionary {
      * accounts_api_get_user_by_id - Get User By Id
      */
     'get'(
-      parameters?: Parameters<Paths.AccountsApiGetUserById.PathParameters> | null,
+      parameters: Parameters<Paths.AccountsApiGetUserById.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AccountsApiGetUserById.Responses.$200 | Paths.AccountsApiGetUserById.Responses.$204>
@@ -732,7 +889,7 @@ export interface PathsDictionary {
      * accounts_api_update_user - Update User
      */
     'patch'(
-      parameters?: Parameters<Paths.AccountsApiUpdateUser.PathParameters> | null,
+      parameters: Parameters<Paths.AccountsApiUpdateUser.PathParameters>,
       data?: Paths.AccountsApiUpdateUser.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AccountsApiUpdateUser.Responses.$201>
@@ -742,7 +899,7 @@ export interface PathsDictionary {
      * accounts_api_get_user_by_username - Get User By Username
      */
     'get'(
-      parameters?: Parameters<Paths.AccountsApiGetUserByUsername.PathParameters> | null,
+      parameters: Parameters<Paths.AccountsApiGetUserByUsername.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$200 | Paths.AccountsApiGetUserByUsername.Responses.$204>
@@ -762,17 +919,27 @@ export interface PathsDictionary {
      * participants_api_get_participants_for_user - Get Participants For User
      */
     'get'(
-      parameters?: Parameters<Paths.ParticipantsApiGetParticipantsForUser.PathParameters> | null,
+      parameters: Parameters<Paths.ParticipantsApiGetParticipantsForUser.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiGetParticipantsForUser.Responses.$201 | Paths.ParticipantsApiGetParticipantsForUser.Responses.$204>
+  }
+  ['/api/participants/heat/{heat_id}']: {
+    /**
+     * participants_api_get_participants_for_heat - Get Participants For Heat
+     */
+    'get'(
+      parameters: Parameters<Paths.ParticipantsApiGetParticipantsForHeat.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiGetParticipantsForHeat.Responses.$200>
   }
   ['/api/participants/{participant_id}']: {
     /**
      * participants_api_update_participant - Update Participant
      */
     'patch'(
-      parameters?: Parameters<Paths.ParticipantsApiUpdateParticipant.PathParameters> | null,
+      parameters: Parameters<Paths.ParticipantsApiUpdateParticipant.PathParameters>,
       data?: Paths.ParticipantsApiUpdateParticipant.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiUpdateParticipant.Responses.$201>
@@ -782,7 +949,7 @@ export interface PathsDictionary {
      * participants_api_reactivate_participant - Reactivate Participant
      */
     'patch'(
-      parameters?: Parameters<Paths.ParticipantsApiReactivateParticipant.PathParameters> | null,
+      parameters: Parameters<Paths.ParticipantsApiReactivateParticipant.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiReactivateParticipant.Responses.$201>
@@ -792,7 +959,7 @@ export interface PathsDictionary {
      * participants_api_change_participant_race_type - Change Participant Race Type
      */
     'patch'(
-      parameters?: Parameters<Paths.ParticipantsApiChangeParticipantRaceType.PathParameters> | null,
+      parameters: Parameters<Paths.ParticipantsApiChangeParticipantRaceType.PathParameters>,
       data?: Paths.ParticipantsApiChangeParticipantRaceType.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiChangeParticipantRaceType.Responses.$201>
@@ -802,7 +969,7 @@ export interface PathsDictionary {
      * participants_api_change_participant_heat - Change Participant Heat
      */
     'patch'(
-      parameters?: Parameters<Paths.ParticipantsApiChangeParticipantHeat.PathParameters> | null,
+      parameters: Parameters<Paths.ParticipantsApiChangeParticipantHeat.PathParameters>,
       data?: Paths.ParticipantsApiChangeParticipantHeat.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiChangeParticipantHeat.Responses.$201>
@@ -812,7 +979,7 @@ export interface PathsDictionary {
      * participants_api_remove_participant_heat - Remove Participant Heat
      */
     'patch'(
-      parameters?: Parameters<Paths.ParticipantsApiRemoveParticipantHeat.PathParameters> | null,
+      parameters: Parameters<Paths.ParticipantsApiRemoveParticipantHeat.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiRemoveParticipantHeat.Responses.$201>
@@ -822,7 +989,7 @@ export interface PathsDictionary {
      * participants_api_deactivate_participant - Deactivate Participant
      */
     'patch'(
-      parameters?: Parameters<Paths.ParticipantsApiDeactivateParticipant.PathParameters> | null,
+      parameters: Parameters<Paths.ParticipantsApiDeactivateParticipant.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiDeactivateParticipant.Responses.$201>
@@ -832,7 +999,7 @@ export interface PathsDictionary {
      * participants_api_get_participant_comments - Get Participant Comments
      */
     'get'(
-      parameters?: Parameters<Paths.ParticipantsApiGetParticipantComments.PathParameters> | null,
+      parameters: Parameters<Paths.ParticipantsApiGetParticipantComments.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiGetParticipantComments.Responses.$200 | Paths.ParticipantsApiGetParticipantComments.Responses.$204>
@@ -840,7 +1007,7 @@ export interface PathsDictionary {
      * participants_api_create_participant_comment - Create Participant Comment
      */
     'post'(
-      parameters?: Parameters<Paths.ParticipantsApiCreateParticipantComment.PathParameters> | null,
+      parameters: Parameters<Paths.ParticipantsApiCreateParticipantComment.PathParameters>,
       data?: Paths.ParticipantsApiCreateParticipantComment.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiCreateParticipantComment.Responses.$201>
@@ -850,7 +1017,7 @@ export interface PathsDictionary {
      * participants_api_delete_participant_comment - Delete Participant Comment
      */
     'delete'(
-      parameters?: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters> | null,
+      parameters: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiDeleteParticipantComment.Responses.$200>
@@ -880,10 +1047,38 @@ export interface PathsDictionary {
      * heats_api_get_heats_for_race - Get Heats For Race
      */
     'get'(
-      parameters?: Parameters<Paths.HeatsApiGetHeatsForRace.PathParameters> | null,
+      parameters: Parameters<Paths.HeatsApiGetHeatsForRace.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.HeatsApiGetHeatsForRace.Responses.$200>
+  }
+  ['/api/heats/{heat_id}']: {
+    /**
+     * heats_api_get_heat - Get Heat
+     */
+    'get'(
+      parameters: Parameters<Paths.HeatsApiGetHeat.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.HeatsApiGetHeat.Responses.$200>
+    /**
+     * heats_api_update_heat - Update Heat
+     */
+    'patch'(
+      parameters: Parameters<Paths.HeatsApiUpdateHeat.PathParameters>,
+      data?: Paths.HeatsApiUpdateHeat.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.HeatsApiUpdateHeat.Responses.$201>
+  }
+  ['/api/heats/']: {
+    /**
+     * heats_api_create_heat - Create Heat
+     */
+    'post'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: Paths.HeatsApiCreateHeat.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.HeatsApiCreateHeat.Responses.$201>
   }
 }
 
