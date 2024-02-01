@@ -139,7 +139,7 @@ function ParticipantPICard(props: {userId: string}) {
                                                          options={[{value: "U", key: "Undefined"}, {
                                                              value: "M",
                                                              key: "Male"
-                                                         }, {value: "F", key: "Female"}]}/>
+                                                         }, {value: "F", key: "Female"}, {value: "D", key: "Gender Diverse"}]}/>
                             <EditableRowStackTextField label={"Email:"} data={formik.values.email} id={"email"}
                                                        editing={isEditing}
                                                        onChange={formik.handleChange} error={formik.errors.email}/>
