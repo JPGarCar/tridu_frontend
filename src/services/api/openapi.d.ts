@@ -38,6 +38,10 @@ declare namespace Components {
              */
             ideal_capacity?: /* Ideal Capacity */ number | null;
             /**
+             * Pool
+             */
+            pool?: string;
+            /**
              * Race
              */
             race_id: number;
@@ -85,6 +89,10 @@ declare namespace Components {
              * Ideal Capacity
              */
             ideal_capacity?: number;
+            /**
+             * Pool
+             */
+            pool?: string;
         }
         /**
          * Input
@@ -226,6 +234,10 @@ declare namespace Components {
              * Ideal Capacity
              */
             ideal_capacity?: number;
+            /**
+             * Pool
+             */
+            pool?: string;
         }
         /**
          * PatchParticipantSchema
