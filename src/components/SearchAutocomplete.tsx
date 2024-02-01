@@ -1,6 +1,6 @@
 import {Autocomplete, InputAdornment, TextField} from "@mui/material";
 import {Search} from "@mui/icons-material";
-import {useState} from "react";
+import {SetStateAction, SyntheticEvent, useState} from "react";
 import {Components} from "../services/api/openapi";
 import {getApiClient} from "../services/api/api.ts";
 import {useNavigate} from "react-router-dom";
@@ -15,6 +15,19 @@ const SearchAutocomplete = () => {
 
     const navigate = useNavigate();
 
+    const onInputChangeHandle = async (_event: SyntheticEvent, value: SetStateAction<string>) => {
+        setInputValue(value);
+
+        const api = await getApiClient();
+        const response = await api.accounts_api_get_active_non_staff_users({
+            name: value.toString(), limit: 8
+        });
+
+        if (response.status === 200) {
+            setOptions(response.data.items);
+        }
+    }
+
     return (
         <Autocomplete
             sx={{ my: 1 }}
@@ -24,19 +37,8 @@ const SearchAutocomplete = () => {
             value={value}
             blurOnSelect={true}
             getOptionLabel={(option) => {return option.first_name + " " + option.last_name;}}
-            onInputChange={async (_event, value) => {
-                setInputValue(value);
-
-                const api = await getApiClient();
-                const response = await api.accounts_api_get_active_non_staff_users({
-                    name: value, limit: 8
-                });
-
-                if (response.status === 200) {
-                    setOptions(response.data.items);
-                }
-            }}
-            onChange={(event, value) => {
+            onInputChange={(event, value) => {void onInputChangeHandle(event, value)}}
+            onChange={(_event, value) => {
                 if (value) {
                     navigate(`/participants/${value.id}`);
                     setInputValue("");
