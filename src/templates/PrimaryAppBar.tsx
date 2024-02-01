@@ -9,8 +9,6 @@ import {useAuthServiceContext} from "../context/AuthContext.tsx";
 import SearchAutocomplete from "../components/SearchAutocomplete.tsx";
 import {useNavigate} from "react-router-dom";
 import Grid from "@mui/material/Unstable_Grid2";
-import {name} from "axios";
-
 
 const PrimaryAppBar = () => {
 
