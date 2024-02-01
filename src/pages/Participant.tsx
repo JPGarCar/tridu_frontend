@@ -33,6 +33,7 @@ import {getAxiosError} from "../services/api/apiError.ts";
 import SnackbarServiceProvider, {useSnackbarServiceContext} from "../context/SnackbarContext.tsx";
 import {CommentCard} from "../components/Comments.tsx";
 import * as Yup from 'yup';
+import CustomCard from "../components/CustomCard.tsx";
 
 
 function ParticipantPICard(props: {userId: string}) {
@@ -112,47 +113,58 @@ function ParticipantPICard(props: {userId: string}) {
     }
 
     return (
-        userQuery.isLoading ? <Skeleton /> : <Card>
-            <Box textAlign={"center"} sx={{p: 0.75}}>
-                <Typography variant={"h5"} component={"div"}>Personal Info</Typography>
-            </Box>
-            <Divider/>
-            <form onSubmit={formik.handleSubmit}>
-                <CardContent>
-                    <Stack spacing={2} sx={{ ml: 2 }}>
-                        <EditableRowStackTextField label={"First Name:"} data={formik.values.firstName} id={"firstName"}
-                                                   editing={isEditing} onChange={formik.handleChange} error={formik.errors.firstName}/>
-                        <EditableRowStackTextField label={"Last Name:"} data={formik.values.lastName} id={"lastName"}
-                                                   editing={isEditing} onChange={formik.handleChange} error={formik.errors.lastName}/>
-                        <Stack direction={"row"} spacing={4}>
-                            <EditableRowStackTextField label={"DOB (Y-M-D):"} data={formik.values.dob} id={"dob"}
-                                                       editing={isEditing} onChange={formik.handleChange} error={formik.errors.dob}/>
-                            <EditableRowStackTextField label={"Age:"} data={Math.abs(DateTime.fromISO(formik.values.dob ?? "").minus({year: 2023}).year).toString()} editing={false} id={"age"}
-                                                       onChange={formik.handleChange} error={undefined}/>
+        userQuery.isLoading ? <Skeleton />
+            : <CustomCard title={"Personal Info"}>
+                <form onSubmit={formik.handleSubmit}>
+                    <CardContent>
+                        <Stack spacing={2} sx={{ml: 2}}>
+                            <EditableRowStackTextField label={"First Name:"} data={formik.values.firstName} id={"firstName"}
+                                                       editing={isEditing} onChange={formik.handleChange}
+                                                       error={formik.errors.firstName}/>
+                            <EditableRowStackTextField label={"Last Name:"} data={formik.values.lastName} id={"lastName"}
+                                                       editing={isEditing} onChange={formik.handleChange}
+                                                       error={formik.errors.lastName}/>
+                            <Stack direction={"row"} spacing={4}>
+                                <EditableRowStackTextField label={"DOB (Y-M-D):"} data={formik.values.dob} id={"dob"}
+                                                           editing={isEditing} onChange={formik.handleChange}
+                                                           error={formik.errors.dob}/>
+                                <EditableRowStackTextField label={"Age:"}
+                                                           data={Math.abs(DateTime.fromISO(formik.values.dob ?? "").minus({year: 2023}).year).toString()}
+                                                           editing={false} id={"age"}
+                                                           onChange={formik.handleChange} error={undefined}/>
+                            </Stack>
+                            <EditableRowStackSelectField label={"Gender:"} value={formik.values.gender}
+                                                         valueLabel={formik.values.gender} id={"gender"} editing={isEditing}
+                                                         onChange={formik.handleChange} error={formik.errors.gender}
+                                                         options={[{value: "U", key: "Undefined"}, {
+                                                             value: "M",
+                                                             key: "Male"
+                                                         }, {value: "F", key: "Female"}]}/>
+                            <EditableRowStackTextField label={"Email:"} data={formik.values.email} id={"email"}
+                                                       editing={isEditing}
+                                                       onChange={formik.handleChange} error={formik.errors.email}/>
+                            <EditableRowStackTextField label={"Phone #:"} data={formik.values.phone} id={"phone"}
+                                                       editing={isEditing}
+                                                       onChange={formik.handleChange} error={formik.errors.phone}/>
                         </Stack>
-                        <EditableRowStackSelectField label={"Gender:"} value={formik.values.gender} valueLabel={formik.values.gender} id={"gender"} editing={isEditing}
-                                                     onChange={formik.handleChange} error={formik.errors.gender}
-                                                     options={[{value: "U", key: "Undefined"}, {value: "M", key: "Male"}, {value: "F", key: "Female"}]}/>
-                        <EditableRowStackTextField label={"Email:"} data={formik.values.email} id={"email"} editing={isEditing}
-                                                   onChange={formik.handleChange} error={formik.errors.email}/>
-                        <EditableRowStackTextField label={"Phone #:"} data={formik.values.phone} id={"phone"} editing={isEditing}
-                                                   onChange={formik.handleChange} error={formik.errors.phone}/>
-                    </Stack>
-                </CardContent>
-                <Divider/>
-                <CardActions>
-                    <Button onClick={handleEditButton}>{ isEditing ? "Cancel" : "Edit"}</Button>
-                    {
-                        isEditing ? <Button type={"submit"} color={"success"}>Save</Button> : null
-                    }
-                </CardActions>
-            </form>
-        </Card>
+                    </CardContent>
+                    <Divider/>
+                    <CardActions>
+                        <Button onClick={handleEditButton}>{isEditing ? "Cancel" : "Edit"}</Button>
+                        {
+                            isEditing ? <Button type={"submit"} color={"success"}>Save</Button> : null
+                        }
+                    </CardActions>
+                </form>
+            </CustomCard>
     );
 }
 
 function ParticipantRaceListCard(props: {
-        userId: string, activeParticipantId: number | null, setActiveParticipant: (arg0: Components.Schemas.ParticipantSchema) => void}) {
+    userId: string,
+    activeParticipantId: number | null,
+    setActiveParticipant: (arg0: Components.Schemas.ParticipantSchema) => void
+}) {
 
     const participantsQuery = useQuery({
         queryKey: ['getParticipantsForUser', props.userId],
@@ -166,38 +178,34 @@ function ParticipantRaceListCard(props: {
     }
 
     return (
-        participantsQuery.isLoading ? <Skeleton /> : <Card>
-            <Box textAlign={"center"} sx={{p: 0.75}}>
-                <Typography variant={"h5"} component={"div"}>Races</Typography>
-            </Box>
-            <Divider/>
-            <CardContent>
-
-                {
-                    participants ? participants.length > 0 ? <Stack spacing={2}>
-                        {
-                            participants.map(participant => {
-                                return (
-                                    <Card sx={participant.id === props.activeParticipantId ? { border: 2, borderColor: 'success.main' } : {}} key={participant.id} onClick={() => { props.setActiveParticipant(participant); }} >
-                                        <CardContent>
-                                            {participant.race.name}
-                                        </CardContent>
-                                    </Card>
-                                )
-                            })
-                        }
-                    </Stack> : <div>No races!</div> : <div>Loading...</div>
-                }
-
-
-            </CardContent>
-        </Card>
+        participantsQuery.isLoading ? <Skeleton/> : <CustomCard title={"Races"}>
+            {
+                participants ? participants.length > 0 ? <Stack spacing={2}>
+                    {
+                        participants.map(participant => {
+                            return (
+                                <Card sx={participant.id === props.activeParticipantId ? {
+                                    border: 2,
+                                    borderColor: 'success.main'
+                                } : {}} key={participant.id} onClick={() => {
+                                    props.setActiveParticipant(participant);
+                                }}>
+                                    <CardContent>
+                                        {participant.race.name}
+                                    </CardContent>
+                                </Card>
+                            )
+                        })
+                    }
+                </Stack> : <div>No races!</div> : <div>Loading...</div>
+            }
+        </CustomCard>
     );
 }
 
-function CommentInput(props: {participant_id: number, onCommentSubmit: () => void}) {
+function CommentInput(props: { participant_id: number, onCommentSubmit: () => void }) {
 
-    const { pushAlert } = useSnackbarServiceContext();
+    const {pushAlert} = useSnackbarServiceContext();
 
     const formik = useFormik({
         initialValues: {
@@ -211,7 +219,7 @@ function CommentInput(props: {participant_id: number, onCommentSubmit: () => voi
                 {
                     participant_id: props.participant_id,
                 },
-                { comment: values.commentText },
+                {comment: values.commentText},
             );
 
             if (response.status == 201) {
@@ -246,7 +254,11 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
 
     const { pushAlert } = useSnackbarServiceContext();
 
-    const swimTimeCreator = (swimTime: string): string => {
+    const swimTimeCreator = (swimTime: string | null): string => {
+        if (swimTime == null) {
+            return "N/A";
+        }
+
         const duration = Duration.fromISO(swimTime).shiftTo('minutes', 'seconds')
 
         return duration.toFormat("mm:ss")
@@ -256,7 +268,7 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
         const minutes = swimTime.substring(0, swimTime.indexOf(":"));
         const seconds = swimTime.substring(swimTime.indexOf(":") + 1);
 
-        return Duration.fromObject({minutes: minutes, second: seconds});
+        return Duration.fromObject({minutes: parseInt(minutes), second: parseInt(seconds)});
     }
 
     const ParticipantFormSchema = Yup.object({
@@ -274,7 +286,7 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
             bib_num: props.participant.bib_number,
             is_ftt: props.participant.is_ftt,
             team: props.participant.team,
-            swimTime: swimTimeCreator(props.participant.swim_time),
+            swimTime: swimTimeCreator(props.participant.swim_time ?? null),
             city: props.participant.origin.city,
             province: props.participant.origin.province,
             country: props.participant.origin.country,
@@ -313,7 +325,7 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
 
     const deactivateParticipant = async () => {
         const api = await getApiClient();
-        const response = await api.participants_api_deactivate_participant(props.participant.id);
+        const response = await api.participants_api_deactivate_participant(props.participant.id ?? 0);
 
         if (response.status == 201) {
             props.setParticipant(response.data);
@@ -324,7 +336,7 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
 
     const reactivateParticipant = async () => {
         const api = await getApiClient();
-        const response = await api.participants_api_reactivate_participant(props.participant.id);
+        const response = await api.participants_api_reactivate_participant(props.participant.id ?? 0);
 
         if (response.status == 201) {
             props.setParticipant(response.data);
@@ -353,7 +365,7 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
                                                        onChange={formik.handleChange} error={formik.errors.bib_num}/>
                             <EditableRowStackSwitch label={"Is FTT:"} checked={formik.values.is_ftt}
                                                     editing={isEditing} id={"is_ftt"}
-                                                    onChange={formik.handleChange} error={formik.errors.is_ftt}/>
+                                                    onChange={formik.handleChange}/>
                             <EditableRowStackTextField label={"Team:"} data={formik.values.team}
                                                        editing={isEditing} id={"team"}
                                                        onChange={formik.handleChange} error={formik.errors.team}/>
@@ -382,8 +394,8 @@ function ParticipantInformation(props: {setParticipant: (arg0: Components.Schema
                         isEditing ? <Button type={"submit"} color={"success"}>Save</Button> : null
                     }
                     {
-                        props.participant.is_active ? <Button color={"error"} onClick={deactivateParticipant}>De-Activate</Button> :
-                            <Button color={"success"} onClick={reactivateParticipant}>Re-Activate</Button>
+                        props.participant.is_active ? <Button color={"error"} onClick={() => {void deactivateParticipant()}}>De-Activate</Button> :
+                            <Button color={"success"} onClick={() => {void reactivateParticipant()}}>Re-Activate</Button>
                     }
                 </Grid>
             </Grid>
@@ -570,7 +582,7 @@ function ParticipantRaceHeat(props: {setParticipant: (arg0: Components.Schemas.P
                     <Skeleton variant={"text"}/> :
                     <EditableRowStackSelectField label={"Heat:"}
                                                  value={formik.values.heatId}
-                                                 valueLabel={getHeat(formik.values.heatId ?? 0)?.name}
+                                                 valueLabel={getHeat(formik.values.heatId)?.name}
                                                  editing={isEditing} id={"heatId"}
                                                  options={raceHeatsQuery.data.map(heat => ({
                                                      value: heat.id ?? 0,
@@ -583,7 +595,7 @@ function ParticipantRaceHeat(props: {setParticipant: (arg0: Components.Schemas.P
             {
                 props.participant.heat == null
                     ? <Button  onClick={handleEditButton}>{ isEditing ? "Cancel" : "Edit" }</Button>
-                    : <Button onClick={handleRemoveButton} color={"warning"}>Remove</Button>
+                    : <Button onClick={() => {void handleRemoveButton();}} color={"warning"}>Remove</Button>
             }
 
             {
@@ -598,7 +610,7 @@ function ParticipantRaceCard(props: { participant: Components.Schemas.Participan
 
     const commentsQuery = useQuery({
         queryKey: ['getComments', props.participant.id],
-        queryFn: () => getApiClient().then(client => client.participants_api_get_participant_comments(props.participant.id)).then(res => res.data)
+        queryFn: () => getApiClient().then(client => client.participants_api_get_participant_comments(props.participant.id ?? 0)).then(res => res.data)
     });
 
     const [participant, setParticipant] = useState(props.participant);
