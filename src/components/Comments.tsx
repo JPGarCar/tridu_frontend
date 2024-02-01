@@ -1,4 +1,4 @@
-import {Box, Card, CardActions, CardContent, IconButton, Typography} from "@mui/material";
+import {Box, Card, IconButton, Typography} from "@mui/material";
 import {Components} from "../services/api/openapi";
 import {DateTime} from "luxon";
 import {Delete} from "@mui/icons-material";
@@ -16,7 +16,8 @@ function CommentCard(props: {comment: Components.Schemas.ParticipantCommentSchem
     const handleOnClickDelete = async () => {
         const api = await getApiClient();
         const response = await api.participants_api_delete_participant_comment(
-            { comment_id: props.comment.id }
+                        // @ts-expect-error I dont know why this doesnt work
+            { comment_id: props.comment.id ?? undefined }
         );
 
         if (response.status === 200) {
@@ -32,7 +33,7 @@ function CommentCard(props: {comment: Components.Schemas.ParticipantCommentSchem
             </Box>
             <Grid container justifyContent={"space-between"} alignItems={"center"} sx={{ mx: 2, mb: 1 }}>
                 <Typography variant={"caption"}>By: {props.comment.writer_name} | {dateCreated.toFormat("yyyy LLL dd")}</Typography>
-                <IconButton size={"small"} onClick={handleOnClickDelete}><Delete fontSize={"small"} /></IconButton>
+                <IconButton size={"small"} onClick={() => {void handleOnClickDelete()}}><Delete fontSize={"small"} /></IconButton>
             </Grid>
         </Card>
     );
