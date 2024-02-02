@@ -1,4 +1,24 @@
-import {Box, Button, ButtonBase, Card, CardContent, Divider, Skeleton, Stack, Typography} from "@mui/material";
+import {
+    Box,
+    Button,
+    ButtonBase,
+    Card,
+    CardContent,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Divider,
+    FormControl,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Select,
+    Skeleton,
+    Stack,
+    TextField,
+    Typography
+} from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import SnackbarServiceProvider, {useSnackbarServiceContext} from "../context/SnackbarContext.tsx";
 import {useState} from "react";
@@ -10,31 +30,187 @@ import {DateTime, Duration} from "luxon";
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import {
-    EditableRowStackNumberField, EditableRowStackSelectField,
+    EditableRowStackNumberField,
+    EditableRowStackSelectField,
     EditableRowStackTextField,
     EditableRowStackTimeField
 } from "../components/EditableRowComponents.tsx";
 import LabelValueRow from "../components/LabelValueRow.tsx";
 import {useNavigate} from "react-router-dom";
+import {TimePicker} from "@mui/x-date-pickers";
+import {DeleteSharp} from "@mui/icons-material";
 
+
+const PoolOptions = [{key: "RECREATION", value: "Recreation"}, {key: "COMPETITIVE", value: "Competitive"}];
+
+function CreateHeatDialog(props: { isOpen: boolean, handleClose: () => void, raceId: number }) {
+
+    const raceId = 1;
+
+    const queryClient = useQueryClient();
+
+    const HeatFormCreateSchema = Yup.object({
+        raceId: Yup.number().required("Required!"),
+        raceType: Yup.string().required("Required!"),
+        termination: Yup.string().required("Required!").length(1, "Length must be 1!"),
+        color: Yup.string(),
+        startDateTime: Yup.date().required("Required!"),
+        idealCapacity: Yup.number().required("Required!").min(0, "Min value is 0!"),
+        pool: Yup.string().required("Required!"),
+    })
+
+    const formik = useFormik({
+        initialValues: {
+            raceId: raceId,
+            raceType: "",
+            termination: "",
+            startDateTime: DateTime.now(),
+            color: "",
+            idealCapacity: 0,
+            pool: "",
+        },
+        validationSchema: HeatFormCreateSchema,
+        onSubmit: async (values) => {
+            const api = await getApiClient();
+            const response = await api.heats_api_create_heat(
+                null,
+                {
+                    race_id: values.raceId,
+                    race_type_id: parseInt(values.raceType),
+                    termination: values.termination,
+                    start_datetime: values.startDateTime.toISO(),
+                    color: values.color,
+                    ideal_capacity: values.idealCapacity,
+                    pool: values.pool,
+                }
+            );
+
+            if (response.status === 201) {
+                queryClient.setQueryData(
+                    ["heatsQuery"],
+                    (oldData: Components.Schemas.HeatSchema[]) => {
+                        oldData.push(response.data)
+                        return oldData;
+                    }
+                );
+                props.handleClose();
+            }
+        }
+    });
+
+    const raceTypesQuery = useQuery({
+        queryKey: ["raceTypes"],
+        queryFn: () => getApiClient().then(client => client.race_api_get_race_types()).then(res => res.data)
+    });
+
+    return (
+        <Dialog open={props.isOpen} onClose={() => {props.handleClose();}} >
+            <DialogTitle>Create Heat</DialogTitle>
+            <form onSubmit={formik.handleSubmit}>
+                <DialogContent>
+                    <Stack spacing={2}>
+                        <TextField label={"Category"} value={formik.values.termination}
+                                   onChange={formik.handleChange} id={"termination"}
+                                   error={formik.errors.termination != undefined}
+                                   helperText={formik.errors.termination ?? ""} />
+                        <TextField label={"Color"} value={formik.values.color}
+                                   onChange={formik.handleChange} id={"color"}
+                                   error={formik.errors.color != undefined}
+                                   helperText={formik.errors.color ?? ""} />
+                        <TextField label={"Ideal Capacity"} value={formik.values.idealCapacity}
+                                   onChange={formik.handleChange} type={"number"} id={"idealCapacity"}
+                                   error={formik.errors.idealCapacity != undefined}
+                                   helperText={formik.errors.idealCapacity ?? ""} />
+                        <TimePicker label={"Start Time"} value={formik.values.startDateTime}
+                                    onChange={(value) => {void formik.setFieldValue("startDateTime", value, true)}}
+                                    slotProps={{
+                                        textField: {
+                                            error: formik.errors.startDateTime != undefined,
+                                            helperText: formik.errors.startDateTime?.invalidReason ?? ""
+                                        }
+                                    }}
+                        />
+                        <FormControl>
+                            <InputLabel id={`label-for-pool`}>Pool</InputLabel>
+                            <Select name={"pool"} id={"pool"} labelId={`label-for-pool`} error={formik.errors.pool != null}
+                                    label={"Pool"} value={formik.values.pool} onChange={formik.handleChange}
+                            >
+                                {
+                                    PoolOptions.map(({key, value}) => {
+                                        return <MenuItem key={value} value={value}>{key}</MenuItem>
+                                    })
+                                }
+                            </Select>
+                        </FormControl>
+
+                        {
+                            raceTypesQuery.isLoading ? <Skeleton variant={"rectangular"} />
+                                : raceTypesQuery.isError || raceTypesQuery.data == undefined
+                                    ? <div>Error... </div>
+                                    : <FormControl>
+                                        <InputLabel id={`label-for-raceType`}>Race Type</InputLabel>
+                                        <Select name={"raceType"} id={"raceType"} labelId={`label-for-raceType`} error={formik.errors.raceType != null}
+                                                label={"Race Type"} value={formik.values.raceType} onChange={formik.handleChange}
+                                        >
+                                            {
+                                                raceTypesQuery.data.map((raceType) => {
+                                                    if (raceType.id != null)
+                                                        return <MenuItem key={raceType.id} value={raceType.id}>{raceType.name}</MenuItem>
+                                                })
+                                            }
+                                        </Select>
+                                    </FormControl>
+                        }
+                    </Stack>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => {props.handleClose();}}>Cancel</Button>
+                    <Button type={"submit"} color={"success"}>Create</Button>
+                </DialogActions>
+            </form>
+        </Dialog>
+    )
+}
 
 function HeatListCard(props: {activeHeatId: number, setActiveHeatId: (arg0: number) => void}) {
 
+    const raceId = 1;
+
+    const queryClient = useQueryClient();
+
     const heatsQuery = useQuery({
         queryKey: ['heatsQuery'],
-        queryFn: () => getApiClient().then(apiClient => apiClient.heats_api_get_heats_for_race({ race_id: 1 }).then(res => res.data))
+        queryFn: () => getApiClient().then(apiClient => apiClient.heats_api_get_heats_for_race({ race_id: raceId }).then(res => res.data))
     });
+
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const getFormattedHeatStartDateTime = (datetimeString: string) => {
         const dateTime = DateTime.fromISO(datetimeString);
 
-        return dateTime.toFormat("LLL dd, t")
+        return dateTime.toFormat("t")
+    }
+
+    const handleHeatDelete = async (heatId: number) => {
+        const api = await getApiClient();
+        const response = await api.heats_api_delete_heat({ heat_id: heatId});
+
+        if (response.status === 204) {
+            queryClient.setQueryData(
+                ["heatsQuery"],
+                (oldData: Components.Schemas.HeatSchema[]) => {
+                    return oldData.filter((value) => value.id != heatId);
+                }
+            )
+        }
     }
 
     return (
       <CustomCard title={"Heats"}>
           <Grid sx={{ pt: 0 }}>
-              <Button size={"small"} color={"success"}>New</Button>
+              <Button size={"small"} color={"success"} variant={"outlined"} onClick={() => {setIsDialogOpen(true);}}>New</Button>
+              <CreateHeatDialog isOpen={isDialogOpen} handleClose={() => {setIsDialogOpen(false);}}
+                                raceId={raceId} />
           </Grid>
           <Divider />
           <Stack spacing={2} sx={{ mt: 2 }}>
@@ -48,14 +224,21 @@ function HeatListCard(props: {activeHeatId: number, setActiveHeatId: (arg0: numb
                               <Card sx={heat.id === props.activeHeatId ? {
                                   border: 2,
                                   borderColor: 'success.main'
-                              } : {}} key={heat.id} onClick={() => {
-                                  if (heat.id) {
-                                      props.setActiveHeatId(heat.id);
-                                  }
-                              }}>
+                              } : {}} key={heat.id}>
                                   <CardContent>
-                                      <Typography variant={"body1"}>{`${heat.race_type.name} ${heat.termination} - ${heat.participant_count}/${heat.ideal_capacity}`}</Typography>
-                                      <Typography variant={"caption"}>{getFormattedHeatStartDateTime(heat.start_datetime)}</Typography>
+                                      <Grid container>
+                                          <Grid xs={10} onClick={() => {
+                                              if (heat.id) {
+                                                  props.setActiveHeatId(heat.id);
+                                              }
+                                          }}>
+                                              <Typography variant={"body1"}>{`${heat.race_type.name} ${heat.termination} - ${heat.participant_count}/${heat.ideal_capacity}`}</Typography>
+                                              <Typography variant={"caption"}>{getFormattedHeatStartDateTime(heat.start_datetime)} | {heat.pool} Pool</Typography>
+                                          </Grid>
+                                          <Grid xs>
+                                              <IconButton onClick={() => {void handleHeatDelete(heat.id ?? -1);}}><DeleteSharp color={"error"} /></IconButton>
+                                          </Grid>
+                                      </Grid>
                                   </CardContent>
                               </Card>
                           );
@@ -134,7 +317,7 @@ function HeatInformationForm(props: {heat: Components.Schemas.HeatSchema, onHeat
                                                      onChange={formik.handleChange} />
                         <EditableRowStackSelectField label={"Pool: "} value={formik.values.pool} valueLabel={formik.values.pool}
                                                      editing={isEditing} id={"pool"} error={formik.errors.pool} onChange={formik.handleChange}
-                                                     options={[{key: "RECREATION", value: "Recreation"}, {key: "COMPETITIVE", value: "Competitive"}]} />
+                                                     options={PoolOptions} />
                         <EditableRowStackTimeField label={"Start Time: "} data={formik.values.startDateTime} editing={isEditing}
                                                    id={"startDateTime"} error={formik.errors.startDateTime}
                                                    setFieldValue={(arg0, arg1, arg2) => {void formik.setFieldValue(arg0, arg1, arg2)}}

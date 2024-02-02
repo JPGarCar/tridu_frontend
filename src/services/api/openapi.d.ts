@@ -457,6 +457,21 @@ declare namespace Paths {
             export type $201 = /* HeatSchema */ Components.Schemas.HeatSchema;
         }
     }
+    namespace HeatsApiDeleteHeat {
+        namespace Parameters {
+            /**
+             * Heat Id
+             */
+            export type HeatId = number;
+        }
+        export interface PathParameters {
+            heat_id: /* Heat Id */ Parameters.HeatId;
+        }
+        namespace Responses {
+            export interface $204 {
+            }
+        }
+    }
     namespace HeatsApiGetHeat {
         namespace Parameters {
             /**
@@ -878,6 +893,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.HeatsApiUpdateHeat.Responses.$201>
   /**
+   * heats_api_delete_heat - Delete Heat
+   */
+  'heats_api_delete_heat'(
+    parameters: Parameters<Paths.HeatsApiDeleteHeat.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.HeatsApiDeleteHeat.Responses.$204>
+  /**
    * heats_api_create_heat - Create Heat
    */
   'heats_api_create_heat'(
@@ -1081,6 +1104,14 @@ export interface PathsDictionary {
       data?: Paths.HeatsApiUpdateHeat.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.HeatsApiUpdateHeat.Responses.$201>
+    /**
+     * heats_api_delete_heat - Delete Heat
+     */
+    'delete'(
+      parameters: Parameters<Paths.HeatsApiDeleteHeat.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.HeatsApiDeleteHeat.Responses.$204>
   }
   ['/api/heats/']: {
     /**
