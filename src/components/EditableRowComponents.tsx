@@ -56,7 +56,7 @@ function EditableRowStackSelectField<T extends number | string>(props: {
                         <InputLabel id={`label-for-${props.id}`}>{props.label}</InputLabel>
                         <Select name={props.id} id={props.id} labelId={`label-for-${props.id}`} error={isError}
                                 label={props.label} value={props.value} onChange={props.onChange} variant="outlined"
-                                size={'small'}>
+                                size={'small'} sx={{ minWidth: 100 }}>
                             {
                                 props.options.map(({key, value}) => {
                                     return <MenuItem key={value} value={value}>{key}</MenuItem>
