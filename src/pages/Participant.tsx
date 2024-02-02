@@ -582,7 +582,7 @@ function ParticipantRaceHeat(props: {setParticipant: (arg0: Components.Schemas.P
                     <Skeleton variant={"text"}/> :
                     <EditableRowStackSelectField label={"Heat:"}
                                                  value={formik.values.heatId}
-                                                 valueLabel={getHeat(formik.values.heatId)?.name}
+                                                 valueLabel={getHeat(formik.values.heatId)?.name ?? "No Heat"}
                                                  editing={isEditing} id={"heatId"}
                                                  options={raceHeatsQuery.data.map(heat => ({
                                                      value: heat.id ?? 0,
