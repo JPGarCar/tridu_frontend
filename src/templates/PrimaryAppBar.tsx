@@ -27,12 +27,21 @@ const PrimaryAppBar = () => {
                             </Typography>
                         </ButtonBase>
                     </Grid>
-                    <Grid>
-                        <ButtonBase onClick={() => {navigator("/heats")}}>
-                            <Typography variant="button">
-                                Heats
-                            </Typography>
-                        </ButtonBase>
+                    <Grid spacing={2} container>
+                        <Grid>
+                            <ButtonBase onClick={() => {navigator("/heats")}}>
+                                <Typography variant="button">
+                                    Heats
+                                </Typography>
+                            </ButtonBase>
+                        </Grid>
+                        <Grid>
+                            <ButtonBase onClick={() => {navigator("/participants/create")}}>
+                                <Typography variant="button">
+                                    Create Participant
+                                </Typography>
+                            </ButtonBase>
+                        </Grid>
                     </Grid>
                 </Grid>
                 <Box flexGrow={1/3}>

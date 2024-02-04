@@ -51,6 +51,65 @@ declare namespace Components {
             race_type_id: number;
         }
         /**
+         * CreateParticipantSchema
+         */
+        export interface CreateParticipantSchema {
+            origin: /* LocationSchema */ LocationSchema;
+            /**
+             * Bib Number
+             */
+            bib_number: number;
+            /**
+             * Is First Time Triathlete
+             */
+            is_ftt?: boolean;
+            /**
+             * Team Name
+             */
+            team: string;
+            /**
+             * Swim Time
+             */
+            swim_time?: /* Swim Time */ string /* duration */ | null;
+            /**
+             * Race
+             */
+            race_id: number;
+            /**
+             * Race Type
+             */
+            race_type_id: number;
+        }
+        /**
+         * CreateUserSchema
+         */
+        export interface CreateUserSchema {
+            /**
+             * First Name
+             */
+            first_name?: /* First Name */ string | null;
+            /**
+             * Last Name
+             */
+            last_name?: /* Last Name */ string | null;
+            /**
+             * Email Address
+             */
+            email?: /* Email Address */ string | null;
+            /**
+             * Phone Number
+             */
+            phone_number?: /* Phone Number */ string | null;
+            /**
+             * Date Of Birth
+             */
+            date_of_birth?: /* Date Of Birth */ string /* date */ | null;
+            /**
+             * Gender
+             */
+            gender?: string;
+        }
+        /**
          * HeatSchema
          */
         export interface HeatSchema {
@@ -380,6 +439,12 @@ declare namespace Components {
     }
 }
 declare namespace Paths {
+    namespace AccountsApiCreateUser {
+        export type RequestBody = /* CreateUserSchema */ Components.Schemas.CreateUserSchema;
+        namespace Responses {
+            export type $201 = /* UserSchema */ Components.Schemas.UserSchema;
+        }
+    }
     namespace AccountsApiGetActiveNonStaffUsers {
         namespace Parameters {
             /**
@@ -554,6 +619,21 @@ declare namespace Paths {
              * Response
              */
             export type $409 = string;
+        }
+    }
+    namespace ParticipantsApiCreateParticipant {
+        namespace Parameters {
+            /**
+             * User Id
+             */
+            export type UserId = number;
+        }
+        export interface PathParameters {
+            user_id: /* User Id */ Parameters.UserId;
+        }
+        export type RequestBody = /* CreateParticipantSchema */ Components.Schemas.CreateParticipantSchema;
+        namespace Responses {
+            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
         }
     }
     namespace ParticipantsApiCreateParticipantComment {
@@ -757,6 +837,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$200 | Paths.AccountsApiGetUserByUsername.Responses.$204>
   /**
+   * accounts_api_create_user - Create User
+   */
+  'accounts_api_create_user'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: Paths.AccountsApiCreateUser.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AccountsApiCreateUser.Responses.$201>
+  /**
    * accounts_api_get_active_non_staff_users - Get Active Non Staff Users
    */
   'accounts_api_get_active_non_staff_users'(
@@ -772,6 +860,14 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiGetParticipantsForUser.Responses.$201 | Paths.ParticipantsApiGetParticipantsForUser.Responses.$204>
+  /**
+   * participants_api_create_participant - Create Participant
+   */
+  'participants_api_create_participant'(
+    parameters: Parameters<Paths.ParticipantsApiCreateParticipant.PathParameters>,
+    data?: Paths.ParticipantsApiCreateParticipant.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiCreateParticipant.Responses.$201>
   /**
    * participants_api_get_participants_for_heat - Get Participants For Heat
    */
@@ -939,6 +1035,16 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$200 | Paths.AccountsApiGetUserByUsername.Responses.$204>
   }
+  ['/api/users/']: {
+    /**
+     * accounts_api_create_user - Create User
+     */
+    'post'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: Paths.AccountsApiCreateUser.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AccountsApiCreateUser.Responses.$201>
+  }
   ['/api/users/active/non-staff']: {
     /**
      * accounts_api_get_active_non_staff_users - Get Active Non Staff Users
@@ -950,6 +1056,14 @@ export interface PathsDictionary {
     ): OperationResponse<Paths.AccountsApiGetActiveNonStaffUsers.Responses.$200>
   }
   ['/api/participants/user/{user_id}/participants']: {
+    /**
+     * participants_api_create_participant - Create Participant
+     */
+    'post'(
+      parameters: Parameters<Paths.ParticipantsApiCreateParticipant.PathParameters>,
+      data?: Paths.ParticipantsApiCreateParticipant.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiCreateParticipant.Responses.$201>
     /**
      * participants_api_get_participants_for_user - Get Participants For User
      */

@@ -10,7 +10,7 @@ const MainLayout = () => {
             <AuthServiceProvider>
                 <CssBaseline />
                 <PrimaryAppBar />
-                <Box component="main" sx={{ height: "90%" }}>
+                <Box component="main" sx={{ height: "90%", overflow: "auto" }}>
                     <Outlet />
                 </Box>
             </AuthServiceProvider>
