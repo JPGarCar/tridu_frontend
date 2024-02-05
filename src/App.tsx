@@ -2,11 +2,12 @@ import {Route, createBrowserRouter, createRoutesFromElements, RouterProvider} fr
 import React from "react";
 import Login from "./pages/Login.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
-import ProtectedRoute from "./services/ProtectedRoute..tsx";
+import ProtectedRoute from "./services/ProtectedRoute.tsx";
 import Participant from "./pages/Participant.tsx";
 import MainLayout from "./layouts/MainLayout.tsx";
 import Heats from "./pages/Heats.tsx";
 import CreateParticipant from "./pages/createNewUserParticipant/CreateParticipant.tsx";
+import DataUpload from "./pages/dataUpload/DataUpload.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -19,6 +20,7 @@ const router = createBrowserRouter(
                     <Route path="/participants/:userId" element={<Participant />} />
                     <Route path="/participants/create" element={<CreateParticipant />} />
                 </Route>
+                <Route path="/data/upload" element={<DataUpload />} />
             </Route>
         </Route>
     )

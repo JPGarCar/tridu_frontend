@@ -42,6 +42,13 @@ const PrimaryAppBar = () => {
                                 </Typography>
                             </ButtonBase>
                         </Grid>
+                        <Grid>
+                            <ButtonBase onClick={() => {navigator("/data/upload")}}>
+                                <Typography variant="button">
+                                    Bulk Upload
+                                </Typography>
+                            </ButtonBase>
+                        </Grid>
                     </Grid>
                 </Grid>
                 <Box flexGrow={1/3}>
