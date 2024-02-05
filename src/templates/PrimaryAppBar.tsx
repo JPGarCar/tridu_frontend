@@ -36,6 +36,13 @@ const PrimaryAppBar = () => {
                             </ButtonBase>
                         </Grid>
                         <Grid>
+                            <ButtonBase onClick={() => {navigator("/races")}}>
+                                <Typography variant="button">
+                                    Races
+                                </Typography>
+                            </ButtonBase>
+                        </Grid>
+                        <Grid>
                             <ButtonBase onClick={() => {navigator("/participants/create")}}>
                                 <Typography variant="button">
                                     Create Participant

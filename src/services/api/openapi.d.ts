@@ -885,6 +885,12 @@ declare namespace Paths {
             export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
         }
     }
+    namespace RaceApiCreateRaceType {
+        export type RequestBody = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
+        namespace Responses {
+            export type $201 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
+        }
+    }
     namespace RaceApiGetRaceTypes {
         namespace Responses {
             /**
@@ -1064,6 +1070,14 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RaceApiGetRaceTypes.Responses.$200>
+  /**
+   * race_api_create_race_type - Create Race Type
+   */
+  'race_api_create_race_type'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: Paths.RaceApiCreateRaceType.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiCreateRaceType.Responses.$201>
   /**
    * race_api_get_races - Get Races
    */
@@ -1308,6 +1322,14 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.RaceApiGetRaceTypes.Responses.$200>
+    /**
+     * race_api_create_race_type - Create Race Type
+     */
+    'post'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: Paths.RaceApiCreateRaceType.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiCreateRaceType.Responses.$201>
   }
   ['/api/races/']: {
     /**

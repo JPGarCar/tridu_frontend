@@ -8,6 +8,7 @@ import MainLayout from "./layouts/MainLayout.tsx";
 import Heats from "./pages/Heats.tsx";
 import CreateParticipant from "./pages/createNewUserParticipant/CreateParticipant.tsx";
 import DataUpload from "./pages/dataUpload/DataUpload.tsx";
+import Races from "./pages/Races.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -16,6 +17,7 @@ const router = createBrowserRouter(
             <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/heats" element={<Heats />} />
+                <Route path="/races" element={<Races />} />
                 <Route path="/participants">
                     <Route path="/participants/:userId" element={<Participant />} />
                     <Route path="/participants/create" element={<CreateParticipant />} />
