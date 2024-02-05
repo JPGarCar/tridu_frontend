@@ -1,6 +1,7 @@
 import { OpenAPIClientAxios } from 'openapi-client-axios';
 import type { Client } from './openapi';
 import axios from 'axios';
+import {useNavigate} from "react-router-dom";
 
 const api = new OpenAPIClientAxios({
     definition: 'http://localhost:8000/api/openapi.json',
@@ -33,7 +34,7 @@ export const getApiClient = async () :Promise<Client> => {
         async (error) => {
             const originalRequest = error.config;
 
-            if (error.response.status === 401 && !originalRequest._retry) {
+            if (error.response != undefined && (error.response.status === 401 || error.response.status === 403) && !originalRequest._retry) {
                 originalRequest._retry = true;
 
                 try {
@@ -46,11 +47,9 @@ export const getApiClient = async () :Promise<Client> => {
                     originalRequest.headers.Authorization = `Bearer ${access}`;
                     return axios(originalRequest);
                 } catch (error) {
-                    // TODO redirect to login
+                    //todo
                 }
             }
-
-            return Promise.reject(error);
         }
     )
 
