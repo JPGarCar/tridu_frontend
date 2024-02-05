@@ -6,6 +6,7 @@ import {ComponentPreviews, useInitial} from "./dev";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterLuxon} from "@mui/x-date-pickers/AdapterLuxon";
+import AuthServiceProvider from "./context/AuthContext.tsx";
 
 
 const queryClient = new QueryClient();
@@ -18,7 +19,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         >
             <QueryClientProvider client={queryClient}>
                 <LocalizationProvider dateAdapter={AdapterLuxon}>
-                    <App/>
+                    <AuthServiceProvider>
+                        <App/>
+                    </AuthServiceProvider>
                 </LocalizationProvider>
             </QueryClientProvider>
         </DevSupport>
