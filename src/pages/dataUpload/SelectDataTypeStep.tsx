@@ -26,12 +26,19 @@ const dataTypeOptions: {name: string, schema: Yup.ObjectSchema<object>}[] = [
             email: Yup.string().email().trim(),
             phone_number: Yup.string().trim(),
             date_of_birth: Yup.date().required().transform((value, originalValue: string, context) => {
-                if (context.isType(value)) {
+                let newValue;
+                if (context.isType(value) && value.getFullYear() < DateTime.now().year) {
                     value.setUTCHours(0, 0, 0, 0);
                     return value;
                 }
 
-                const newValue = DateTime.fromISO(originalValue).set({hour: 0, minute: 0, second: 0, millisecond: 0});
+                if (!isNaN(parseInt(originalValue))) {
+                    const age = parseInt(originalValue);
+                    newValue = DateTime.now().toUTC().set({month: 1, day: 2, hour: 0, minute: 0, second: 0, millisecond: 0}).minus({year: age});
+                } else {
+                    newValue = DateTime.fromISO(originalValue).set({hour: 0, minute: 0, second: 0, millisecond: 0});
+                }
+
                 return newValue.isValid ? newValue.toJSDate() : new Date('');
             }),
             gender: Yup.string().default("U").trim(),
