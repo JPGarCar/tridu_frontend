@@ -1,12 +1,11 @@
 import { OpenAPIClientAxios } from 'openapi-client-axios';
 import type { Client } from './openapi';
 import axios from 'axios';
-import {useNavigate} from "react-router-dom";
 
 const api = new OpenAPIClientAxios({
-    definition: 'http://localhost:8000/api/openapi.json',
+    definition: `${import.meta.env.VITE_API_URL}/api/openapi.json`,
     withServer: {
-        url: "http://localhost:8000"
+        url: `${import.meta.env.VITE_API_URL}`
     }
 });
 
@@ -39,7 +38,7 @@ export const getApiClient = async () :Promise<Client> => {
 
                 try {
                     const refreshToken = localStorage.getItem('jwt_refreshToken');
-                    const response = await axios.post('http://localhost:8000/api/token/refresh/', { "refresh": refreshToken });
+                    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/token/refresh/`, { "refresh": refreshToken });
                     const { access } = response.data;
 
                     localStorage.setItem('jwt_token', access);

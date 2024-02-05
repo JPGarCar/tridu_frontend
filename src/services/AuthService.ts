@@ -28,7 +28,7 @@ export function useAuthService(): AuthServiceProps {
     const login = async (username: string, password: string) => {
         try {
             const response = await axios.post(
-                "http://localhost:8000/api/token/",
+                `${import.meta.env.VITE_API_URL}/api/token/`,
                 {
                     username,
                     password,

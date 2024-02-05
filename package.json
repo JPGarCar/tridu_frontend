@@ -22,6 +22,7 @@
     "@types/papaparse": "^5.3.14",
     "axios": "^1.6.2",
     "file-saver": "^2.0.5",
+    "firebase": "^10.8.0",
     "flat": "^6.0.1",
     "formik": "^2.4.5",
     "luxon": "^3.4.4",
