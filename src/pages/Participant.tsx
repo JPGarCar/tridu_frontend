@@ -155,7 +155,7 @@ function ParticipantPICard(props: { userId: string }) {
                 label={"Age:"}
                 data={Math.abs(
                   DateTime.fromISO(formik.values.dob ?? "").minus({
-                    year: 2023,
+                    year: DateTime.now().year,
                   }).year,
                 ).toString()}
                 editing={false}
