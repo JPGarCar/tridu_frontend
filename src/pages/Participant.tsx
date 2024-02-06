@@ -20,7 +20,7 @@ import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getApiClient } from "../services/api/api.ts";
 import type { Components } from "../services/api/openapi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { Error, Send } from "@mui/icons-material";
 import { DateTime, Duration } from "luxon";
@@ -235,9 +235,11 @@ function ParticipantRaceListCard(props: {
     ? null
     : (participantsQuery.data as Components.Schemas.ParticipantSchema[]);
 
-  if (participants && participants.length == 1) {
-    props.setActiveParticipant(participants[0]);
-  }
+  useEffect(() => {
+    if (participants && participants.length == 1) {
+      props.setActiveParticipant(participants[0]);
+    }
+  }, [participants, props]);
 
   return participantsQuery.isLoading ? (
     <Skeleton />
@@ -804,6 +806,7 @@ function ParticipantRaceHeat(props: {
 
 function ParticipantRaceCard(props: {
   participant: Components.Schemas.ParticipantSchema;
+  setParticipant: (arg0: Components.Schemas.ParticipantSchema) => void;
 }) {
   const commentsQuery = useQuery({
     queryKey: ["getComments", props.participant.id],
@@ -817,8 +820,6 @@ function ParticipantRaceCard(props: {
         .then((res) => res.data),
   });
 
-  const [participant, setParticipant] = useState(props.participant);
-
   const refreshComments = () => {
     void commentsQuery.refetch();
   };
@@ -830,9 +831,9 @@ function ParticipantRaceCard(props: {
     >
       <Box textAlign={"center"} sx={{ p: 0.75 }}>
         <Typography variant={"h5"} component={"div"}>
-          {participant.race.name} - {participant.bib_number}
+          {props.participant.race.name} - {props.participant.bib_number}
         </Typography>
-        {participant.is_active ? null : (
+        {props.participant.is_active ? null : (
           <Alert sx={{ m: 2 }} icon={<Error />} severity={"error"}>
             Inactive participant! Participant will not show up on heat or other
             exports.
@@ -843,18 +844,18 @@ function ParticipantRaceCard(props: {
       <Grid container flexGrow={1}>
         <Grid xs>
           <ParticipantInformation
-            setParticipant={setParticipant}
-            participant={participant}
+            setParticipant={props.setParticipant}
+            participant={props.participant}
           />
           <Divider flexItem />
           <Grid sx={{ m: 2 }}>
             <ParticipantRaceType
-              setParticipant={setParticipant}
-              participant={participant}
+              setParticipant={props.setParticipant}
+              participant={props.participant}
             />
             <ParticipantRaceHeat
-              setParticipant={setParticipant}
-              participant={participant}
+              setParticipant={props.setParticipant}
+              participant={props.participant}
             />
           </Grid>
         </Grid>
@@ -891,7 +892,7 @@ function ParticipantRaceCard(props: {
           <Divider flexItem />
           <Grid flexWrap={"nowrap"} sx={{ p: 1 }}>
             <CommentInput
-              participant_id={participant.id ?? 0}
+              participant_id={props.participant.id ?? 0}
               onCommentSubmit={refreshComments}
             />
           </Grid>
@@ -923,7 +924,10 @@ const Participant = () => {
           </Grid>
           <Grid xs>
             {activeParticipant != null ? (
-              <ParticipantRaceCard participant={activeParticipant} />
+              <ParticipantRaceCard
+                participant={activeParticipant}
+                setParticipant={setActiveParticipant}
+              />
             ) : (
               <div>Select a race first!</div>
             )}
