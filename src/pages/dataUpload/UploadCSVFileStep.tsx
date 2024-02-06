@@ -41,6 +41,12 @@ const UploadCSVFileStep = (props: {
         isCheckingHeaders: true,
         headersChecked: false,
       });
+      checkHeaders();
+    }
+  };
+
+  const checkHeaders = () => {
+    if (file) {
       // check headers first
       Papa.parse<string[]>(file, {
         header: false,
@@ -80,6 +86,12 @@ const UploadCSVFileStep = (props: {
   const handleFullParsing = () => {
     if (file) {
       setIsParsingData(true);
+      parseData();
+    }
+  };
+
+  const parseData = () => {
+    if (file) {
       Papa.parse<object>(file, {
         header: true,
         dynamicTyping: true,

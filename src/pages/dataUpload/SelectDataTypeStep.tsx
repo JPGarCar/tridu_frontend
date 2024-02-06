@@ -76,6 +76,7 @@ const dataTypeOptions: { name: string; schema: Yup.ObjectSchema<object> }[] = [
       team: Yup.string().notRequired().trim(),
       swim_time: Yup.string()
         .notRequired()
+        .trim()
         .matches(/^\d{2}:\d{2}$/, "Swim Time must be in format MM:SS"),
       city: Yup.string().notRequired().trim(),
       province: Yup.string()

@@ -92,6 +92,10 @@ declare namespace Components {
              */
             province?: /* Province */ string | null;
             /**
+             * Swim Time
+             */
+            swim_time?: /* Swim Time */ string | null;
+            /**
              * Bib Number
              */
             bib_number: number;
@@ -103,10 +107,6 @@ declare namespace Components {
              * Team Name
              */
             team?: /* Team Name */ string | null;
-            /**
-             * Swim Time
-             */
-            swim_time?: /* Swim Time */ string /* duration */ | null;
             /**
              * Race
              */
@@ -361,7 +361,7 @@ declare namespace Components {
             /**
              * Location
              */
-            location?: string;
+            location?: /* Location */ string | null;
         }
         /**
          * PatchHeatSchema
