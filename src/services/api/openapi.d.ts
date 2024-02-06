@@ -119,12 +119,16 @@ declare namespace Components {
              * User
              */
             user_id: number;
+            /**
+             * Location
+             */
+            location?: /* Location */ string | null;
         }
         /**
          * CreateParticipantSchema
          */
         export interface CreateParticipantSchema {
-            origin: /* LocationSchema */ LocationSchema;
+            origin?: /* LocationSchema */ LocationSchema | null;
             /**
              * Bib Number
              */
@@ -149,6 +153,19 @@ declare namespace Components {
              * Race Type
              */
             race_type_id: number;
+            /**
+             * Location
+             */
+            location?: /* Location */ string | null;
+        }
+        /**
+         * CreateRaceSchema
+         */
+        export interface CreateRaceSchema {
+            /**
+             * Name
+             */
+            name: string;
         }
         /**
          * CreateUserSchema
@@ -341,6 +358,10 @@ declare namespace Components {
              * Is Active
              */
             is_active?: boolean;
+            /**
+             * Location
+             */
+            location?: string;
         }
         /**
          * PatchHeatSchema
@@ -393,6 +414,10 @@ declare namespace Components {
              * Swim Time
              */
             swim_time?: /* Swim Time */ string /* duration */ | null;
+            /**
+             * Location
+             */
+            location?: /* Location */ string | null;
         }
         /**
          * PatchUserSchema
@@ -599,6 +624,7 @@ declare namespace Paths {
         export type RequestBody = /* CreateHeatSchema */ Components.Schemas.CreateHeatSchema;
         namespace Responses {
             export type $201 = /* HeatSchema */ Components.Schemas.HeatSchema;
+            export type $409 = /* HeatSchema */ Components.Schemas.HeatSchema;
         }
     }
     namespace HeatsApiDeleteHeat {
@@ -614,6 +640,10 @@ declare namespace Paths {
         namespace Responses {
             export interface $204 {
             }
+            /**
+             * Response
+             */
+            export type $404 = string;
         }
     }
     namespace HeatsApiGetHeat {
@@ -628,6 +658,10 @@ declare namespace Paths {
         }
         namespace Responses {
             export type $200 = /* HeatSchema */ Components.Schemas.HeatSchema;
+            /**
+             * Response
+             */
+            export type $404 = string;
         }
     }
     namespace HeatsApiGetHeatsForRace {
@@ -659,7 +693,11 @@ declare namespace Paths {
         }
         export type RequestBody = /* PatchHeatSchema */ Components.Schemas.PatchHeatSchema;
         namespace Responses {
-            export type $201 = /* HeatSchema */ Components.Schemas.HeatSchema;
+            export type $200 = /* HeatSchema */ Components.Schemas.HeatSchema;
+            /**
+             * Response
+             */
+            export type $404 = string;
         }
     }
     namespace ParticipantsApiChangeParticipantHeat {
@@ -885,10 +923,36 @@ declare namespace Paths {
             export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
         }
     }
+    namespace RaceApiCreateRace {
+        export type RequestBody = /* CreateRaceSchema */ Components.Schemas.CreateRaceSchema;
+        namespace Responses {
+            export type $201 = /* RaceSchema */ Components.Schemas.RaceSchema;
+        }
+    }
     namespace RaceApiCreateRaceType {
         export type RequestBody = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
         namespace Responses {
             export type $201 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
+            export type $409 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
+        }
+    }
+    namespace RaceApiDeleteRace {
+        namespace Parameters {
+            /**
+             * Id
+             */
+            export type Id = number;
+        }
+        export interface PathParameters {
+            id: /* Id */ Parameters.Id;
+        }
+        namespace Responses {
+            export interface $204 {
+            }
+            /**
+             * Response
+             */
+            export type $404 = string;
         }
     }
     namespace RaceApiGetRaceTypes {
@@ -991,6 +1055,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiCreateParticipantBulk.Responses.$201>
   /**
+   * participants_api_delete_participant_comment - Delete Participant Comment
+   */
+  'participants_api_delete_participant_comment'(
+    parameters: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiDeleteParticipantComment.Responses.$200>
+  /**
    * participants_api_reactivate_participant - Reactivate Participant
    */
   'participants_api_reactivate_participant'(
@@ -1055,14 +1127,6 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiUpdateParticipant.Responses.$201>
   /**
-   * participants_api_delete_participant_comment - Delete Participant Comment
-   */
-  'participants_api_delete_participant_comment'(
-    parameters: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters>,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiDeleteParticipantComment.Responses.$200>
-  /**
    * race_api_get_race_types - Get Race Types
    */
   'race_api_get_race_types'(
@@ -1079,6 +1143,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RaceApiCreateRaceType.Responses.$201>
   /**
+   * race_api_delete_race - Delete Race
+   */
+  'race_api_delete_race'(
+    parameters: Parameters<Paths.RaceApiDeleteRace.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiDeleteRace.Responses.$204>
+  /**
    * race_api_get_races - Get Races
    */
   'race_api_get_races'(
@@ -1086,6 +1158,22 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RaceApiGetRaces.Responses.$200>
+  /**
+   * race_api_create_race - Create Race
+   */
+  'race_api_create_race'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: Paths.RaceApiCreateRace.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiCreateRace.Responses.$201>
+  /**
+   * race_api_delete_race - Delete Race
+   */
+  'race_api_delete_race'(
+    parameters: Parameters<Paths.RaceApiDeleteRace.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiDeleteRace.Responses.$204>
   /**
    * heats_api_get_heats_for_race - Get Heats For Race
    */
@@ -1109,7 +1197,7 @@ export interface OperationMethods {
     parameters: Parameters<Paths.HeatsApiUpdateHeat.PathParameters>,
     data?: Paths.HeatsApiUpdateHeat.RequestBody,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.HeatsApiUpdateHeat.Responses.$201>
+  ): OperationResponse<Paths.HeatsApiUpdateHeat.Responses.$200>
   /**
    * heats_api_delete_heat - Delete Heat
    */
@@ -1225,6 +1313,16 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiCreateParticipantBulk.Responses.$201>
   }
+  ['/api/participants/comment/{comment_id}']: {
+    /**
+     * participants_api_delete_participant_comment - Delete Participant Comment
+     */
+    'delete'(
+      parameters: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiDeleteParticipantComment.Responses.$200>
+  }
   ['/api/participants/{participant_id}/reactivate']: {
     /**
      * participants_api_reactivate_participant - Reactivate Participant
@@ -1303,16 +1401,6 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiUpdateParticipant.Responses.$201>
   }
-  ['/api/participants/comment/{comment_id}']: {
-    /**
-     * participants_api_delete_participant_comment - Delete Participant Comment
-     */
-    'delete'(
-      parameters: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters>,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiDeleteParticipantComment.Responses.$200>
-  }
   ['/api/races/racetypes']: {
     /**
      * race_api_get_race_types - Get Race Types
@@ -1331,6 +1419,16 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.RaceApiCreateRaceType.Responses.$201>
   }
+  ['/api/races/racetypes/{id}']: {
+    /**
+     * race_api_delete_race - Delete Race
+     */
+    'delete'(
+      parameters: Parameters<Paths.RaceApiDeleteRace.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiDeleteRace.Responses.$204>
+  }
   ['/api/races/']: {
     /**
      * race_api_get_races - Get Races
@@ -1340,6 +1438,24 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.RaceApiGetRaces.Responses.$200>
+    /**
+     * race_api_create_race - Create Race
+     */
+    'post'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: Paths.RaceApiCreateRace.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiCreateRace.Responses.$201>
+  }
+  ['/api/races/{id}']: {
+    /**
+     * race_api_delete_race - Delete Race
+     */
+    'delete'(
+      parameters: Parameters<Paths.RaceApiDeleteRace.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiDeleteRace.Responses.$204>
   }
   ['/api/heats/race/{race_id}']: {
     /**
@@ -1367,7 +1483,7 @@ export interface PathsDictionary {
       parameters: Parameters<Paths.HeatsApiUpdateHeat.PathParameters>,
       data?: Paths.HeatsApiUpdateHeat.RequestBody,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.HeatsApiUpdateHeat.Responses.$201>
+    ): OperationResponse<Paths.HeatsApiUpdateHeat.Responses.$200>
     /**
      * heats_api_delete_heat - Delete Heat
      */

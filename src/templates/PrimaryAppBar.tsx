@@ -27,36 +27,40 @@ const PrimaryAppBar = () => {
                             </Typography>
                         </ButtonBase>
                     </Grid>
-                    <Grid spacing={2} container>
-                        <Grid>
-                            <ButtonBase onClick={() => {navigator("/heats")}}>
-                                <Typography variant="button">
-                                    Heats
-                                </Typography>
-                            </ButtonBase>
-                        </Grid>
-                        <Grid>
-                            <ButtonBase onClick={() => {navigator("/races")}}>
-                                <Typography variant="button">
-                                    Races
-                                </Typography>
-                            </ButtonBase>
-                        </Grid>
-                        <Grid>
-                            <ButtonBase onClick={() => {navigator("/participants/create")}}>
-                                <Typography variant="button">
-                                    Create Participant
-                                </Typography>
-                            </ButtonBase>
-                        </Grid>
-                        <Grid>
-                            <ButtonBase onClick={() => {navigator("/data/upload")}}>
-                                <Typography variant="button">
-                                    Bulk Upload
-                                </Typography>
-                            </ButtonBase>
-                        </Grid>
-                    </Grid>
+                    {
+                        isLoggedIn
+                            ? <Grid spacing={2} container>
+                                <Grid>
+                                    <ButtonBase onClick={() => {navigator("/heats")}}>
+                                        <Typography variant="button">
+                                            Heats
+                                        </Typography>
+                                    </ButtonBase>
+                                </Grid>
+                                <Grid>
+                                    <ButtonBase onClick={() => {navigator("/races")}}>
+                                        <Typography variant="button">
+                                            Races
+                                        </Typography>
+                                    </ButtonBase>
+                                </Grid>
+                                <Grid>
+                                    <ButtonBase onClick={() => {navigator("/participants/create")}}>
+                                        <Typography variant="button">
+                                            Create Participant
+                                        </Typography>
+                                    </ButtonBase>
+                                </Grid>
+                                <Grid>
+                                    <ButtonBase onClick={() => {navigator("/data/upload")}}>
+                                        <Typography variant="button">
+                                            Bulk Upload
+                                        </Typography>
+                                    </ButtonBase>
+                                </Grid>
+                            </Grid>
+                            : null
+                    }
                 </Grid>
                 <Box flexGrow={1/3}>
                     {
