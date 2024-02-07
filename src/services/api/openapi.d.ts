@@ -534,6 +534,18 @@ declare namespace Components {
     }
 }
 declare namespace Paths {
+    namespace AccountsApiAdminActionCleanGender {
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = string;
+            /**
+             * Response
+             */
+            export type $403 = string;
+        }
+    }
     namespace AccountsApiCreateUser {
         export type RequestBody = /* CreateUserSchema */ Components.Schemas.CreateUserSchema;
         namespace Responses {
@@ -999,6 +1011,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AccountsApiCreateUsersBulk.Responses.$201>
   /**
+   * accounts_api_admin_action_clean_gender - Admin Action Clean Gender
+   */
+  'accounts_api_admin_action_clean_gender'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AccountsApiAdminActionCleanGender.Responses.$200>
+  /**
    * accounts_api_get_user_by_id - Get User By Id
    */
   'accounts_api_get_user_by_id'(
@@ -1246,6 +1266,16 @@ export interface PathsDictionary {
       data?: Paths.AccountsApiCreateUsersBulk.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AccountsApiCreateUsersBulk.Responses.$201>
+  }
+  ['/api/users/action/clean_gender']: {
+    /**
+     * accounts_api_admin_action_clean_gender - Admin Action Clean Gender
+     */
+    'post'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AccountsApiAdminActionCleanGender.Responses.$200>
   }
   ['/api/users/{user_id}']: {
     /**

@@ -30,9 +30,7 @@ import {
   EditableRowStackTextField,
 } from "../components/EditableRowComponents.tsx";
 import { getAxiosError } from "../services/api/apiError.ts";
-import SnackbarServiceProvider, {
-  useSnackbarServiceContext,
-} from "../context/SnackbarContext.tsx";
+import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
 import { CommentCard } from "../components/Comments.tsx";
 import * as Yup from "yup";
 import CustomCard from "../components/CustomCard.tsx";
@@ -909,32 +907,30 @@ const Participant = () => {
     useState<Components.Schemas.ParticipantSchema | null>(null);
 
   return (
-    <SnackbarServiceProvider>
-      <Box sx={{ height: "100%", px: 5 }}>
-        <Grid container spacing={4} sx={{ height: "100%", mt: 2 }}>
-          <Grid xs={4}>
-            <Stack spacing={2}>
-              <ParticipantPICard userId={userId ?? ""} />
-              <ParticipantRaceListCard
-                userId={userId ?? ""}
-                activeParticipantId={activeParticipant?.id ?? null}
-                setActiveParticipant={setActiveParticipant}
-              />
-            </Stack>
-          </Grid>
-          <Grid xs>
-            {activeParticipant != null ? (
-              <ParticipantRaceCard
-                participant={activeParticipant}
-                setParticipant={setActiveParticipant}
-              />
-            ) : (
-              <div>Select a race first!</div>
-            )}
-          </Grid>
+    <Box sx={{ height: "100%", px: 5 }}>
+      <Grid container spacing={4} sx={{ height: "100%", mt: 2 }}>
+        <Grid xs={4}>
+          <Stack spacing={2}>
+            <ParticipantPICard userId={userId ?? ""} />
+            <ParticipantRaceListCard
+              userId={userId ?? ""}
+              activeParticipantId={activeParticipant?.id ?? null}
+              setActiveParticipant={setActiveParticipant}
+            />
+          </Stack>
         </Grid>
-      </Box>
-    </SnackbarServiceProvider>
+        <Grid xs>
+          {activeParticipant != null ? (
+            <ParticipantRaceCard
+              participant={activeParticipant}
+              setParticipant={setActiveParticipant}
+            />
+          ) : (
+            <div>Select a race first!</div>
+          )}
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 
