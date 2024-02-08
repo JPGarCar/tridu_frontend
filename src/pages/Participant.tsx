@@ -48,7 +48,7 @@ function ParticipantPICard(props: { userId: string }) {
         .then((res) => res.data),
   });
 
-  const user = userQuery.data as Components.Schemas.UserSchema;
+  const user = userQuery.data;
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -64,23 +64,24 @@ function ParticipantPICard(props: { userId: string }) {
   });
 
   const formik = useFormik({
-    initialValues: userQuery.isLoading
-      ? {
-          firstName: "",
-          lastName: "",
-          dob: "",
-          gender: "",
-          email: "",
-          phone: "",
-        }
-      : {
-          firstName: user.first_name,
-          lastName: user.last_name,
-          dob: user.date_of_birth,
-          gender: user.gender,
-          email: user.email,
-          phone: user.phone_number,
-        },
+    initialValues:
+      userQuery.isLoading || user == undefined
+        ? {
+            firstName: "",
+            lastName: "",
+            dob: "",
+            gender: "",
+            email: "",
+            phone: "",
+          }
+        : {
+            firstName: user.first_name,
+            lastName: user.last_name,
+            dob: user.date_of_birth,
+            gender: user.gender,
+            email: user.email,
+            phone: user.phone_number,
+          },
     validationSchema: UserFormSchema,
     enableReinitialize: true,
     onSubmit: async (values, formikHelpers) => {
@@ -88,7 +89,7 @@ function ParticipantPICard(props: { userId: string }) {
 
       const apiClient = await getApiClient();
       const response = await apiClient.accounts_api_update_user(
-        { user_id: user.id ?? 0 },
+        { user_id: user?.id ?? 0 },
         {
           first_name: values.firstName,
           last_name: values.lastName,
@@ -217,7 +218,7 @@ function ParticipantPICard(props: { userId: string }) {
 function ParticipantRaceListCard(props: {
   userId: string;
   activeParticipantId: number | null;
-  setActiveParticipant: (arg0: Components.Schemas.ParticipantSchema) => void;
+  setActiveParticipant: (arg0: number | null) => void;
 }) {
   const participantsQuery = useQuery({
     queryKey: ["getParticipantsForUser", props.userId],
@@ -234,10 +235,16 @@ function ParticipantRaceListCard(props: {
     : (participantsQuery.data as Components.Schemas.ParticipantSchema[]);
 
   useEffect(() => {
-    if (participants && participants.length == 1) {
-      props.setActiveParticipant(participants[0]);
+    if (
+      props.activeParticipantId == null &&
+      participants &&
+      participants.length == 1
+    ) {
+      props.setActiveParticipant(participants[0].id ?? null);
     }
-  }, [participants, props]);
+  }, [participants]);
+  // we do not add props to useEffect because other children of parent might change the activeParticipantId and we don't
+  // want this to run twice, only run on first load of participants
 
   return participantsQuery.isLoading ? (
     <Skeleton />
@@ -259,7 +266,7 @@ function ParticipantRaceListCard(props: {
                   }
                   key={participant.id}
                   onClick={() => {
-                    props.setActiveParticipant(participant);
+                    props.setActiveParticipant(participant.id ?? null);
                   }}
                 >
                   <CardContent>{participant.race.name}</CardContent>
@@ -392,9 +399,7 @@ function ParticipantInformation(props: {
     },
     enableReinitialize: true,
     validationSchema: ParticipantFormSchema,
-    onSubmit: async (values, formikHelpers) => {
-      formikHelpers.setSubmitting(true);
-
+    onSubmit: async (values) => {
       const apiClient = await getApiClient();
       const response = await apiClient.participants_api_update_participant(
         { participant_id: props.participant.id ?? 0 },
@@ -412,12 +417,9 @@ function ParticipantInformation(props: {
         },
       );
 
-      if (response.status == 201) {
-        formikHelpers.setSubmitting(false);
-        props.setParticipant(response.data);
-        setIsEditing(false);
-        pushAlert("Edits saved successfully!", "success");
-      }
+      pushAlert("Edits saved successfully!", "success");
+      props.setParticipant(response.data);
+      setIsEditing(false);
     },
   });
 
@@ -802,18 +804,27 @@ function ParticipantRaceHeat(props: {
   );
 }
 
-function ParticipantRaceCard(props: {
-  participant: Components.Schemas.ParticipantSchema;
-  setParticipant: (arg0: Components.Schemas.ParticipantSchema) => void;
-}) {
+function ParticipantRaceCard(props: { participantId: number }) {
+  const queryClient = useQueryClient();
+
   const commentsQuery = useQuery({
-    queryKey: ["getComments", props.participant.id],
+    queryKey: ["getComments", props.participantId],
     queryFn: () =>
       getApiClient()
         .then((client) =>
-          client.participants_api_get_participant_comments(
-            props.participant.id ?? 0,
-          ),
+          client.participants_api_get_participant_comments(props.participantId),
+        )
+        .then((res) => res.data),
+  });
+
+  const participantQuery = useQuery({
+    queryKey: ["getParticipant", props.participantId],
+    queryFn: () =>
+      getApiClient()
+        .then((api) =>
+          api.participants_api_get_participant_details({
+            participant_id: props.participantId,
+          }),
         )
         .then((res) => res.data),
   });
@@ -822,41 +833,65 @@ function ParticipantRaceCard(props: {
     void commentsQuery.refetch();
   };
 
+  const setParticipant = (
+    participant: Components.Schemas.ParticipantSchema,
+  ) => {
+    queryClient.setQueryData(
+      ["getParticipant", props.participantId],
+      participant,
+    );
+  };
+
   return (
     <Card
       variant={"outlined"}
       sx={{ height: "100%", display: "flex", flexDirection: "column" }}
     >
       <Box textAlign={"center"} sx={{ p: 0.75 }}>
-        <Typography variant={"h5"} component={"div"}>
-          {props.participant.race.name} - {props.participant.bib_number}
-        </Typography>
-        {props.participant.is_active ? null : (
-          <Alert sx={{ m: 2 }} icon={<Error />} severity={"error"}>
-            Inactive participant! Participant will not show up on heat or other
-            exports.
-          </Alert>
+        {participantQuery.isLoading ? (
+          <Skeleton />
+        ) : participantQuery.isError || participantQuery.data == undefined ? (
+          <>Error...</>
+        ) : (
+          <>
+            <Typography variant={"h5"} component={"div"}>
+              {participantQuery.data.race.name} -{" "}
+              {participantQuery.data.bib_number}
+            </Typography>
+            {participantQuery.data.is_active ? null : (
+              <Alert sx={{ m: 2 }} icon={<Error />} severity={"error"}>
+                Inactive participant! Participant will not show up on heat or
+                other exports.
+              </Alert>
+            )}
+          </>
         )}
       </Box>
       <Divider />
       <Grid container flexGrow={1}>
-        <Grid xs>
-          <ParticipantInformation
-            setParticipant={props.setParticipant}
-            participant={props.participant}
-          />
-          <Divider flexItem />
-          <Grid sx={{ m: 2 }}>
-            <ParticipantRaceType
-              setParticipant={props.setParticipant}
-              participant={props.participant}
+        {participantQuery.isLoading ? (
+          <Skeleton />
+        ) : participantQuery.isError || participantQuery.data == undefined ? (
+          <>Error...</>
+        ) : (
+          <Grid xs>
+            <ParticipantInformation
+              setParticipant={setParticipant}
+              participant={participantQuery.data}
             />
-            <ParticipantRaceHeat
-              setParticipant={props.setParticipant}
-              participant={props.participant}
-            />
+            <Divider flexItem />
+            <Grid sx={{ m: 2 }}>
+              <ParticipantRaceType
+                setParticipant={setParticipant}
+                participant={participantQuery.data}
+              />
+              <ParticipantRaceHeat
+                setParticipant={setParticipant}
+                participant={participantQuery.data}
+              />
+            </Grid>
           </Grid>
-        </Grid>
+        )}
         <Divider orientation={"vertical"} flexItem />
         <Grid
           container
@@ -889,10 +924,17 @@ function ParticipantRaceCard(props: {
           </Grid>
           <Divider flexItem />
           <Grid flexWrap={"nowrap"} sx={{ p: 1 }}>
-            <CommentInput
-              participant_id={props.participant.id ?? 0}
-              onCommentSubmit={refreshComments}
-            />
+            {participantQuery.isLoading ? (
+              <Skeleton />
+            ) : participantQuery.isError ||
+              participantQuery.data == undefined ? (
+              <>Error...</>
+            ) : (
+              <CommentInput
+                participant_id={participantQuery.data.id ?? 0}
+                onCommentSubmit={refreshComments}
+              />
+            )}
           </Grid>
         </Grid>
       </Grid>
@@ -903,8 +945,9 @@ function ParticipantRaceCard(props: {
 const Participant = () => {
   const { userId } = useParams();
 
-  const [activeParticipant, setActiveParticipant] =
-    useState<Components.Schemas.ParticipantSchema | null>(null);
+  const [activeParticipantId, setActiveParticipantId] = useState<number | null>(
+    null,
+  );
 
   return (
     <Box sx={{ height: "100%", px: 5 }}>
@@ -914,17 +957,14 @@ const Participant = () => {
             <ParticipantPICard userId={userId ?? ""} />
             <ParticipantRaceListCard
               userId={userId ?? ""}
-              activeParticipantId={activeParticipant?.id ?? null}
-              setActiveParticipant={setActiveParticipant}
+              activeParticipantId={activeParticipantId}
+              setActiveParticipant={setActiveParticipantId}
             />
           </Stack>
         </Grid>
         <Grid xs>
-          {activeParticipant != null ? (
-            <ParticipantRaceCard
-              participant={activeParticipant}
-              setParticipant={setActiveParticipant}
-            />
+          {activeParticipantId != null ? (
+            <ParticipantRaceCard participantId={activeParticipantId} />
           ) : (
             <div>Select a race first!</div>
           )}

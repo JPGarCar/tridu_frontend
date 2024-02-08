@@ -479,6 +479,28 @@ declare namespace Components {
             name: string;
         }
         /**
+         * RaceTypeStatSchema
+         */
+        export interface RaceTypeStatSchema {
+            race_type: /* RaceTypeSchema */ RaceTypeSchema;
+            /**
+             * Registered
+             */
+            registered: number;
+            /**
+             * Allowed
+             */
+            allowed: number;
+            /**
+             * Ftt Registered
+             */
+            ftt_registered: number;
+            /**
+             * Ftt Allowed
+             */
+            ftt_allowed: number;
+        }
+        /**
          * UserSchema
          */
         export interface UserSchema {
@@ -597,8 +619,10 @@ declare namespace Paths {
         }
         namespace Responses {
             export type $200 = /* UserSchema */ Components.Schemas.UserSchema;
-            export interface $204 {
-            }
+            /**
+             * Response
+             */
+            export type $404 = string;
         }
     }
     namespace AccountsApiGetUserByUsername {
@@ -613,8 +637,10 @@ declare namespace Paths {
         }
         namespace Responses {
             export type $200 = /* UserSchema */ Components.Schemas.UserSchema;
-            export interface $204 {
-            }
+            /**
+             * Response
+             */
+            export type $404 = string;
         }
     }
     namespace AccountsApiUpdateUser {
@@ -852,6 +878,24 @@ declare namespace Paths {
             }
         }
     }
+    namespace ParticipantsApiGetParticipantDetails {
+        namespace Parameters {
+            /**
+             * Participant Id
+             */
+            export type ParticipantId = number;
+        }
+        export interface PathParameters {
+            participant_id: /* Participant Id */ Parameters.ParticipantId;
+        }
+        namespace Responses {
+            export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+            /**
+             * Response
+             */
+            export type $404 = string;
+        }
+    }
     namespace ParticipantsApiGetParticipantsForHeat {
         namespace Parameters {
             /**
@@ -888,6 +932,23 @@ declare namespace Paths {
             }
         }
     }
+    namespace ParticipantsApiParticipantsWithInvalidSwimTime {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
+        }
+    }
     namespace ParticipantsApiReactivateParticipant {
         namespace Parameters {
             /**
@@ -900,6 +961,23 @@ declare namespace Paths {
         }
         namespace Responses {
             export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+        }
+    }
+    namespace ParticipantsApiRecentParticipantEdits {
+        namespace Parameters {
+            /**
+             * Count
+             */
+            export type Count = number;
+        }
+        export interface QueryParameters {
+            count?: /* Count */ Parameters.Count;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
         }
     }
     namespace ParticipantsApiRemoveParticipantHeat {
@@ -967,6 +1045,23 @@ declare namespace Paths {
             export type $404 = string;
         }
     }
+    namespace RaceApiGetRaceStats {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* RaceTypeStatSchema */ Components.Schemas.RaceTypeStatSchema[];
+        }
+    }
     namespace RaceApiGetRaceTypes {
         namespace Responses {
             /**
@@ -981,6 +1076,23 @@ declare namespace Paths {
              * Response
              */
             export type $200 = /* RaceSchema */ Components.Schemas.RaceSchema[];
+        }
+    }
+    namespace RaceApiRaceParticipantsDisabled {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
         }
     }
 }
@@ -1001,7 +1113,7 @@ export interface OperationMethods {
     parameters: Parameters<Paths.AccountsApiGetUserByUsername.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$200 | Paths.AccountsApiGetUserByUsername.Responses.$204>
+  ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$200>
   /**
    * accounts_api_create_users_bulk - Create Users Bulk
    */
@@ -1025,7 +1137,7 @@ export interface OperationMethods {
     parameters: Parameters<Paths.AccountsApiGetUserById.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AccountsApiGetUserById.Responses.$200 | Paths.AccountsApiGetUserById.Responses.$204>
+  ): OperationResponse<Paths.AccountsApiGetUserById.Responses.$200>
   /**
    * accounts_api_update_user - Update User
    */
@@ -1074,6 +1186,22 @@ export interface OperationMethods {
     data?: Paths.ParticipantsApiCreateParticipantBulk.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiCreateParticipantBulk.Responses.$201>
+  /**
+   * participants_api_participants_with_invalid_swim_time - Participants With Invalid Swim Time
+   */
+  'participants_api_participants_with_invalid_swim_time'(
+    parameters: Parameters<Paths.ParticipantsApiParticipantsWithInvalidSwimTime.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantsWithInvalidSwimTime.Responses.$200>
+  /**
+   * participants_api_recent_participant_edits - Recent Participant Edits
+   */
+  'participants_api_recent_participant_edits'(
+    parameters?: Parameters<Paths.ParticipantsApiRecentParticipantEdits.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRecentParticipantEdits.Responses.$200>
   /**
    * participants_api_delete_participant_comment - Delete Participant Comment
    */
@@ -1139,6 +1267,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiCreateParticipantComment.Responses.$201>
   /**
+   * participants_api_get_participant_details - Get Participant Details
+   */
+  'participants_api_get_participant_details'(
+    parameters: Parameters<Paths.ParticipantsApiGetParticipantDetails.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiGetParticipantDetails.Responses.$200>
+  /**
    * participants_api_update_participant - Update Participant
    */
   'participants_api_update_participant'(
@@ -1186,6 +1322,22 @@ export interface OperationMethods {
     data?: Paths.RaceApiCreateRace.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RaceApiCreateRace.Responses.$201>
+  /**
+   * race_api_get_race_stats - Get Race Stats
+   */
+  'race_api_get_race_stats'(
+    parameters: Parameters<Paths.RaceApiGetRaceStats.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiGetRaceStats.Responses.$200>
+  /**
+   * race_api_race_participants_disabled - Race Participants Disabled
+   */
+  'race_api_race_participants_disabled'(
+    parameters: Parameters<Paths.RaceApiRaceParticipantsDisabled.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiRaceParticipantsDisabled.Responses.$200>
   /**
    * race_api_delete_race - Delete Race
    */
@@ -1255,7 +1407,7 @@ export interface PathsDictionary {
       parameters: Parameters<Paths.AccountsApiGetUserByUsername.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$200 | Paths.AccountsApiGetUserByUsername.Responses.$204>
+    ): OperationResponse<Paths.AccountsApiGetUserByUsername.Responses.$200>
   }
   ['/api/users/bulk']: {
     /**
@@ -1285,7 +1437,7 @@ export interface PathsDictionary {
       parameters: Parameters<Paths.AccountsApiGetUserById.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AccountsApiGetUserById.Responses.$200 | Paths.AccountsApiGetUserById.Responses.$204>
+    ): OperationResponse<Paths.AccountsApiGetUserById.Responses.$200>
     /**
      * accounts_api_update_user - Update User
      */
@@ -1342,6 +1494,26 @@ export interface PathsDictionary {
       data?: Paths.ParticipantsApiCreateParticipantBulk.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiCreateParticipantBulk.Responses.$201>
+  }
+  ['/api/participants/invalid/swim_time/race/{race_id}']: {
+    /**
+     * participants_api_participants_with_invalid_swim_time - Participants With Invalid Swim Time
+     */
+    'get'(
+      parameters: Parameters<Paths.ParticipantsApiParticipantsWithInvalidSwimTime.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantsWithInvalidSwimTime.Responses.$200>
+  }
+  ['/api/participants/recent_edits']: {
+    /**
+     * participants_api_recent_participant_edits - Recent Participant Edits
+     */
+    'get'(
+      parameters?: Parameters<Paths.ParticipantsApiRecentParticipantEdits.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRecentParticipantEdits.Responses.$200>
   }
   ['/api/participants/comment/{comment_id}']: {
     /**
@@ -1423,6 +1595,14 @@ export interface PathsDictionary {
   }
   ['/api/participants/{participant_id}']: {
     /**
+     * participants_api_get_participant_details - Get Participant Details
+     */
+    'get'(
+      parameters: Parameters<Paths.ParticipantsApiGetParticipantDetails.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiGetParticipantDetails.Responses.$200>
+    /**
      * participants_api_update_participant - Update Participant
      */
     'patch'(
@@ -1476,6 +1656,26 @@ export interface PathsDictionary {
       data?: Paths.RaceApiCreateRace.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.RaceApiCreateRace.Responses.$201>
+  }
+  ['/api/races/{race_id}/stats']: {
+    /**
+     * race_api_get_race_stats - Get Race Stats
+     */
+    'get'(
+      parameters: Parameters<Paths.RaceApiGetRaceStats.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiGetRaceStats.Responses.$200>
+  }
+  ['/api/races/{race_id}/participants/disabled']: {
+    /**
+     * race_api_race_participants_disabled - Race Participants Disabled
+     */
+    'get'(
+      parameters: Parameters<Paths.RaceApiRaceParticipantsDisabled.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiRaceParticipantsDisabled.Responses.$200>
   }
   ['/api/races/{id}']: {
     /**
