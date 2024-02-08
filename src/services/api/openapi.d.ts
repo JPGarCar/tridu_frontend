@@ -168,6 +168,23 @@ declare namespace Components {
             name: string;
         }
         /**
+         * CreateRaceTypeSchema
+         */
+        export interface CreateRaceTypeSchema {
+            /**
+             * Name
+             */
+            name: string;
+            /**
+             * Participants Allowed
+             */
+            participants_allowed?: number;
+            /**
+             * Ftt Allowed
+             */
+            ftt_allowed?: number;
+        }
+        /**
          * CreateUserSchema
          */
         export interface CreateUserSchema {
@@ -477,6 +494,14 @@ declare namespace Components {
              * Name
              */
             name: string;
+            /**
+             * Participants Allowed
+             */
+            participants_allowed?: number;
+            /**
+             * Ftt Allowed
+             */
+            ftt_allowed?: number;
         }
         /**
          * RaceTypeStatSchema
@@ -1020,7 +1045,7 @@ declare namespace Paths {
         }
     }
     namespace RaceApiCreateRaceType {
-        export type RequestBody = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
+        export type RequestBody = /* CreateRaceTypeSchema */ Components.Schemas.CreateRaceTypeSchema;
         namespace Responses {
             export type $201 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
             export type $409 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
@@ -1093,6 +1118,25 @@ declare namespace Paths {
              * Response
              */
             export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
+        }
+    }
+    namespace RaceApiUpdateRaceType {
+        namespace Parameters {
+            /**
+             * Race Type Id
+             */
+            export type RaceTypeId = number;
+        }
+        export interface PathParameters {
+            race_type_id: /* Race Type Id */ Parameters.RaceTypeId;
+        }
+        export type RequestBody = /* CreateRaceTypeSchema */ Components.Schemas.CreateRaceTypeSchema;
+        namespace Responses {
+            export type $201 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
+            /**
+             * Response
+             */
+            export type $404 = string;
         }
     }
 }
@@ -1298,6 +1342,14 @@ export interface OperationMethods {
     data?: Paths.RaceApiCreateRaceType.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RaceApiCreateRaceType.Responses.$201>
+  /**
+   * race_api_update_race_type - Update Race Type
+   */
+  'race_api_update_race_type'(
+    parameters: Parameters<Paths.RaceApiUpdateRaceType.PathParameters>,
+    data?: Paths.RaceApiUpdateRaceType.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiUpdateRaceType.Responses.$201>
   /**
    * race_api_delete_race - Delete Race
    */
@@ -1629,7 +1681,17 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.RaceApiCreateRaceType.Responses.$201>
   }
-  ['/api/races/racetypes/{id}']: {
+  ['/api/races/racetypes/{race_type_id}/update']: {
+    /**
+     * race_api_update_race_type - Update Race Type
+     */
+    'patch'(
+      parameters: Parameters<Paths.RaceApiUpdateRaceType.PathParameters>,
+      data?: Paths.RaceApiUpdateRaceType.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiUpdateRaceType.Responses.$201>
+  }
+  ['/api/races/racetypes/{id}/delete']: {
     /**
      * race_api_delete_race - Delete Race
      */
