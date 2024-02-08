@@ -8,8 +8,17 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import AuthServiceProvider from "./context/AuthContext.tsx";
 import SnackbarServiceProvider from "./context/SnackbarContext.tsx";
+import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 
 const queryClient = new QueryClient();
+
+const themeLight = createTheme({
+  palette: {
+    background: {
+      default: "#f7fafb",
+    },
+  },
+});
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -22,7 +31,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <LocalizationProvider dateAdapter={AdapterLuxon}>
           <AuthServiceProvider>
             <SnackbarServiceProvider>
-              <App />
+              <ThemeProvider theme={themeLight}>
+                <CssBaseline />
+                <App />
+              </ThemeProvider>
             </SnackbarServiceProvider>
           </AuthServiceProvider>
         </LocalizationProvider>
