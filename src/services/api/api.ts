@@ -1,56 +1,64 @@
-import { OpenAPIClientAxios } from 'openapi-client-axios';
-import type { Client } from './openapi';
-import axios from 'axios';
+import { OpenAPIClientAxios } from "openapi-client-axios";
+import type { Client } from "./openapi";
+import axios from "axios";
 
 const api = new OpenAPIClientAxios({
-    definition: `${import.meta.env.VITE_API_URL}/api/openapi.json`,
-    withServer: {
-        url: `${import.meta.env.VITE_API_URL}`
-    }
+  definition: `${import.meta.env.VITE_API_URL}/api/openapi.json`,
+  withServer: {
+    url: `${import.meta.env.VITE_API_URL}`,
+  },
 });
 
-export const getApiClient = async () :Promise<Client> => {
+export const getApiClient = async (): Promise<Client> => {
+  const client = await api.getClient<Client>();
 
-    const client = await api.getClient<Client>();
+  // thanks https://blog.theashishmaurya.me/handling-jwt-access-and-refresh-token-using-axios-in-react-app
 
-    // thanks https://blog.theashishmaurya.me/handling-jwt-access-and-refresh-token-using-axios-in-react-app
+  // add auth token
+  client.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem("jwt_token");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => Promise.reject(error),
+  );
 
-    // add auth token
-    client.interceptors.request.use(
-        (config) => {
-            const token = localStorage.getItem('jwt_token');
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
-            }
-            return config;
-        },
-        (error) => Promise.reject(error)
-    )
+  // refresh token if error is 401
+  client.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const originalRequest = error.config;
 
-    // refresh token if error is 401
-    client.interceptors.response.use(
-        (response) => response,
-        async (error) => {
-            const originalRequest = error.config;
+      if (
+        error.response != undefined &&
+        (error.response.status === 401 || error.response.status === 403) &&
+        !originalRequest._retry
+      ) {
+        originalRequest._retry = true;
 
-            if (error.response != undefined && (error.response.status === 401 || error.response.status === 403) && !originalRequest._retry) {
-                originalRequest._retry = true;
+        try {
+          const refreshToken = localStorage.getItem("jwt_refreshToken");
+          const response = await axios.post(
+            `${import.meta.env.VITE_API_URL}/api/token/refresh/`,
+            { refresh: refreshToken },
+          );
+          const { access } = response.data;
 
-                try {
-                    const refreshToken = localStorage.getItem('jwt_refreshToken');
-                    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/token/refresh/`, { "refresh": refreshToken });
-                    const { access } = response.data;
+          localStorage.setItem("jwt_token", access);
 
-                    localStorage.setItem('jwt_token', access);
-
-                    originalRequest.headers.Authorization = `Bearer ${access}`;
-                    return axios(originalRequest);
-                } catch (error) {
-                    //todo
-                }
-            }
+          originalRequest.headers.Authorization = `Bearer ${access}`;
+          return axios(originalRequest);
+        } catch (error) {
+          return Promise.reject(error);
         }
-    )
+      }
 
-    return client;
-}
+      return Promise.reject(error);
+    },
+  );
+
+  return client;
+};
