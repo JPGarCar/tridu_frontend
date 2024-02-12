@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { styled } from "@mui/material";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 const UploadCSVFileStep = (props: {
   columnHeaders: string[];
@@ -41,19 +41,21 @@ const UploadCSVFileStep = (props: {
         isCheckingHeaders: true,
         headersChecked: false,
       });
-      checkHeaders();
     }
   };
 
-  const checkHeaders = () => {
+  useEffect(() => {
     if (file) {
       // check headers first
+      console.log(file);
       Papa.parse<string[]>(file, {
         header: false,
         preview: 1,
         complete: (results) => {
           const errors = [];
           const warnings = [];
+
+          console.log(results);
 
           if (results.data.length == 0) {
             errors.push("Empty CSV file was provided try again!");
@@ -81,7 +83,7 @@ const UploadCSVFileStep = (props: {
         },
       });
     }
-  };
+  }, [file, props.columnHeaders]);
 
   const handleFullParsing = () => {
     if (file) {
