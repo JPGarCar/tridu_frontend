@@ -10,6 +10,8 @@ declare namespace Components {
     namespace Schemas {
         /**
          * BulkCreateResponseSchema
+         * Schema for bulk create response, allows server to respond with items created,
+         * and errors limiting specific instances from being created.
          */
         export interface BulkCreateResponseSchema {
             /**
@@ -410,7 +412,7 @@ declare namespace Components {
          * PatchParticipantSchema
          */
         export interface PatchParticipantSchema {
-            origin: /* LocationSchema */ LocationSchema;
+            origin?: /* LocationSchema */ LocationSchema | null;
             /**
              * ID
              */
@@ -605,7 +607,12 @@ declare namespace Paths {
          */
         export type RequestBody = /* CreateUserSchema */ Components.Schemas.CreateUserSchema[];
         namespace Responses {
-            export type $201 = /* BulkCreateResponseSchema */ Components.Schemas.BulkCreateResponseSchema;
+            export type $201 = /**
+             * BulkCreateResponseSchema
+             * Schema for bulk create response, allows server to respond with items created,
+             * and errors limiting specific instances from being created.
+             */
+            Components.Schemas.BulkCreateResponseSchema;
         }
     }
     namespace AccountsApiGetActiveNonStaffUsers {
@@ -826,7 +833,12 @@ declare namespace Paths {
          */
         export type RequestBody = /* CreateParticipantBulkSchema */ Components.Schemas.CreateParticipantBulkSchema[];
         namespace Responses {
-            export type $201 = /* BulkCreateResponseSchema */ Components.Schemas.BulkCreateResponseSchema;
+            export type $201 = /**
+             * BulkCreateResponseSchema
+             * Schema for bulk create response, allows server to respond with items created,
+             * and errors limiting specific instances from being created.
+             */
+            Components.Schemas.BulkCreateResponseSchema;
         }
     }
     namespace ParticipantsApiCreateParticipantComment {
@@ -986,6 +998,10 @@ declare namespace Paths {
         }
         namespace Responses {
             export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+            /**
+             * Response
+             */
+            export type $409 = string[];
         }
     }
     namespace ParticipantsApiRecentParticipantEdits {
@@ -1036,6 +1052,14 @@ declare namespace Paths {
         export type RequestBody = /* PatchParticipantSchema */ Components.Schemas.PatchParticipantSchema;
         namespace Responses {
             export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+            /**
+             * Response
+             */
+            export type $404 = string;
+            /**
+             * Response
+             */
+            export type $409 = string[];
         }
     }
     namespace RaceApiCreateRace {
@@ -1654,6 +1678,8 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiGetParticipantDetails.Responses.$200>
+  }
+  ['/api/participants/{participant_id}/edit']: {
     /**
      * participants_api_update_participant - Update Participant
      */

@@ -242,9 +242,8 @@ function ParticipantRaceListCard(props: {
     ) {
       props.setActiveParticipant(participants[0].id ?? null);
     }
-  }, [participants]);
-  // we do not add props to useEffect because other children of parent might change the activeParticipantId and we don't
-  // want this to run twice, only run on first load of participants
+  }, [participants, props.activeParticipantId, participantsQuery.data]);
+  // we add only activeParticipantId so that we run this when activeParticipantId is null and also when participantsQuery has some data!
 
   return participantsQuery.isLoading ? (
     <Skeleton />
@@ -401,25 +400,30 @@ function ParticipantInformation(props: {
     validationSchema: ParticipantFormSchema,
     onSubmit: async (values) => {
       const apiClient = await getApiClient();
-      const response = await apiClient.participants_api_update_participant(
-        { participant_id: props.participant.id ?? 0 },
-        {
-          bib_number: values.bib_num,
-          is_ftt: values.is_ftt,
-          team: values.team,
-          swim_time: swimTimeDestructor(values.swimTime)?.toISO(),
-          origin: {
-            city: values.city,
-            province: values.province,
-            country: values.country,
+      try {
+        const response = await apiClient.participants_api_update_participant(
+          { participant_id: props.participant.id ?? 0 },
+          {
+            bib_number: values.bib_num,
+            is_ftt: values.is_ftt,
+            team: values.team,
+            swim_time: swimTimeDestructor(values.swimTime)?.toISO(),
+            origin: {
+              city: values.city,
+              province: values.province,
+              country: values.country,
+            },
+            location: values.location,
           },
-          location: values.location,
-        },
-      );
+        );
 
-      pushAlert("Edits saved successfully!", "success");
-      props.setParticipant(response.data);
-      setIsEditing(false);
+        pushAlert("Edits saved successfully!", "success");
+        props.setParticipant(response.data);
+        setIsEditing(false);
+      } catch (e) {
+        console.log("Error:");
+        console.log(getAxiosError(e));
+      }
     },
   });
 
@@ -948,6 +952,10 @@ const Participant = () => {
   const [activeParticipantId, setActiveParticipantId] = useState<number | null>(
     null,
   );
+
+  useEffect(() => {
+    setActiveParticipantId(null);
+  }, [userId]);
 
   return (
     <Box sx={{ height: "100%", px: 5 }}>
