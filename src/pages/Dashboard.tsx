@@ -92,19 +92,52 @@ const Dashboard = () => {
                 </TableHead>
                 <TableBody>
                   {raceStatsQuery.data.map((stat) => {
+                    const allowedLeft = stat.allowed - stat.registered;
+                    const fttAllowedLeft =
+                      stat.ftt_allowed - stat.ftt_registered;
+
+                    const greenBackground = {
+                      backgroundColor: "lightgreen",
+                      border: 1,
+                    };
+                    const yellowBackground = {
+                      backgroundColor: "lightyellow",
+                      border: 1,
+                    };
+                    const redBackground = {
+                      backgroundColor: "lightsalmon",
+                      border: 1,
+                    };
+
+                    const normalColor =
+                      allowedLeft == 0
+                        ? greenBackground
+                        : allowedLeft > 0
+                          ? yellowBackground
+                          : redBackground;
+
+                    const fttColor =
+                      fttAllowedLeft == 0
+                        ? greenBackground
+                        : fttAllowedLeft > 0
+                          ? yellowBackground
+                          : redBackground;
+
                     return (
                       <TableRow key={stat.race_type.id}>
                         <TableCell component="th" scope={"row"}>
                           {stat.race_type.name}
                         </TableCell>
-                        <TableCell>{stat.allowed}</TableCell>
-                        <TableCell>{stat.registered}</TableCell>
-                        <TableCell>{stat.allowed - stat.registered}</TableCell>
-                        <TableCell>{stat.ftt_allowed}</TableCell>
-                        <TableCell>{stat.ftt_registered}</TableCell>
-                        <TableCell>
-                          {stat.ftt_allowed - stat.ftt_registered}
+                        <TableCell sx={normalColor}>{stat.allowed}</TableCell>
+                        <TableCell sx={normalColor}>
+                          {stat.registered}
                         </TableCell>
+                        <TableCell sx={normalColor}>{allowedLeft}</TableCell>
+                        <TableCell sx={fttColor}>{stat.ftt_allowed}</TableCell>
+                        <TableCell sx={fttColor}>
+                          {stat.ftt_registered}
+                        </TableCell>
+                        <TableCell sx={fttColor}>{fttAllowedLeft}</TableCell>
                       </TableRow>
                     );
                   })}
