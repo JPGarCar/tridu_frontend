@@ -1,17 +1,45 @@
-import { AppBar, Box, ButtonBase, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  ButtonBase,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import UserIconMenu from "./UserIconMenu.tsx";
 import { useAuthServiceContext } from "../context/AuthContext.tsx";
 import SearchAutocomplete from "../components/SearchAutocomplete.tsx";
 import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Unstable_Grid2";
+import { MenuSharp } from "@mui/icons-material";
+import { useState } from "react";
+
+const menuItems = [
+  { title: "Heats", url: "/heats" },
+  { title: "Races", url: "/races" },
+  { title: "Create Participants", url: "/participants/create" },
+  { title: "Bulk Upload", url: "/data/upload" },
+  { title: "Admin", url: "/admin" },
+];
 
 const PrimaryAppBar = () => {
   const { isLoggedIn } = useAuthServiceContext();
 
   const navigator = useNavigate();
 
+  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+
+  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElNav(event.currentTarget);
+  };
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
+
   return (
-    <AppBar position="sticky">
+    <AppBar component={"nav"}>
       <Toolbar>
         <Grid
           flexGrow={1}
@@ -30,53 +58,50 @@ const PrimaryAppBar = () => {
             </ButtonBase>
           </Grid>
           {isLoggedIn ? (
-            <Grid spacing={2} container>
-              <Grid>
-                <ButtonBase
-                  onClick={() => {
-                    navigator("/heats");
-                  }}
-                >
-                  <Typography variant="button">Heats</Typography>
-                </ButtonBase>
+            <>
+              <Grid display={{ xs: "none", md: "flex" }} spacing={2} container>
+                {menuItems.map(({ title, url }) => {
+                  return (
+                    <Grid>
+                      <ButtonBase
+                        onClick={() => {
+                          navigator(url);
+                        }}
+                      >
+                        <Typography variant="button">{title}</Typography>
+                      </ButtonBase>
+                    </Grid>
+                  );
+                })}
               </Grid>
-              <Grid>
-                <ButtonBase
-                  onClick={() => {
-                    navigator("/races");
-                  }}
-                >
-                  <Typography variant="button">Races</Typography>
-                </ButtonBase>
-              </Grid>
-              <Grid>
-                <ButtonBase
-                  onClick={() => {
-                    navigator("/participants/create");
-                  }}
-                >
-                  <Typography variant="button">Create Participant</Typography>
-                </ButtonBase>
-              </Grid>
-              <Grid>
-                <ButtonBase
-                  onClick={() => {
-                    navigator("/data/upload");
-                  }}
-                >
-                  <Typography variant="button">Bulk Upload</Typography>
-                </ButtonBase>
-              </Grid>
-              <Grid>
-                <ButtonBase
-                  onClick={() => {
-                    navigator("/admin");
-                  }}
-                >
-                  <Typography variant="button">Admin</Typography>
-                </ButtonBase>
-              </Grid>
-            </Grid>
+              <IconButton
+                onClick={handleOpenNavMenu}
+                size={"large"}
+                color={"inherit"}
+                sx={{ display: { xs: "flex", md: "none" } }}
+              >
+                <MenuSharp />
+              </IconButton>
+              <Menu
+                open={Boolean(anchorElNav)}
+                anchorEl={anchorElNav}
+                onClose={handleCloseNavMenu}
+                sx={{ display: { xs: "block", md: "none" } }}
+              >
+                {menuItems.map(({ title, url }) => {
+                  return (
+                    <MenuItem
+                      onClick={() => {
+                        handleCloseNavMenu();
+                        navigator(url);
+                      }}
+                    >
+                      {title}
+                    </MenuItem>
+                  );
+                })}
+              </Menu>
+            </>
           ) : null}
         </Grid>
         <Box flexGrow={1 / 3}>
