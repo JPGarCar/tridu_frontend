@@ -111,6 +111,9 @@ const PrimaryAppBar = () => {
         <Box sx={{ ml: { xs: 0, sm: 0.5, md: 2 }, flexGrow: 0 }}>
           {isLoggedIn ? <UserIconMenu /> : <> </>}
         </Box>
+        <Box sx={{ ml: { xs: 0, sm: 0.5, md: 0.5 }, flexGrow: 0 }}>
+          <Typography variant={"caption"}>{APP_VERSION}</Typography>
+        </Box>
       </Toolbar>
     </AppBar>
   );
