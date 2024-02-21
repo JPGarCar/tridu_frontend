@@ -22,7 +22,7 @@ import { useApiServiceContext } from "../../context/ApiContext.tsx";
 const CreateParticipantStep = (props: {
   userId: number;
   raceId: number;
-  handleSuccess: (arg0: number) => void;
+  handleSuccess: () => void;
 }) => {
   const { getApiClient } = useApiServiceContext();
 
@@ -32,11 +32,11 @@ const CreateParticipantStep = (props: {
       .positive("Must be positive!")
       .integer("Must be a full integer!"),
     isFtt: Yup.boolean().required(),
-    team: Yup.string().required(),
+    team: Yup.string(),
     swimTime: Yup.object().required(),
-    city: Yup.string().required(),
-    province: Yup.string().required(),
-    country: Yup.string().required(),
+    city: Yup.string(),
+    province: Yup.string(),
+    country: Yup.string(),
     raceType: Yup.number().required(),
   });
 
@@ -56,7 +56,7 @@ const CreateParticipantStep = (props: {
       formikHelpers.setSubmitting(true);
 
       const apiClient = await getApiClient();
-      const response = await apiClient.participants_api_create_participant(
+      await apiClient.participants_api_create_participant(
         { user_id: props.userId },
         {
           bib_number: values.bibNo,
@@ -73,7 +73,7 @@ const CreateParticipantStep = (props: {
         },
       );
 
-      props.handleSuccess(response.data.id ?? -1);
+      props.handleSuccess();
     },
   });
 
