@@ -19,6 +19,7 @@ import { useState } from "react";
 const menuItems = [
   { title: "Heats", url: "/heats" },
   { title: "Races", url: "/races" },
+  { title: "Bib Numbers", url: "/bibNumbers" },
   { title: "Create Participants", url: "/participants/create" },
   { title: "Bulk Upload", url: "/data/upload" },
   { title: "Admin", url: "/admin" },

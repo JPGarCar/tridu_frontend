@@ -312,6 +312,19 @@ declare namespace Components {
             country: string;
         }
         /**
+         * PagedParticipantCommentSchema
+         */
+        export interface PagedParticipantCommentSchema {
+            /**
+             * Items
+             */
+            items: /* ParticipantCommentSchema */ ParticipantCommentSchema[];
+            /**
+             * Count
+             */
+            count: number;
+        }
+        /**
          * PagedParticipantSchema
          */
         export interface PagedParticipantSchema {
@@ -514,6 +527,39 @@ declare namespace Components {
              * Date Created
              */
             date_created: string; // date-time
+        }
+        /**
+         * RaceTypeBibInfoSchema
+         */
+        export interface RaceTypeBibInfoSchema {
+            /**
+             * ID
+             */
+            id?: /* ID */ number | null;
+            /**
+             * Name
+             */
+            name: string;
+            /**
+             * Participants Allowed
+             */
+            participants_allowed?: number;
+            /**
+             * Ftt Allowed
+             */
+            ftt_allowed?: number;
+            /**
+             * Smallest Bib
+             */
+            smallest_bib: number;
+            /**
+             * Largest Bib
+             */
+            largest_bib: number;
+            /**
+             * Count
+             */
+            count: number;
         }
         /**
          * RaceTypeSchema
@@ -956,6 +1002,25 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
+    namespace ParticipantsApiGetAllParticipantComments {
+        namespace Parameters {
+            /**
+             * Limit
+             */
+            export type Limit = number;
+            /**
+             * Offset
+             */
+            export type Offset = number;
+        }
+        export interface QueryParameters {
+            limit?: /* Limit */ Parameters.Limit;
+            offset?: /* Offset */ Parameters.Offset;
+        }
+        namespace Responses {
+            export type $200 = /* PagedParticipantCommentSchema */ Components.Schemas.PagedParticipantCommentSchema;
+        }
+    }
     namespace ParticipantsApiGetParticipantComments {
         namespace Parameters {
             /**
@@ -1246,6 +1311,23 @@ declare namespace Paths {
             export type $200 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema[];
         }
     }
+    namespace RaceApiGetRaceTypesBibInfoForRace {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* RaceTypeBibInfoSchema */ Components.Schemas.RaceTypeBibInfoSchema[];
+        }
+    }
     namespace RaceApiGetRaces {
         namespace Responses {
             /**
@@ -1475,6 +1557,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiCreateParticipantComment.Responses.$201>
   /**
+   * participants_api_get_all_participant_comments - Get All Participant Comments
+   */
+  'participants_api_get_all_participant_comments'(
+    parameters?: Parameters<Paths.ParticipantsApiGetAllParticipantComments.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiGetAllParticipantComments.Responses.$200>
+  /**
    * participants_api_get_participant_details - Get Participant Details
    */
   'participants_api_get_participant_details'(
@@ -1554,6 +1644,14 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RaceApiRaceParticipantsDisabled.Responses.$200>
+  /**
+   * race_api_get_race_types_bib_info_for_race - Get Race Types Bib Info For Race
+   */
+  'race_api_get_race_types_bib_info_for_race'(
+    parameters: Parameters<Paths.RaceApiGetRaceTypesBibInfoForRace.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiGetRaceTypesBibInfoForRace.Responses.$200>
   /**
    * race_api_get_race - Get Race
    */
@@ -1831,6 +1929,16 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiCreateParticipantComment.Responses.$201>
   }
+  ['/api/participants/comments']: {
+    /**
+     * participants_api_get_all_participant_comments - Get All Participant Comments
+     */
+    'get'(
+      parameters?: Parameters<Paths.ParticipantsApiGetAllParticipantComments.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiGetAllParticipantComments.Responses.$200>
+  }
   ['/api/participants/{participant_id}']: {
     /**
      * participants_api_get_participant_details - Get Participant Details
@@ -1922,6 +2030,16 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.RaceApiRaceParticipantsDisabled.Responses.$200>
+  }
+  ['/api/races/{race_id}/racetypes/bib_info']: {
+    /**
+     * race_api_get_race_types_bib_info_for_race - Get Race Types Bib Info For Race
+     */
+    'get'(
+      parameters: Parameters<Paths.RaceApiGetRaceTypesBibInfoForRace.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiGetRaceTypesBibInfoForRace.Responses.$200>
   }
   ['/api/races/{race_id}']: {
     /**
