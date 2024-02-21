@@ -17,17 +17,19 @@ import Grid from "@mui/material/Unstable_Grid2";
 import CustomCard from "../components/CustomCard.tsx";
 import { DeleteSharp, Edit } from "@mui/icons-material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getApiClient } from "../services/api/api.ts";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { Components } from "../services/api/openapi";
 import { useState } from "react";
+import { useApiServiceContext } from "../context/ApiContext.tsx";
 
 function CreateRaceTypeDialog(props: {
   isOpen: boolean;
   handleClose: () => void;
 }) {
   const queryClient = useQueryClient();
+
+  const { getApiClient } = useApiServiceContext();
 
   const HeatFormCreateSchema = Yup.object({
     name: Yup.string().required(),
@@ -44,16 +46,14 @@ function CreateRaceTypeDialog(props: {
         name: values.name,
       });
 
-      if (response.status === 201) {
-        queryClient.setQueryData(
-          ["getRaceTypes"],
-          (oldData: Components.Schemas.RaceTypeSchema[]) => {
-            oldData.push(response.data);
-            return oldData;
-          },
-        );
-        props.handleClose();
-      }
+      queryClient.setQueryData(
+        ["getRaceTypes"],
+        (oldData: Components.Schemas.RaceTypeSchema[]) => {
+          oldData.push(response.data);
+          return oldData;
+        },
+      );
+      props.handleClose();
     },
   });
 
@@ -98,6 +98,8 @@ function EditRaceTypeDialog(props: {
   handleClose: (arg0: Components.Schemas.RaceTypeSchema | null) => void;
   raceType: Components.Schemas.RaceTypeSchema | null;
 }) {
+  const { getApiClient } = useApiServiceContext();
+
   const HeatFormCreateSchema = Yup.object({
     name: Yup.string().required(),
     participantsAllowed: Yup.number().default(0).min(0),
@@ -130,9 +132,7 @@ function EditRaceTypeDialog(props: {
         },
       );
 
-      if (response.status === 201) {
-        props.handleClose(response.data);
-      }
+      props.handleClose(response.data);
     },
   });
 
@@ -194,6 +194,8 @@ function EditRaceTypeDialog(props: {
 
 const Races = () => {
   const queryClient = useQueryClient();
+
+  const { getApiClient } = useApiServiceContext();
 
   const [editRaceTypeDialogInfo, setEditRaceTypeDialogInfo] = useState<{
     isOpen: boolean;

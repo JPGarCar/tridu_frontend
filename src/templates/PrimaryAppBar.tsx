@@ -60,9 +60,9 @@ const PrimaryAppBar = () => {
           {isLoggedIn ? (
             <>
               <Grid display={{ xs: "none", md: "flex" }} spacing={2} container>
-                {menuItems.map(({ title, url }) => {
+                {menuItems.map(({ title, url }, index) => {
                   return (
-                    <Grid>
+                    <Grid key={index}>
                       <ButtonBase
                         onClick={() => {
                           navigator(url);
@@ -88,9 +88,10 @@ const PrimaryAppBar = () => {
                 onClose={handleCloseNavMenu}
                 sx={{ display: { xs: "block", md: "none" } }}
               >
-                {menuItems.map(({ title, url }) => {
+                {menuItems.map(({ title, url }, index) => {
                   return (
                     <MenuItem
+                      key={index}
                       onClick={() => {
                         handleCloseNavMenu();
                         navigator(url);

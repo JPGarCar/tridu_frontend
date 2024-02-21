@@ -9,6 +9,7 @@ import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import AuthServiceProvider from "./context/AuthContext.tsx";
 import SnackbarServiceProvider from "./context/SnackbarContext.tsx";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+import ApiServiceProvider from "./context/ApiContext.tsx";
 
 const queryClient = new QueryClient();
 
@@ -31,10 +32,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <LocalizationProvider dateAdapter={AdapterLuxon}>
           <AuthServiceProvider>
             <SnackbarServiceProvider>
-              <ThemeProvider theme={themeLight}>
-                <CssBaseline />
-                <App />
-              </ThemeProvider>
+              <ApiServiceProvider>
+                <ThemeProvider theme={themeLight}>
+                  <CssBaseline />
+                  <App />
+                </ThemeProvider>
+              </ApiServiceProvider>
             </SnackbarServiceProvider>
           </AuthServiceProvider>
         </LocalizationProvider>

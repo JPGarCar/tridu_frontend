@@ -18,7 +18,6 @@ import {
 import Grid from "@mui/material/Unstable_Grid2";
 import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getApiClient } from "../services/api/api.ts";
 import type { Components } from "../services/api/openapi";
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
@@ -34,9 +33,12 @@ import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
 import { CommentCard } from "../components/Comments.tsx";
 import * as Yup from "yup";
 import CustomCard from "../components/CustomCard.tsx";
+import { useApiServiceContext } from "../context/ApiContext.tsx";
 
 function ParticipantPICard(props: { userId: string }) {
   const { pushAlert } = useSnackbarServiceContext();
+
+  const { getApiClient } = useApiServiceContext();
 
   const queryClient = useQueryClient();
 
@@ -100,13 +102,11 @@ function ParticipantPICard(props: { userId: string }) {
         },
       );
 
-      if (response.status == 201) {
-        formikHelpers.setSubmitting(false);
-        formikHelpers.resetForm();
-        queryClient.setQueryData(["getUserById", props.userId], response.data);
-        setIsEditing(false);
-        pushAlert("Edits saved successfully!", "success");
-      }
+      formikHelpers.setSubmitting(false);
+      formikHelpers.resetForm();
+      queryClient.setQueryData(["getUserById", props.userId], response.data);
+      setIsEditing(false);
+      pushAlert("Edits saved successfully!", "success");
     },
   });
 
@@ -220,6 +220,8 @@ function ParticipantRaceListCard(props: {
   activeParticipantId: number | null;
   setActiveParticipant: (arg0: number | null) => void;
 }) {
+  const { getApiClient } = useApiServiceContext();
+
   const participantsQuery = useQuery({
     queryKey: ["getParticipantsForUser", props.userId],
     queryFn: () =>
@@ -289,6 +291,8 @@ function CommentInput(props: {
 }) {
   const { pushAlert } = useSnackbarServiceContext();
 
+  const { getApiClient } = useApiServiceContext();
+
   const formik = useFormik({
     initialValues: {
       commentText: "",
@@ -297,22 +301,17 @@ function CommentInput(props: {
       formikHelpers.setSubmitting(true);
 
       const apiClient = await getApiClient();
-      const response =
-        await apiClient.participants_api_create_participant_comment(
-          {
-            participant_id: props.participant_id,
-          },
-          { comment: values.commentText },
-        );
+      await apiClient.participants_api_create_participant_comment(
+        {
+          participant_id: props.participant_id,
+        },
+        { comment: values.commentText },
+      );
 
-      if (response.status == 201) {
-        props.onCommentSubmit();
-        formikHelpers.setSubmitting(false);
-        formikHelpers.resetForm();
-        pushAlert("Comment added!", "success");
-      } else {
-        // todo
-      }
+      props.onCommentSubmit();
+      formikHelpers.setSubmitting(false);
+      formikHelpers.resetForm();
+      pushAlert("Comment added!", "success");
     },
   });
 
@@ -345,6 +344,8 @@ function ParticipantInformation(props: {
   participant: Components.Schemas.ParticipantSchema;
 }) {
   const { pushAlert } = useSnackbarServiceContext();
+
+  const { getApiClient } = useApiServiceContext();
 
   const swimTimeCreator = (swimTime: string | null): string => {
     if (swimTime == null) {
@@ -435,9 +436,7 @@ function ParticipantInformation(props: {
       props.participant.id ?? 0,
     );
 
-    if (response.status == 201) {
-      props.setParticipant(response.data);
-    }
+    props.setParticipant(response.data);
 
     return null;
   };
@@ -448,9 +447,7 @@ function ParticipantInformation(props: {
       props.participant.id ?? 0,
     );
 
-    if (response.status == 201) {
-      props.setParticipant(response.data);
-    }
+    props.setParticipant(response.data);
 
     return null;
   };
@@ -577,6 +574,8 @@ function ParticipantRaceType(props: {
   setParticipant: (arg0: Components.Schemas.ParticipantSchema) => void;
   participant: Components.Schemas.ParticipantSchema;
 }) {
+  const { getApiClient } = useApiServiceContext();
+
   const raceTypesQuery = useQuery({
     queryKey: ["getRaceTypes"],
     queryFn: () =>
@@ -679,6 +678,8 @@ function ParticipantRaceHeat(props: {
   setParticipant: (arg0: Components.Schemas.ParticipantSchema) => void;
   participant: Components.Schemas.ParticipantSchema;
 }) {
+  const { getApiClient } = useApiServiceContext();
+
   const raceHeatsQuery = useQuery({
     queryKey: ["getRaceHeats"],
     queryFn: () =>
@@ -811,6 +812,8 @@ function ParticipantRaceHeat(props: {
 function ParticipantRaceCard(props: { participantId: number }) {
   const queryClient = useQueryClient();
 
+  const { getApiClient } = useApiServiceContext();
+
   const commentsQuery = useQuery({
     queryKey: ["getComments", props.participantId],
     queryFn: () =>
@@ -908,7 +911,7 @@ function ParticipantRaceCard(props: { participantId: number }) {
               <>Loading...</>
             ) : commentsQuery.isError ? (
               <>Error...</>
-            ) : commentsQuery.data == "" ? (
+            ) : commentsQuery.data === undefined ? (
               <>No comments...</>
             ) : (
               <Stack spacing={2} direction={"column-reverse"}>

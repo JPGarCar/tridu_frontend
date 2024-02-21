@@ -25,7 +25,6 @@ import { useState } from "react";
 import { Components } from "../services/api/openapi";
 import CustomCard from "../components/CustomCard.tsx";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getApiClient } from "../services/api/api.ts";
 import { DateTime, Duration } from "luxon";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -39,6 +38,7 @@ import LabelValueRow from "../components/LabelValueRow.tsx";
 import { useNavigate } from "react-router-dom";
 import { TimePicker } from "@mui/x-date-pickers";
 import { DeleteSharp } from "@mui/icons-material";
+import { useApiServiceContext } from "../context/ApiContext.tsx";
 
 const PoolOptions = [
   { key: "RECREATION", value: "Recreation" },
@@ -53,6 +53,8 @@ function CreateHeatDialog(props: {
   const raceId = 1;
 
   const queryClient = useQueryClient();
+
+  const { getApiClient } = useApiServiceContext();
 
   const HeatFormCreateSchema = Yup.object({
     raceId: Yup.number().required("Required!"),
@@ -89,16 +91,14 @@ function CreateHeatDialog(props: {
         pool: values.pool,
       });
 
-      if (response.status === 201) {
-        queryClient.setQueryData(
-          ["heatsQuery"],
-          (oldData: Components.Schemas.HeatSchema[]) => {
-            oldData.push(response.data);
-            return oldData;
-          },
-        );
-        props.handleClose();
-      }
+      queryClient.setQueryData(
+        ["heatsQuery"],
+        (oldData: Components.Schemas.HeatSchema[]) => {
+          oldData.push(response.data);
+          return oldData;
+        },
+      );
+      props.handleClose();
     },
   });
 
@@ -234,6 +234,8 @@ function HeatListCard(props: {
 
   const queryClient = useQueryClient();
 
+  const { getApiClient } = useApiServiceContext();
+
   const heatsQuery = useQuery({
     queryKey: ["heatsQuery"],
     queryFn: () =>
@@ -254,16 +256,14 @@ function HeatListCard(props: {
 
   const handleHeatDelete = async (heatId: number) => {
     const api = await getApiClient();
-    const response = await api.heats_api_delete_heat({ heat_id: heatId });
+    await api.heats_api_delete_heat({ heat_id: heatId });
 
-    if (response.status === 204) {
-      queryClient.setQueryData(
-        ["heatsQuery"],
-        (oldData: Components.Schemas.HeatSchema[]) => {
-          return oldData.filter((value) => value.id != heatId);
-        },
-      );
-    }
+    queryClient.setQueryData(
+      ["heatsQuery"],
+      (oldData: Components.Schemas.HeatSchema[]) => {
+        return oldData.filter((value) => value.id != heatId);
+      },
+    );
   };
 
   return (
@@ -351,6 +351,8 @@ function HeatInformationForm(props: {
 }) {
   const { pushAlert } = useSnackbarServiceContext();
 
+  const { getApiClient } = useApiServiceContext();
+
   const HeatFormSchema = Yup.object({
     termination: Yup.string().length(1, "Length must be 1!"),
     color: Yup.string(),
@@ -382,10 +384,8 @@ function HeatInformationForm(props: {
         },
       );
 
-      if (response.status === 201) {
-        props.onHeatUpdate(response.data);
-        setIsEditing(false);
-      }
+      props.onHeatUpdate(response.data);
+      setIsEditing(false);
     },
   });
 
@@ -467,6 +467,8 @@ function HeatInformationForm(props: {
 
 function HeatParticipantList(props: { heatId: number }) {
   const navigator = useNavigate();
+
+  const { getApiClient } = useApiServiceContext();
 
   const participantsQuery = useQuery({
     queryKey: ["getParticipantsForHeat", props.heatId],
@@ -555,6 +557,8 @@ function HeatAdditionalInformation(props: {
 }
 
 function HeatInformationCard(props: { heatId: number }) {
+  const { getApiClient } = useApiServiceContext();
+
   const heatQuery = useQuery({
     queryKey: ["getHeatQuery", props.heatId],
     queryFn: () =>

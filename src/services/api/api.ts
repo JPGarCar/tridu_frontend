@@ -34,7 +34,7 @@ export const getApiClient = async (): Promise<Client> => {
 
       if (
         error.response != undefined &&
-        (error.response.status === 401 || error.response.status === 403) &&
+        error.response.status === 401 &&
         !originalRequest._retry
       ) {
         originalRequest._retry = true;
@@ -47,10 +47,13 @@ export const getApiClient = async (): Promise<Client> => {
           );
           const { access } = response.data;
 
-          localStorage.setItem("jwt_token", access);
+          if (access != null && typeof access === "string") {
+            localStorage.setItem("jwt_token", access);
+            originalRequest.headers.Authorization = `Bearer ${access}`;
+            return axios(originalRequest);
+          }
 
-          originalRequest.headers.Authorization = `Bearer ${access}`;
-          return axios(originalRequest);
+          return Promise.reject(error);
         } catch (error) {
           return Promise.reject(error);
         }

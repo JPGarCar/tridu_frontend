@@ -1,10 +1,12 @@
 import Grid from "@mui/material/Unstable_Grid2";
 import { Box, Button, Typography } from "@mui/material";
-import { getApiClient } from "../services/api/api.ts";
 import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
+import { useApiServiceContext } from "../context/ApiContext.tsx";
 
 const Admin = () => {
   const { pushAlert } = useSnackbarServiceContext();
+
+  const { getApiClient } = useApiServiceContext();
 
   const cleanUpGender = async () => {
     const api = await getApiClient();

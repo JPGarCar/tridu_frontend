@@ -16,14 +16,16 @@ import {
   Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { getApiClient } from "../services/api/api.ts";
 import { useNavigate } from "react-router-dom";
+import { useApiServiceContext } from "../context/ApiContext.tsx";
 
 const Dashboard = () => {
   const race_id = 1;
   const refetchInterval = 10000; // 10 seconds
 
   const navigate = useNavigate();
+
+  const { getApiClient } = useApiServiceContext();
 
   const disabledParticipantsQuery = useQuery({
     queryKey: ["disabledParticipants", race_id],
@@ -40,7 +42,7 @@ const Dashboard = () => {
     queryKey: ["recentEditedParticipantsQuery", race_id],
     queryFn: () =>
       getApiClient()
-        .then((api) => api.participants_api_recent_participant_edits())
+        .then((api) => api.participants_api_recently_edited_participants())
         .then((res) => res.data),
     refetchInterval: refetchInterval,
   });
