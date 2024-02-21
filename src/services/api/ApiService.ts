@@ -1,9 +1,10 @@
 import { ApiServiceProps } from "../../@types/api-service";
-import { Client, Components } from "./openapi";
+import { Client } from "./openapi";
 import axios, { AxiosError } from "axios";
 import { OpenAPIClientAxios } from "openapi-client-axios";
 import { SnackbarServiceProps } from "../../@types/snackbar_service";
 import { AuthServiceProps } from "../../@types/auth-service";
+import { getErrorObjectSchema } from "./apiError.ts";
 
 export function useApiService(
   authService: AuthServiceProps,
@@ -70,13 +71,16 @@ export function useApiService(
           error.response.status >= 400 &&
           error.response.status < 500
         ) {
-          const jsonError: Components.Schemas.ErrorObjectSchema =
-            error.response.data;
+          const errorObjectSchema = getErrorObjectSchema(error.response.data);
 
-          snackBarService.pushAlert(
-            jsonError.title + ": " + jsonError.details,
-            "warning",
-          );
+          if (errorObjectSchema != null) {
+            snackBarService.pushAlert(
+              errorObjectSchema.title + ": " + errorObjectSchema.details,
+              "warning",
+            );
+          } else {
+            snackBarService.pushAlert(error.message, "warning");
+          }
         } else if (
           error.response != undefined &&
           error.response.status >= 500
