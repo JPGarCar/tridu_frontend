@@ -5,7 +5,7 @@ import { Components } from "../services/api/openapi";
 import { useNavigate } from "react-router-dom";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
 
-const SearchAutocomplete = () => {
+const UserSearchAutocomplete = () => {
   const [options, setOptions] = useState<Components.Schemas.UserSchema[]>([]);
 
   const [inputValue, setInputValue] = useState("");
@@ -60,8 +60,7 @@ const SearchAutocomplete = () => {
             ...params.InputProps,
             endAdornment: (
               <InputAdornment position="end">
-                {" "}
-                <Search />{" "}
+                <Search />
               </InputAdornment>
             ),
           }}
@@ -71,4 +70,4 @@ const SearchAutocomplete = () => {
   );
 };
 
-export default SearchAutocomplete;
+export default UserSearchAutocomplete;

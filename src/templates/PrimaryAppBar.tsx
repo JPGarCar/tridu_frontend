@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import UserIconMenu from "./UserIconMenu.tsx";
 import { useAuthServiceContext } from "../context/AuthContext.tsx";
-import SearchAutocomplete from "../components/SearchAutocomplete.tsx";
+import UserSearchAutocomplete from "../components/UserSearchAutocomplete.tsx";
 import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Unstable_Grid2";
 import { MenuSharp } from "@mui/icons-material";
@@ -106,7 +106,7 @@ const PrimaryAppBar = () => {
           ) : null}
         </Grid>
         <Box flexGrow={1 / 3}>
-          {isLoggedIn ? <SearchAutocomplete /> : <></>}
+          {isLoggedIn ? <UserSearchAutocomplete /> : <></>}
         </Box>
         <Box sx={{ ml: { xs: 0, sm: 0.5, md: 2 }, flexGrow: 0 }}>
           {isLoggedIn ? <UserIconMenu /> : <> </>}
