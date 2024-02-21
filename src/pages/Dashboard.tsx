@@ -150,7 +150,7 @@ const Dashboard = () => {
         </CustomCard>
       </Grid>
       <Grid sx={{ maxHeight: "100%", overflow: "auto" }}>
-        <CustomCard title={"Disabled Participants"}>
+        <CustomCard title={"Inactive Participants"}>
           {disabledParticipantsQuery.isLoading ? (
             <Skeleton />
           ) : disabledParticipantsQuery.isError ||
@@ -159,7 +159,7 @@ const Dashboard = () => {
           ) : (
             <Stack spacing={2}>
               {disabledParticipantsQuery.data.length == 0 ? (
-                <Container>No Disabled Participants</Container>
+                <Container>No Inactive Participants</Container>
               ) : (
                 disabledParticipantsQuery.data.map((participant) => {
                   return (
