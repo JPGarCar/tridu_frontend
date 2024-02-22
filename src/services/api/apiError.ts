@@ -20,7 +20,7 @@ export const getErrorObjectSchema = (
     "status" in error &&
     "title" in error &&
     "details" in error &&
-    typeof error.status === "string" &&
+    typeof error.status === "number" &&
     typeof error.title === "string" &&
     typeof error.details === "string"
   ) {
