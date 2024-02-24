@@ -42,7 +42,7 @@ function CreateRaceTypeDialog(props: {
     validationSchema: HeatFormCreateSchema,
     onSubmit: async (values) => {
       const api = await getApiClient();
-      const response = await api.race_api_create_race_type(null, {
+      const response = await api.race_api_race_type_api_create_race_type(null, {
         name: values.name,
       });
 
@@ -123,7 +123,7 @@ function EditRaceTypeDialog(props: {
     enableReinitialize: true,
     onSubmit: async (values) => {
       const api = await getApiClient();
-      const response = await api.race_api_update_race_type(
+      const response = await api.race_api_race_type_api_update_race_type(
         { race_type_id: props.raceType?.id ?? 0 },
         {
           name: values.name,
@@ -212,7 +212,7 @@ const Races = () => {
     queryKey: ["getRaceTypes"],
     queryFn: () =>
       getApiClient().then((client) =>
-        client.race_api_get_race_types().then((res) => res.data),
+        client.race_api_race_type_api_get_race_types().then((res) => res.data),
       ),
   });
 
@@ -220,7 +220,7 @@ const Races = () => {
     queryKey: ["getRaces"],
     queryFn: () =>
       getApiClient()
-        .then((client) => client.race_api_get_races())
+        .then((client) => client.race_api_race_api_get_races())
         .then((res) => res.data),
   });
 

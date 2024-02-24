@@ -34,7 +34,7 @@ const SelectRaceStep = (props: { handleSuccess: (arg0: number) => void }) => {
     queryKey: ["getRaces"],
     queryFn: () =>
       getApiClient()
-        .then((client) => client.race_api_get_races())
+        .then((client) => client.race_api_race_api_get_races())
         .then((res) => res.data),
   });
 

@@ -27,7 +27,7 @@ const ParticipantSearchAutocomplete = () => {
       setInputValue(value);
 
       const api = await getApiClient();
-      const response = await api.participants_api_get_participants_for_race({
+      const response = await api.race_api_race_api_get_race_participants({
         bib_number: Number(value.toString()),
         limit: 5,
         race_id: 1,

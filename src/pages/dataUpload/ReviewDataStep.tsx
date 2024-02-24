@@ -45,11 +45,12 @@ const ReviewDataStep = (props: {
         props.validObjects,
       );
     } else if (props.dataTypeName == "Participants") {
-      response = await api.participants_api_create_participant_bulk(
-        null,
-        // @ts-expect-error We know the obj is correct!
-        props.validObjects,
-      );
+      response =
+        await api.participants_api_participant_api_create_participant_bulk(
+          null,
+          // @ts-expect-error We know the obj is correct!
+          props.validObjects,
+        );
     }
 
     if (response) {

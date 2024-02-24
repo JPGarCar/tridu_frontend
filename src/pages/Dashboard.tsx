@@ -33,7 +33,9 @@ const Dashboard = () => {
     queryFn: () =>
       getApiClient()
         .then((api) =>
-          api.race_api_race_participants_disabled({ race_id: race_id }),
+          api.race_api_race_api_get_race_participants_disabled({
+            race_id: race_id,
+          }),
         )
         .then((res) => res.data),
     refetchInterval: refetchInterval,
@@ -43,7 +45,9 @@ const Dashboard = () => {
     queryKey: ["recentEditedParticipantsQuery", race_id],
     queryFn: () =>
       getApiClient()
-        .then((api) => api.participants_api_recently_edited_participants())
+        .then((api) =>
+          api.participants_api_participant_api_recently_edited_participants(),
+        )
         .then((res) => res.data),
     refetchInterval: refetchInterval,
   });
@@ -53,7 +57,7 @@ const Dashboard = () => {
     queryFn: () =>
       getApiClient()
         .then((api) =>
-          api.participants_api_participants_with_invalid_swim_time({
+          api.race_api_race_api_get_race_participants_with_invalid_swim_time({
             race_id: race_id,
           }),
         )
@@ -66,7 +70,7 @@ const Dashboard = () => {
     queryFn: () =>
       getApiClient()
         .then((api) =>
-          api.race_api_get_race_stats({
+          api.race_api_race_api_get_race_stats({
             race_id: race_id,
           }),
         )
@@ -77,7 +81,9 @@ const Dashboard = () => {
     queryKey: ["race"],
     queryFn: () =>
       getApiClient()
-        .then((client) => client.race_api_get_race({ race_id: race_id }))
+        .then((client) =>
+          client.race_api_race_api_get_race({ race_id: race_id }),
+        )
         .then((res) => res.data),
   });
 
@@ -86,7 +92,7 @@ const Dashboard = () => {
       <Grid container sx={{ pb: 2 }} justifyContent={"center"}>
         {raceQuery.isLoading ? (
           <Skeleton />
-        ) : raceQuery.error || raceQuery.data == undefined ? (
+        ) : raceQuery.isError || raceQuery.data == undefined ? (
           <>Error...</>
         ) : (
           <Typography variant={"h5"}>

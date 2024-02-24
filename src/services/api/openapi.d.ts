@@ -187,6 +187,44 @@ declare namespace Components {
             ftt_allowed?: number;
         }
         /**
+         * CreateRelayParticipantSchema
+         */
+        export interface CreateRelayParticipantSchema {
+            /**
+             * Location
+             */
+            location?: /* Location */ string | null;
+            /**
+             * User
+             */
+            user_id: number;
+            /**
+             * Team
+             */
+            team_id: number;
+        }
+        /**
+         * CreateRelayTeamSchema
+         */
+        export interface CreateRelayTeamSchema {
+            /**
+             * Bib Number
+             */
+            bib_number: number;
+            /**
+             * Relay Team Name
+             */
+            name: string;
+            /**
+             * Race
+             */
+            race_id: number;
+            /**
+             * Race Type
+             */
+            race_type_id: number;
+        }
+        /**
          * CreateUserSchema
          */
         export interface CreateUserSchema {
@@ -427,6 +465,22 @@ declare namespace Components {
             location?: /* Location */ string | null;
         }
         /**
+         * ParticipationSchema
+         * A simple Participation schema that allows returning IDs for Participant and RelayParticipant Models.
+         */
+        export interface ParticipationSchema {
+            /**
+             * Id
+             */
+            id: number;
+            race: /* RaceSchema */ RaceSchema;
+            type: /* ParticipationTypes */ ParticipationTypes;
+        }
+        /**
+         * ParticipationTypes
+         */
+        export type ParticipationTypes = "participant" | "relay_participant";
+        /**
          * PatchHeatSchema
          */
         export interface PatchHeatSchema {
@@ -481,6 +535,29 @@ declare namespace Components {
              * Location
              */
             location?: /* Location */ string | null;
+        }
+        /**
+         * PatchRelayParticipantSchema
+         */
+        export interface PatchRelayParticipantSchema {
+            origin?: /* LocationSchema */ LocationSchema | null;
+            /**
+             * Location
+             */
+            location?: /* Location */ string | null;
+        }
+        /**
+         * PatchRelayTeamSchema
+         */
+        export interface PatchRelayTeamSchema {
+            /**
+             * Bib Number
+             */
+            bib_number?: /* Bib Number */ number | null;
+            /**
+             * Relay Team Name
+             */
+            name?: /* Relay Team Name */ string | null;
         }
         /**
          * PatchUserSchema
@@ -605,6 +682,88 @@ declare namespace Components {
             ftt_allowed: number;
         }
         /**
+         * RelayTeamCommentCreateSchema
+         */
+        export interface RelayTeamCommentCreateSchema {
+            /**
+             * Comment
+             */
+            comment: string;
+        }
+        /**
+         * RelayTeamCommentSchema
+         */
+        export interface RelayTeamCommentSchema {
+            /**
+             * Writer Name
+             */
+            writer_name?: string;
+            /**
+             * ID
+             */
+            id?: /* ID */ number | null;
+            /**
+             * Relay Team
+             */
+            relay_team: number;
+            /**
+             * Comment
+             */
+            comment: string;
+            /**
+             * Creation Date
+             */
+            creation_date: string; // date-time
+        }
+        /**
+         * RelayTeamParticipantSchema
+         */
+        export interface RelayTeamParticipantSchema {
+            origin?: /* LocationSchema */ LocationSchema | null;
+            user: /* UserSchema */ UserSchema;
+            team: /* RelayTeamSchema */ RelayTeamSchema;
+            /**
+             * ID
+             */
+            id?: /* ID */ number | null;
+            /**
+             * Date Changed
+             */
+            date_changed: string; // date-time
+            /**
+             * Is Active
+             */
+            is_active?: boolean;
+            /**
+             * Location
+             */
+            location?: /* Location */ string | null;
+        }
+        /**
+         * RelayTeamSchema
+         */
+        export interface RelayTeamSchema {
+            race: /* RaceSchema */ RaceSchema;
+            race_type: /* RaceTypeSchema */ RaceTypeSchema;
+            heat?: /* HeatSchema */ HeatSchema | null;
+            /**
+             * ID
+             */
+            id?: /* ID */ number | null;
+            /**
+             * Is Active
+             */
+            is_active?: boolean;
+            /**
+             * Bib Number
+             */
+            bib_number: number;
+            /**
+             * Relay Team Name
+             */
+            name: string;
+        }
+        /**
          * UserSchema
          */
         export interface UserSchema {
@@ -678,6 +837,26 @@ declare namespace Paths {
         namespace Responses {
             export type $200 = /* UserSchema */ Components.Schemas.UserSchema;
             export type $201 = /* UserSchema */ Components.Schemas.UserSchema;
+        }
+    }
+    namespace AccountsApiCreateUserParticipant {
+        namespace Parameters {
+            /**
+             * User Id
+             */
+            export type UserId = number;
+        }
+        export interface PathParameters {
+            user_id: /* User Id */ Parameters.UserId;
+        }
+        export type RequestBody = /* CreateParticipantSchema */ Components.Schemas.CreateParticipantSchema;
+        namespace Responses {
+            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
         }
     }
     namespace AccountsApiCreateUsersBulk {
@@ -756,6 +935,44 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
+    namespace AccountsApiGetUserParticipants {
+        namespace Parameters {
+            /**
+             * User Id
+             */
+            export type UserId = number;
+        }
+        export interface PathParameters {
+            user_id: /* User Id */ Parameters.UserId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
+        }
+    }
+    namespace AccountsApiGetUserParticipations {
+        namespace Parameters {
+            /**
+             * User Id
+             */
+            export type UserId = number;
+        }
+        export interface PathParameters {
+            user_id: /* User Id */ Parameters.UserId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /**
+             * ParticipationSchema
+             * A simple Participation schema that allows returning IDs for Participant and RelayParticipant Models.
+             */
+            Components.Schemas.ParticipationSchema[];
+        }
+    }
     namespace AccountsApiUpdateUser {
         namespace Parameters {
             /**
@@ -822,21 +1039,21 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
-    namespace HeatsApiGetHeatsForRace {
+    namespace HeatsApiGetHeatParticipants {
         namespace Parameters {
             /**
-             * Race Id
+             * Heat Id
              */
-            export type RaceId = number;
+            export type HeatId = number;
         }
         export interface PathParameters {
-            race_id: /* Race Id */ Parameters.RaceId;
+            heat_id: /* Heat Id */ Parameters.HeatId;
         }
         namespace Responses {
             /**
              * Response
              */
-            export type $200 = /* HeatSchema */ Components.Schemas.HeatSchema[];
+            export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
         }
     }
     namespace HeatsApiUpdateHeat {
@@ -859,7 +1076,66 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
-    namespace ParticipantsApiChangeParticipantHeat {
+    namespace ParticipantsApiCommentApiDeleteParticipantComment {
+        namespace Parameters {
+            /**
+             * Comment Id
+             */
+            export type CommentId = number;
+        }
+        export interface PathParameters {
+            comment_id: /* Comment Id */ Parameters.CommentId;
+        }
+        namespace Responses {
+            export interface $204 {
+            }
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiCommentApiDeleteRelayTeamComment {
+        namespace Parameters {
+            /**
+             * Comment Id
+             */
+            export type CommentId = number;
+        }
+        export interface PathParameters {
+            comment_id: /* Comment Id */ Parameters.CommentId;
+        }
+        namespace Responses {
+            export interface $204 {
+            }
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiCommentApiGetAllParticipantComments {
+        namespace Parameters {
+            /**
+             * Limit
+             */
+            export type Limit = number;
+            /**
+             * Offset
+             */
+            export type Offset = number;
+        }
+        export interface QueryParameters {
+            limit?: /* Limit */ Parameters.Limit;
+            offset?: /* Offset */ Parameters.Offset;
+        }
+        namespace Responses {
+            export type $200 = /* PagedParticipantCommentSchema */ Components.Schemas.PagedParticipantCommentSchema;
+        }
+    }
+    namespace ParticipantsApiParticipantApiChangeParticipantHeat {
         namespace Parameters {
             /**
              * Participant Id
@@ -884,7 +1160,7 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
-    namespace ParticipantsApiChangeParticipantRaceType {
+    namespace ParticipantsApiParticipantApiChangeParticipantRaceType {
         namespace Parameters {
             /**
              * Participant Id
@@ -909,27 +1185,7 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
-    namespace ParticipantsApiCreateParticipant {
-        namespace Parameters {
-            /**
-             * User Id
-             */
-            export type UserId = number;
-        }
-        export interface PathParameters {
-            user_id: /* User Id */ Parameters.UserId;
-        }
-        export type RequestBody = /* CreateParticipantSchema */ Components.Schemas.CreateParticipantSchema;
-        namespace Responses {
-            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
-            export type $409 = /**
-             * ErrorObjectSchema
-             * Schema for the error object as described in decisions_api.md
-             */
-            Components.Schemas.ErrorObjectSchema;
-        }
-    }
-    namespace ParticipantsApiCreateParticipantBulk {
+    namespace ParticipantsApiParticipantApiCreateParticipantBulk {
         /**
          * Participantschemas
          */
@@ -943,7 +1199,7 @@ declare namespace Paths {
             Components.Schemas.BulkCreateResponseSchema;
         }
     }
-    namespace ParticipantsApiCreateParticipantComment {
+    namespace ParticipantsApiParticipantApiCreateParticipantComment {
         namespace Parameters {
             /**
              * Participant Id
@@ -963,7 +1219,7 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
-    namespace ParticipantsApiDeactivateParticipant {
+    namespace ParticipantsApiParticipantApiDeactivateParticipant {
         namespace Parameters {
             /**
              * Participant Id
@@ -982,63 +1238,7 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
-    namespace ParticipantsApiDeleteParticipantComment {
-        namespace Parameters {
-            /**
-             * Comment Id
-             */
-            export type CommentId = number;
-        }
-        export interface PathParameters {
-            comment_id: /* Comment Id */ Parameters.CommentId;
-        }
-        namespace Responses {
-            export interface $204 {
-            }
-            export type $404 = /**
-             * ErrorObjectSchema
-             * Schema for the error object as described in decisions_api.md
-             */
-            Components.Schemas.ErrorObjectSchema;
-        }
-    }
-    namespace ParticipantsApiGetAllParticipantComments {
-        namespace Parameters {
-            /**
-             * Limit
-             */
-            export type Limit = number;
-            /**
-             * Offset
-             */
-            export type Offset = number;
-        }
-        export interface QueryParameters {
-            limit?: /* Limit */ Parameters.Limit;
-            offset?: /* Offset */ Parameters.Offset;
-        }
-        namespace Responses {
-            export type $200 = /* PagedParticipantCommentSchema */ Components.Schemas.PagedParticipantCommentSchema;
-        }
-    }
-    namespace ParticipantsApiGetParticipantComments {
-        namespace Parameters {
-            /**
-             * Participant Id
-             */
-            export type ParticipantId = number;
-        }
-        export interface PathParameters {
-            participant_id: /* Participant Id */ Parameters.ParticipantId;
-        }
-        namespace Responses {
-            /**
-             * Response
-             */
-            export type $200 = /* ParticipantCommentSchema */ Components.Schemas.ParticipantCommentSchema[];
-        }
-    }
-    namespace ParticipantsApiGetParticipantDetails {
+    namespace ParticipantsApiParticipantApiGetParticipant {
         namespace Parameters {
             /**
              * Participant Id
@@ -1057,15 +1257,56 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
-    namespace ParticipantsApiGetParticipantsForHeat {
+    namespace ParticipantsApiParticipantApiGetParticipantComments {
         namespace Parameters {
             /**
-             * Heat Id
+             * Participant Id
              */
-            export type HeatId = number;
+            export type ParticipantId = number;
         }
         export interface PathParameters {
-            heat_id: /* Heat Id */ Parameters.HeatId;
+            participant_id: /* Participant Id */ Parameters.ParticipantId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* ParticipantCommentSchema */ Components.Schemas.ParticipantCommentSchema[];
+        }
+    }
+    namespace ParticipantsApiParticipantApiReactivateParticipant {
+        namespace Parameters {
+            /**
+             * Participant Id
+             */
+            export type ParticipantId = number;
+        }
+        export interface PathParameters {
+            participant_id: /* Participant Id */ Parameters.ParticipantId;
+        }
+        namespace Responses {
+            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiParticipantApiRecentlyEditedParticipants {
+        namespace Parameters {
+            /**
+             * Count
+             */
+            export type Count = number;
+        }
+        export interface QueryParameters {
+            count?: /* Count */ Parameters.Count;
         }
         namespace Responses {
             /**
@@ -1074,7 +1315,431 @@ declare namespace Paths {
             export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
         }
     }
-    namespace ParticipantsApiGetParticipantsForRace {
+    namespace ParticipantsApiParticipantApiRemoveParticipantHeat {
+        namespace Parameters {
+            /**
+             * Participant Id
+             */
+            export type ParticipantId = number;
+        }
+        export interface PathParameters {
+            participant_id: /* Participant Id */ Parameters.ParticipantId;
+        }
+        namespace Responses {
+            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiParticipantApiUpdateParticipant {
+        namespace Parameters {
+            /**
+             * Participant Id
+             */
+            export type ParticipantId = number;
+        }
+        export interface PathParameters {
+            participant_id: /* Participant Id */ Parameters.ParticipantId;
+        }
+        export type RequestBody = /* PatchParticipantSchema */ Components.Schemas.PatchParticipantSchema;
+        namespace Responses {
+            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiAddParticipantToRelayTeam {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        export type RequestBody = /* CreateRelayParticipantSchema */ Components.Schemas.CreateRelayParticipantSchema;
+        namespace Responses {
+            export type $201 = /* RelayTeamParticipantSchema */ Components.Schemas.RelayTeamParticipantSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiChangeRelayTeamHeat {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        export type RequestBody = /* HeatSchema */ Components.Schemas.HeatSchema;
+        namespace Responses {
+            export type $200 = /* RelayTeamSchema */ Components.Schemas.RelayTeamSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiChangeRelayTeamRaceType {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        export type RequestBody = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
+        namespace Responses {
+            export type $201 = /* RelayTeamSchema */ Components.Schemas.RelayTeamSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiCreateRelayTeam {
+        export type RequestBody = /* CreateRelayTeamSchema */ Components.Schemas.CreateRelayTeamSchema;
+        namespace Responses {
+            export type $201 = /* RelayTeamSchema */ Components.Schemas.RelayTeamSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiCreateRelayTeamComment {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        export type RequestBody = /* RelayTeamCommentCreateSchema */ Components.Schemas.RelayTeamCommentCreateSchema;
+        namespace Responses {
+            export type $201 = /* RelayTeamCommentSchema */ Components.Schemas.RelayTeamCommentSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiDeactivateRelayTeam {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        namespace Responses {
+            export type $201 = /* RelayTeamSchema */ Components.Schemas.RelayTeamSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiGetRelayParticipant {
+        namespace Parameters {
+            /**
+             * Relay Participant Id
+             */
+            export type RelayParticipantId = number;
+        }
+        export interface PathParameters {
+            relay_participant_id: /* Relay Participant Id */ Parameters.RelayParticipantId;
+        }
+        namespace Responses {
+            export type $200 = /* RelayTeamParticipantSchema */ Components.Schemas.RelayTeamParticipantSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiGetRelayTeamByName {
+        namespace Parameters {
+            /**
+             * Relay Team Name
+             */
+            export type RelayTeamName = string;
+        }
+        export interface PathParameters {
+            relay_team_name: /* Relay Team Name */ Parameters.RelayTeamName;
+        }
+        namespace Responses {
+            export type $200 = /* RelayTeamSchema */ Components.Schemas.RelayTeamSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiGetRelayTeamComments {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* RelayTeamCommentSchema */ Components.Schemas.RelayTeamCommentSchema[];
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiGetRelayTeamParticipants {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* RelayTeamParticipantSchema */ Components.Schemas.RelayTeamParticipantSchema[];
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiReactivateRelayTeam {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        namespace Responses {
+            export type $201 = /* RelayTeamSchema */ Components.Schemas.RelayTeamSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiRemoveRelayTeamHeat {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        namespace Responses {
+            export type $201 = /* RelayTeamSchema */ Components.Schemas.RelayTeamSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiUpdateRelayParticipant {
+        namespace Parameters {
+            /**
+             * Relay Participant Id
+             */
+            export type RelayParticipantId = number;
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+            relay_participant_id: /* Relay Participant Id */ Parameters.RelayParticipantId;
+        }
+        export type RequestBody = /* PatchRelayParticipantSchema */ Components.Schemas.PatchRelayParticipantSchema;
+        namespace Responses {
+            export type $201 = /* RelayTeamParticipantSchema */ Components.Schemas.RelayTeamParticipantSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiUpdateRelayTeam {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        export type RequestBody = /* PatchRelayTeamSchema */ Components.Schemas.PatchRelayTeamSchema;
+        namespace Responses {
+            export type $200 = /* RelayTeamSchema */ Components.Schemas.RelayTeamSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace RaceApiRaceApiCreateRace {
+        export type RequestBody = /* CreateRaceSchema */ Components.Schemas.CreateRaceSchema;
+        namespace Responses {
+            export type $200 = /* RaceSchema */ Components.Schemas.RaceSchema;
+            export type $409 = /* RaceSchema */ Components.Schemas.RaceSchema;
+        }
+    }
+    namespace RaceApiRaceApiDeleteRace {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            export interface $204 {
+            }
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace RaceApiRaceApiGetRace {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            export type $200 = /* RaceSchema */ Components.Schemas.RaceSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace RaceApiRaceApiGetRaceBibInfoPerRaceType {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* RaceTypeBibInfoSchema */ Components.Schemas.RaceTypeBibInfoSchema[];
+        }
+    }
+    namespace RaceApiRaceApiGetRaceHeats {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* HeatSchema */ Components.Schemas.HeatSchema[];
+        }
+    }
+    namespace RaceApiRaceApiGetRaceParticipants {
         namespace Parameters {
             /**
              * Bib Number
@@ -1105,24 +1770,7 @@ declare namespace Paths {
             export type $200 = /* PagedParticipantSchema */ Components.Schemas.PagedParticipantSchema;
         }
     }
-    namespace ParticipantsApiGetParticipantsForUser {
-        namespace Parameters {
-            /**
-             * User Id
-             */
-            export type UserId = number;
-        }
-        export interface PathParameters {
-            user_id: /* User Id */ Parameters.UserId;
-        }
-        namespace Responses {
-            /**
-             * Response
-             */
-            export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
-        }
-    }
-    namespace ParticipantsApiParticipantsWithInvalidSwimTime {
+    namespace RaceApiRaceApiGetRaceParticipantsDisabled {
         namespace Parameters {
             /**
              * Race Id
@@ -1139,39 +1787,15 @@ declare namespace Paths {
             export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
         }
     }
-    namespace ParticipantsApiReactivateParticipant {
+    namespace RaceApiRaceApiGetRaceParticipantsWithInvalidSwimTime {
         namespace Parameters {
             /**
-             * Participant Id
+             * Race Id
              */
-            export type ParticipantId = number;
+            export type RaceId = number;
         }
         export interface PathParameters {
-            participant_id: /* Participant Id */ Parameters.ParticipantId;
-        }
-        namespace Responses {
-            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
-            export type $404 = /**
-             * ErrorObjectSchema
-             * Schema for the error object as described in decisions_api.md
-             */
-            Components.Schemas.ErrorObjectSchema;
-            export type $409 = /**
-             * ErrorObjectSchema
-             * Schema for the error object as described in decisions_api.md
-             */
-            Components.Schemas.ErrorObjectSchema;
-        }
-    }
-    namespace ParticipantsApiRecentlyEditedParticipants {
-        namespace Parameters {
-            /**
-             * Count
-             */
-            export type Count = number;
-        }
-        export interface QueryParameters {
-            count?: /* Count */ Parameters.Count;
+            race_id: /* Race Id */ Parameters.RaceId;
         }
         namespace Responses {
             /**
@@ -1180,75 +1804,40 @@ declare namespace Paths {
             export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
         }
     }
-    namespace ParticipantsApiRemoveParticipantHeat {
+    namespace RaceApiRaceApiGetRaceStats {
         namespace Parameters {
             /**
-             * Participant Id
+             * Race Id
              */
-            export type ParticipantId = number;
+            export type RaceId = number;
         }
         export interface PathParameters {
-            participant_id: /* Participant Id */ Parameters.ParticipantId;
+            race_id: /* Race Id */ Parameters.RaceId;
         }
         namespace Responses {
-            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
-            export type $404 = /**
-             * ErrorObjectSchema
-             * Schema for the error object as described in decisions_api.md
-             */
-            Components.Schemas.ErrorObjectSchema;
-            export type $409 = /**
-             * ErrorObjectSchema
-             * Schema for the error object as described in decisions_api.md
-             */
-            Components.Schemas.ErrorObjectSchema;
-        }
-    }
-    namespace ParticipantsApiUpdateParticipant {
-        namespace Parameters {
             /**
-             * Participant Id
+             * Response
              */
-            export type ParticipantId = number;
-        }
-        export interface PathParameters {
-            participant_id: /* Participant Id */ Parameters.ParticipantId;
-        }
-        export type RequestBody = /* PatchParticipantSchema */ Components.Schemas.PatchParticipantSchema;
-        namespace Responses {
-            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
-            export type $404 = /**
-             * ErrorObjectSchema
-             * Schema for the error object as described in decisions_api.md
-             */
-            Components.Schemas.ErrorObjectSchema;
-            export type $409 = /**
-             * ErrorObjectSchema
-             * Schema for the error object as described in decisions_api.md
-             */
-            Components.Schemas.ErrorObjectSchema;
+            export type $200 = /* RaceTypeStatSchema */ Components.Schemas.RaceTypeStatSchema[];
         }
     }
-    namespace RaceApiCreateRace {
-        export type RequestBody = /* CreateRaceSchema */ Components.Schemas.CreateRaceSchema;
+    namespace RaceApiRaceApiGetRaces {
         namespace Responses {
-            export type $200 = /* RaceSchema */ Components.Schemas.RaceSchema;
-            export type $409 = /* RaceSchema */ Components.Schemas.RaceSchema;
+            /**
+             * Response
+             */
+            export type $200 = /* RaceSchema */ Components.Schemas.RaceSchema[];
         }
     }
-    namespace RaceApiCreateRaceType {
+    namespace RaceApiRaceTypeApiCreateRaceType {
         export type RequestBody = /* CreateRaceTypeSchema */ Components.Schemas.CreateRaceTypeSchema;
         namespace Responses {
             export type $200 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
             export type $201 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
         }
     }
-    namespace RaceApiDeleteRace {
+    namespace RaceApiRaceTypeApiDeleteRace {
         namespace Parameters {
-            /**
-             * Race Id
-             */
-            export type RaceId = number;
             /**
              * Race Type Id
              */
@@ -1267,43 +1856,7 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
-    namespace RaceApiGetRace {
-        namespace Parameters {
-            /**
-             * Race Id
-             */
-            export type RaceId = number;
-        }
-        export interface PathParameters {
-            race_id: /* Race Id */ Parameters.RaceId;
-        }
-        namespace Responses {
-            export type $200 = /* RaceSchema */ Components.Schemas.RaceSchema;
-            export type $404 = /**
-             * ErrorObjectSchema
-             * Schema for the error object as described in decisions_api.md
-             */
-            Components.Schemas.ErrorObjectSchema;
-        }
-    }
-    namespace RaceApiGetRaceStats {
-        namespace Parameters {
-            /**
-             * Race Id
-             */
-            export type RaceId = number;
-        }
-        export interface PathParameters {
-            race_id: /* Race Id */ Parameters.RaceId;
-        }
-        namespace Responses {
-            /**
-             * Response
-             */
-            export type $200 = /* RaceTypeStatSchema */ Components.Schemas.RaceTypeStatSchema[];
-        }
-    }
-    namespace RaceApiGetRaceTypes {
+    namespace RaceApiRaceTypeApiGetRaceTypes {
         namespace Responses {
             /**
              * Response
@@ -1311,49 +1864,7 @@ declare namespace Paths {
             export type $200 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema[];
         }
     }
-    namespace RaceApiGetRaceTypesBibInfoForRace {
-        namespace Parameters {
-            /**
-             * Race Id
-             */
-            export type RaceId = number;
-        }
-        export interface PathParameters {
-            race_id: /* Race Id */ Parameters.RaceId;
-        }
-        namespace Responses {
-            /**
-             * Response
-             */
-            export type $200 = /* RaceTypeBibInfoSchema */ Components.Schemas.RaceTypeBibInfoSchema[];
-        }
-    }
-    namespace RaceApiGetRaces {
-        namespace Responses {
-            /**
-             * Response
-             */
-            export type $200 = /* RaceSchema */ Components.Schemas.RaceSchema[];
-        }
-    }
-    namespace RaceApiRaceParticipantsDisabled {
-        namespace Parameters {
-            /**
-             * Race Id
-             */
-            export type RaceId = number;
-        }
-        export interface PathParameters {
-            race_id: /* Race Id */ Parameters.RaceId;
-        }
-        namespace Responses {
-            /**
-             * Response
-             */
-            export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
-        }
-    }
-    namespace RaceApiUpdateRaceType {
+    namespace RaceApiRaceTypeApiUpdateRaceType {
         namespace Parameters {
             /**
              * Race Type Id
@@ -1401,6 +1912,30 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AccountsApiAdminActionCleanGender.Responses.$200>
   /**
+   * accounts_api_get_user_participations - Get User Participations
+   */
+  'accounts_api_get_user_participations'(
+    parameters: Parameters<Paths.AccountsApiGetUserParticipations.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AccountsApiGetUserParticipations.Responses.$200>
+  /**
+   * accounts_api_get_user_participants - Get User Participants
+   */
+  'accounts_api_get_user_participants'(
+    parameters: Parameters<Paths.AccountsApiGetUserParticipants.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AccountsApiGetUserParticipants.Responses.$200>
+  /**
+   * accounts_api_create_user_participant - Create User Participant
+   */
+  'accounts_api_create_user_participant'(
+    parameters: Parameters<Paths.AccountsApiCreateUserParticipant.PathParameters>,
+    data?: Paths.AccountsApiCreateUserParticipant.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AccountsApiCreateUserParticipant.Responses.$201>
+  /**
    * accounts_api_get_user_by_id - Get User By Id
    */
   'accounts_api_get_user_by_id'(
@@ -1433,249 +1968,127 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AccountsApiCreateUser.Responses.$200 | Paths.AccountsApiCreateUser.Responses.$201>
   /**
-   * participants_api_get_participants_for_user - Get Participants For User
+   * race_api_race_api_get_races - Get Races
    */
-  'participants_api_get_participants_for_user'(
-    parameters: Parameters<Paths.ParticipantsApiGetParticipantsForUser.PathParameters>,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiGetParticipantsForUser.Responses.$200>
-  /**
-   * participants_api_create_participant - Create Participant
-   */
-  'participants_api_create_participant'(
-    parameters: Parameters<Paths.ParticipantsApiCreateParticipant.PathParameters>,
-    data?: Paths.ParticipantsApiCreateParticipant.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiCreateParticipant.Responses.$201>
-  /**
-   * participants_api_get_participants_for_heat - Get Participants For Heat
-   */
-  'participants_api_get_participants_for_heat'(
-    parameters: Parameters<Paths.ParticipantsApiGetParticipantsForHeat.PathParameters>,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiGetParticipantsForHeat.Responses.$200>
-  /**
-   * participants_api_create_participant_bulk - Create Participant Bulk
-   */
-  'participants_api_create_participant_bulk'(
+  'race_api_race_api_get_races'(
     parameters?: Parameters<UnknownParamsObject> | null,
-    data?: Paths.ParticipantsApiCreateParticipantBulk.RequestBody,
+    data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiCreateParticipantBulk.Responses.$201>
+  ): OperationResponse<Paths.RaceApiRaceApiGetRaces.Responses.$200>
   /**
-   * participants_api_participants_with_invalid_swim_time - Participants With Invalid Swim Time
+   * race_api_race_api_create_race - Create Race
+   */
+  'race_api_race_api_create_race'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: Paths.RaceApiRaceApiCreateRace.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiRaceApiCreateRace.Responses.$200>
+  /**
+   * race_api_race_api_get_race_heats - Get Race Heats
+   */
+  'race_api_race_api_get_race_heats'(
+    parameters: Parameters<Paths.RaceApiRaceApiGetRaceHeats.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiRaceApiGetRaceHeats.Responses.$200>
+  /**
+   * race_api_race_api_get_race_participants_with_invalid_swim_time - Get Race Participants With Invalid Swim Time
    * 
    * Returns all the active participants of the given race that have an invalid swim time.
    */
-  'participants_api_participants_with_invalid_swim_time'(
-    parameters: Parameters<Paths.ParticipantsApiParticipantsWithInvalidSwimTime.PathParameters>,
+  'race_api_race_api_get_race_participants_with_invalid_swim_time'(
+    parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipantsWithInvalidSwimTime.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiParticipantsWithInvalidSwimTime.Responses.$200>
+  ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipantsWithInvalidSwimTime.Responses.$200>
   /**
-   * participants_api_get_participants_for_race - Get Participants For Race
+   * race_api_race_api_get_race_participants - Get Race Participants
    */
-  'participants_api_get_participants_for_race'(
-    parameters: Parameters<Paths.ParticipantsApiGetParticipantsForRace.QueryParameters & Paths.ParticipantsApiGetParticipantsForRace.PathParameters>,
+  'race_api_race_api_get_race_participants'(
+    parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipants.QueryParameters & Paths.RaceApiRaceApiGetRaceParticipants.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiGetParticipantsForRace.Responses.$200>
+  ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipants.Responses.$200>
   /**
-   * participants_api_recently_edited_participants - Recently Edited Participants
-   * 
-   * Returns the most recently edited participants.
+   * race_api_race_api_get_race_stats - Get Race Stats
    */
-  'participants_api_recently_edited_participants'(
-    parameters?: Parameters<Paths.ParticipantsApiRecentlyEditedParticipants.QueryParameters> | null,
+  'race_api_race_api_get_race_stats'(
+    parameters: Parameters<Paths.RaceApiRaceApiGetRaceStats.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiRecentlyEditedParticipants.Responses.$200>
+  ): OperationResponse<Paths.RaceApiRaceApiGetRaceStats.Responses.$200>
   /**
-   * participants_api_delete_participant_comment - Delete Participant Comment
+   * race_api_race_api_get_race_participants_disabled - Get Race Participants Disabled
    */
-  'participants_api_delete_participant_comment'(
-    parameters: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters>,
+  'race_api_race_api_get_race_participants_disabled'(
+    parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipantsDisabled.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiDeleteParticipantComment.Responses.$204>
+  ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipantsDisabled.Responses.$200>
   /**
-   * participants_api_reactivate_participant - Reactivate Participant
+   * race_api_race_api_get_race_bib_info_per_race_type - Get Race Bib Info Per Race Type
    */
-  'participants_api_reactivate_participant'(
-    parameters: Parameters<Paths.ParticipantsApiReactivateParticipant.PathParameters>,
+  'race_api_race_api_get_race_bib_info_per_race_type'(
+    parameters: Parameters<Paths.RaceApiRaceApiGetRaceBibInfoPerRaceType.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiReactivateParticipant.Responses.$201>
+  ): OperationResponse<Paths.RaceApiRaceApiGetRaceBibInfoPerRaceType.Responses.$200>
   /**
-   * participants_api_change_participant_race_type - Change Participant Race Type
+   * race_api_race_api_get_race - Get Race
    */
-  'participants_api_change_participant_race_type'(
-    parameters: Parameters<Paths.ParticipantsApiChangeParticipantRaceType.PathParameters>,
-    data?: Paths.ParticipantsApiChangeParticipantRaceType.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiChangeParticipantRaceType.Responses.$201>
-  /**
-   * participants_api_change_participant_heat - Change Participant Heat
-   */
-  'participants_api_change_participant_heat'(
-    parameters: Parameters<Paths.ParticipantsApiChangeParticipantHeat.PathParameters>,
-    data?: Paths.ParticipantsApiChangeParticipantHeat.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiChangeParticipantHeat.Responses.$200>
-  /**
-   * participants_api_remove_participant_heat - Remove Participant Heat
-   */
-  'participants_api_remove_participant_heat'(
-    parameters: Parameters<Paths.ParticipantsApiRemoveParticipantHeat.PathParameters>,
+  'race_api_race_api_get_race'(
+    parameters: Parameters<Paths.RaceApiRaceApiGetRace.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiRemoveParticipantHeat.Responses.$201>
+  ): OperationResponse<Paths.RaceApiRaceApiGetRace.Responses.$200>
   /**
-   * participants_api_deactivate_participant - Deactivate Participant
+   * race_api_race_api_delete_race - Delete Race
    */
-  'participants_api_deactivate_participant'(
-    parameters: Parameters<Paths.ParticipantsApiDeactivateParticipant.PathParameters>,
+  'race_api_race_api_delete_race'(
+    parameters: Parameters<Paths.RaceApiRaceApiDeleteRace.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiDeactivateParticipant.Responses.$201>
+  ): OperationResponse<Paths.RaceApiRaceApiDeleteRace.Responses.$204>
   /**
-   * participants_api_get_participant_comments - Get Participant Comments
+   * race_api_race_type_api_update_race_type - Update Race Type
    */
-  'participants_api_get_participant_comments'(
-    parameters: Parameters<Paths.ParticipantsApiGetParticipantComments.PathParameters>,
+  'race_api_race_type_api_update_race_type'(
+    parameters: Parameters<Paths.RaceApiRaceTypeApiUpdateRaceType.PathParameters>,
+    data?: Paths.RaceApiRaceTypeApiUpdateRaceType.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiRaceTypeApiUpdateRaceType.Responses.$201>
+  /**
+   * race_api_race_type_api_delete_race - Delete Race
+   */
+  'race_api_race_type_api_delete_race'(
+    parameters: Parameters<Paths.RaceApiRaceTypeApiDeleteRace.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiGetParticipantComments.Responses.$200>
+  ): OperationResponse<Paths.RaceApiRaceTypeApiDeleteRace.Responses.$204>
   /**
-   * participants_api_create_participant_comment - Create Participant Comment
+   * race_api_race_type_api_get_race_types - Get Race Types
    */
-  'participants_api_create_participant_comment'(
-    parameters: Parameters<Paths.ParticipantsApiCreateParticipantComment.PathParameters>,
-    data?: Paths.ParticipantsApiCreateParticipantComment.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiCreateParticipantComment.Responses.$201>
-  /**
-   * participants_api_get_all_participant_comments - Get All Participant Comments
-   */
-  'participants_api_get_all_participant_comments'(
-    parameters?: Parameters<Paths.ParticipantsApiGetAllParticipantComments.QueryParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiGetAllParticipantComments.Responses.$200>
-  /**
-   * participants_api_get_participant_details - Get Participant Details
-   */
-  'participants_api_get_participant_details'(
-    parameters: Parameters<Paths.ParticipantsApiGetParticipantDetails.PathParameters>,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiGetParticipantDetails.Responses.$200>
-  /**
-   * participants_api_update_participant - Update Participant
-   */
-  'participants_api_update_participant'(
-    parameters: Parameters<Paths.ParticipantsApiUpdateParticipant.PathParameters>,
-    data?: Paths.ParticipantsApiUpdateParticipant.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiUpdateParticipant.Responses.$201>
-  /**
-   * race_api_get_race_types - Get Race Types
-   */
-  'race_api_get_race_types'(
+  'race_api_race_type_api_get_race_types'(
     parameters?: Parameters<UnknownParamsObject> | null,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RaceApiGetRaceTypes.Responses.$200>
+  ): OperationResponse<Paths.RaceApiRaceTypeApiGetRaceTypes.Responses.$200>
   /**
-   * race_api_create_race_type - Create Race Type
+   * race_api_race_type_api_create_race_type - Create Race Type
    */
-  'race_api_create_race_type'(
+  'race_api_race_type_api_create_race_type'(
     parameters?: Parameters<UnknownParamsObject> | null,
-    data?: Paths.RaceApiCreateRaceType.RequestBody,
+    data?: Paths.RaceApiRaceTypeApiCreateRaceType.RequestBody,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RaceApiCreateRaceType.Responses.$200 | Paths.RaceApiCreateRaceType.Responses.$201>
+  ): OperationResponse<Paths.RaceApiRaceTypeApiCreateRaceType.Responses.$200 | Paths.RaceApiRaceTypeApiCreateRaceType.Responses.$201>
   /**
-   * race_api_update_race_type - Update Race Type
+   * heats_api_get_heat_participants - Get Heat Participants
    */
-  'race_api_update_race_type'(
-    parameters: Parameters<Paths.RaceApiUpdateRaceType.PathParameters>,
-    data?: Paths.RaceApiUpdateRaceType.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RaceApiUpdateRaceType.Responses.$201>
-  /**
-   * race_api_delete_race - Delete Race
-   */
-  'race_api_delete_race'(
-    parameters: Parameters<Paths.RaceApiDeleteRace.PathParameters>,
+  'heats_api_get_heat_participants'(
+    parameters: Parameters<Paths.HeatsApiGetHeatParticipants.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RaceApiDeleteRace.Responses.$204>
-  /**
-   * race_api_get_races - Get Races
-   */
-  'race_api_get_races'(
-    parameters?: Parameters<UnknownParamsObject> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RaceApiGetRaces.Responses.$200>
-  /**
-   * race_api_create_race - Create Race
-   */
-  'race_api_create_race'(
-    parameters?: Parameters<UnknownParamsObject> | null,
-    data?: Paths.RaceApiCreateRace.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RaceApiCreateRace.Responses.$200>
-  /**
-   * race_api_get_race_stats - Get Race Stats
-   */
-  'race_api_get_race_stats'(
-    parameters: Parameters<Paths.RaceApiGetRaceStats.PathParameters>,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RaceApiGetRaceStats.Responses.$200>
-  /**
-   * race_api_race_participants_disabled - Race Participants Disabled
-   */
-  'race_api_race_participants_disabled'(
-    parameters: Parameters<Paths.RaceApiRaceParticipantsDisabled.PathParameters>,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RaceApiRaceParticipantsDisabled.Responses.$200>
-  /**
-   * race_api_get_race_types_bib_info_for_race - Get Race Types Bib Info For Race
-   */
-  'race_api_get_race_types_bib_info_for_race'(
-    parameters: Parameters<Paths.RaceApiGetRaceTypesBibInfoForRace.PathParameters>,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RaceApiGetRaceTypesBibInfoForRace.Responses.$200>
-  /**
-   * race_api_get_race - Get Race
-   */
-  'race_api_get_race'(
-    parameters: Parameters<Paths.RaceApiGetRace.PathParameters>,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RaceApiGetRace.Responses.$200>
-  /**
-   * race_api_delete_race - Delete Race
-   */
-  'race_api_delete_race'(
-    parameters: Parameters<Paths.RaceApiDeleteRace.PathParameters>,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RaceApiDeleteRace.Responses.$204>
-  /**
-   * heats_api_get_heats_for_race - Get Heats For Race
-   */
-  'heats_api_get_heats_for_race'(
-    parameters: Parameters<Paths.HeatsApiGetHeatsForRace.PathParameters>,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.HeatsApiGetHeatsForRace.Responses.$200>
+  ): OperationResponse<Paths.HeatsApiGetHeatParticipants.Responses.$200>
   /**
    * heats_api_get_heat - Get Heat
    */
@@ -1708,6 +2121,232 @@ export interface OperationMethods {
     data?: Paths.HeatsApiCreateHeat.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.HeatsApiCreateHeat.Responses.$200 | Paths.HeatsApiCreateHeat.Responses.$201>
+  /**
+   * participants_api_participant_api_create_participant_bulk - Create Participant Bulk
+   */
+  'participants_api_participant_api_create_participant_bulk'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: Paths.ParticipantsApiParticipantApiCreateParticipantBulk.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiCreateParticipantBulk.Responses.$201>
+  /**
+   * participants_api_participant_api_recently_edited_participants - Recently Edited Participants
+   * 
+   * Returns the most recently edited participants.
+   */
+  'participants_api_participant_api_recently_edited_participants'(
+    parameters?: Parameters<Paths.ParticipantsApiParticipantApiRecentlyEditedParticipants.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiRecentlyEditedParticipants.Responses.$200>
+  /**
+   * participants_api_participant_api_reactivate_participant - Reactivate Participant
+   */
+  'participants_api_participant_api_reactivate_participant'(
+    parameters: Parameters<Paths.ParticipantsApiParticipantApiReactivateParticipant.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiReactivateParticipant.Responses.$201>
+  /**
+   * participants_api_participant_api_change_participant_race_type - Change Participant Race Type
+   */
+  'participants_api_participant_api_change_participant_race_type'(
+    parameters: Parameters<Paths.ParticipantsApiParticipantApiChangeParticipantRaceType.PathParameters>,
+    data?: Paths.ParticipantsApiParticipantApiChangeParticipantRaceType.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiChangeParticipantRaceType.Responses.$201>
+  /**
+   * participants_api_participant_api_change_participant_heat - Change Participant Heat
+   */
+  'participants_api_participant_api_change_participant_heat'(
+    parameters: Parameters<Paths.ParticipantsApiParticipantApiChangeParticipantHeat.PathParameters>,
+    data?: Paths.ParticipantsApiParticipantApiChangeParticipantHeat.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiChangeParticipantHeat.Responses.$200>
+  /**
+   * participants_api_participant_api_remove_participant_heat - Remove Participant Heat
+   */
+  'participants_api_participant_api_remove_participant_heat'(
+    parameters: Parameters<Paths.ParticipantsApiParticipantApiRemoveParticipantHeat.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiRemoveParticipantHeat.Responses.$201>
+  /**
+   * participants_api_participant_api_deactivate_participant - Deactivate Participant
+   */
+  'participants_api_participant_api_deactivate_participant'(
+    parameters: Parameters<Paths.ParticipantsApiParticipantApiDeactivateParticipant.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiDeactivateParticipant.Responses.$201>
+  /**
+   * participants_api_participant_api_get_participant_comments - Get Participant Comments
+   */
+  'participants_api_participant_api_get_participant_comments'(
+    parameters: Parameters<Paths.ParticipantsApiParticipantApiGetParticipantComments.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiGetParticipantComments.Responses.$200>
+  /**
+   * participants_api_participant_api_create_participant_comment - Create Participant Comment
+   */
+  'participants_api_participant_api_create_participant_comment'(
+    parameters: Parameters<Paths.ParticipantsApiParticipantApiCreateParticipantComment.PathParameters>,
+    data?: Paths.ParticipantsApiParticipantApiCreateParticipantComment.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiCreateParticipantComment.Responses.$201>
+  /**
+   * participants_api_participant_api_get_participant - Get Participant
+   */
+  'participants_api_participant_api_get_participant'(
+    parameters: Parameters<Paths.ParticipantsApiParticipantApiGetParticipant.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiGetParticipant.Responses.$200>
+  /**
+   * participants_api_participant_api_update_participant - Update Participant
+   */
+  'participants_api_participant_api_update_participant'(
+    parameters: Parameters<Paths.ParticipantsApiParticipantApiUpdateParticipant.PathParameters>,
+    data?: Paths.ParticipantsApiParticipantApiUpdateParticipant.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiUpdateParticipant.Responses.$201>
+  /**
+   * participants_api_comment_api_get_all_participant_comments - Get All Participant Comments
+   */
+  'participants_api_comment_api_get_all_participant_comments'(
+    parameters?: Parameters<Paths.ParticipantsApiCommentApiGetAllParticipantComments.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiCommentApiGetAllParticipantComments.Responses.$200>
+  /**
+   * participants_api_comment_api_delete_participant_comment - Delete Participant Comment
+   */
+  'participants_api_comment_api_delete_participant_comment'(
+    parameters: Parameters<Paths.ParticipantsApiCommentApiDeleteParticipantComment.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiCommentApiDeleteParticipantComment.Responses.$204>
+  /**
+   * participants_api_relay_team_api_get_relay_team_comments - Get Relay Team Comments
+   */
+  'participants_api_relay_team_api_get_relay_team_comments'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiGetRelayTeamComments.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiGetRelayTeamComments.Responses.$200>
+  /**
+   * participants_api_relay_team_api_create_relay_team_comment - Create Relay Team Comment
+   */
+  'participants_api_relay_team_api_create_relay_team_comment'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiCreateRelayTeamComment.PathParameters>,
+    data?: Paths.ParticipantsApiRelayTeamApiCreateRelayTeamComment.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiCreateRelayTeamComment.Responses.$201>
+  /**
+   * participants_api_relay_team_api_change_relay_team_race_type - Change Relay Team Race Type
+   */
+  'participants_api_relay_team_api_change_relay_team_race_type'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamRaceType.PathParameters>,
+    data?: Paths.ParticipantsApiRelayTeamApiChangeRelayTeamRaceType.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamRaceType.Responses.$201>
+  /**
+   * participants_api_relay_team_api_change_relay_team_heat - Change Relay Team Heat
+   */
+  'participants_api_relay_team_api_change_relay_team_heat'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.PathParameters>,
+    data?: Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.Responses.$200>
+  /**
+   * participants_api_relay_team_api_remove_relay_team_heat - Remove Relay Team Heat
+   */
+  'participants_api_relay_team_api_remove_relay_team_heat'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiRemoveRelayTeamHeat.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiRemoveRelayTeamHeat.Responses.$201>
+  /**
+   * participants_api_relay_team_api_deactivate_relay_team - Deactivate Relay Team
+   */
+  'participants_api_relay_team_api_deactivate_relay_team'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiDeactivateRelayTeam.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiDeactivateRelayTeam.Responses.$201>
+  /**
+   * participants_api_relay_team_api_reactivate_relay_team - Reactivate Relay Team
+   */
+  'participants_api_relay_team_api_reactivate_relay_team'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiReactivateRelayTeam.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiReactivateRelayTeam.Responses.$201>
+  /**
+   * participants_api_relay_team_api_get_relay_team_participants - Get Relay Team Participants
+   */
+  'participants_api_relay_team_api_get_relay_team_participants'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiGetRelayTeamParticipants.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiGetRelayTeamParticipants.Responses.$200>
+  /**
+   * participants_api_relay_team_api_add_participant_to_relay_team - Add Participant To Relay Team
+   */
+  'participants_api_relay_team_api_add_participant_to_relay_team'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiAddParticipantToRelayTeam.PathParameters>,
+    data?: Paths.ParticipantsApiRelayTeamApiAddParticipantToRelayTeam.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiAddParticipantToRelayTeam.Responses.$201>
+  /**
+   * participants_api_relay_team_api_update_relay_participant - Update Relay Participant
+   */
+  'participants_api_relay_team_api_update_relay_participant'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiUpdateRelayParticipant.PathParameters>,
+    data?: Paths.ParticipantsApiRelayTeamApiUpdateRelayParticipant.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiUpdateRelayParticipant.Responses.$201>
+  /**
+   * participants_api_relay_team_api_get_relay_participant - Get Relay Participant
+   */
+  'participants_api_relay_team_api_get_relay_participant'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiGetRelayParticipant.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiGetRelayParticipant.Responses.$200>
+  /**
+   * participants_api_relay_team_api_update_relay_team - Update Relay Team
+   */
+  'participants_api_relay_team_api_update_relay_team'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiUpdateRelayTeam.PathParameters>,
+    data?: Paths.ParticipantsApiRelayTeamApiUpdateRelayTeam.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiUpdateRelayTeam.Responses.$200>
+  /**
+   * participants_api_relay_team_api_get_relay_team_by_name - Get Relay Team By Name
+   */
+  'participants_api_relay_team_api_get_relay_team_by_name'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiGetRelayTeamByName.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiGetRelayTeamByName.Responses.$200>
+  /**
+   * participants_api_relay_team_api_create_relay_team - Create Relay Team
+   */
+  'participants_api_relay_team_api_create_relay_team'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: Paths.ParticipantsApiRelayTeamApiCreateRelayTeam.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiCreateRelayTeam.Responses.$201>
+  /**
+   * participants_api_comment_api_delete_relay_team_comment - Delete Relay Team Comment
+   */
+  'participants_api_comment_api_delete_relay_team_comment'(
+    parameters: Parameters<Paths.ParticipantsApiCommentApiDeleteRelayTeamComment.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiCommentApiDeleteRelayTeamComment.Responses.$204>
 }
 
 export interface PathsDictionary {
@@ -1740,6 +2379,34 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AccountsApiAdminActionCleanGender.Responses.$200>
+  }
+  ['/api/users/{user_id}/participations']: {
+    /**
+     * accounts_api_get_user_participations - Get User Participations
+     */
+    'get'(
+      parameters: Parameters<Paths.AccountsApiGetUserParticipations.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AccountsApiGetUserParticipations.Responses.$200>
+  }
+  ['/api/users/{user_id}/participants']: {
+    /**
+     * accounts_api_create_user_participant - Create User Participant
+     */
+    'post'(
+      parameters: Parameters<Paths.AccountsApiCreateUserParticipant.PathParameters>,
+      data?: Paths.AccountsApiCreateUserParticipant.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AccountsApiCreateUserParticipant.Responses.$201>
+    /**
+     * accounts_api_get_user_participants - Get User Participants
+     */
+    'get'(
+      parameters: Parameters<Paths.AccountsApiGetUserParticipants.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AccountsApiGetUserParticipants.Responses.$200>
   }
   ['/api/users/{user_id}']: {
     /**
@@ -1779,295 +2446,149 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AccountsApiCreateUser.Responses.$200 | Paths.AccountsApiCreateUser.Responses.$201>
   }
-  ['/api/participants/user/{user_id}/participants']: {
+  ['/api/races/']: {
     /**
-     * participants_api_create_participant - Create Participant
-     */
-    'post'(
-      parameters: Parameters<Paths.ParticipantsApiCreateParticipant.PathParameters>,
-      data?: Paths.ParticipantsApiCreateParticipant.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiCreateParticipant.Responses.$201>
-    /**
-     * participants_api_get_participants_for_user - Get Participants For User
+     * race_api_race_api_get_races - Get Races
      */
     'get'(
-      parameters: Parameters<Paths.ParticipantsApiGetParticipantsForUser.PathParameters>,
+      parameters?: Parameters<UnknownParamsObject> | null,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiGetParticipantsForUser.Responses.$200>
-  }
-  ['/api/participants/heat/{heat_id}']: {
+    ): OperationResponse<Paths.RaceApiRaceApiGetRaces.Responses.$200>
     /**
-     * participants_api_get_participants_for_heat - Get Participants For Heat
-     */
-    'get'(
-      parameters: Parameters<Paths.ParticipantsApiGetParticipantsForHeat.PathParameters>,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiGetParticipantsForHeat.Responses.$200>
-  }
-  ['/api/participants/import']: {
-    /**
-     * participants_api_create_participant_bulk - Create Participant Bulk
+     * race_api_race_api_create_race - Create Race
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
-      data?: Paths.ParticipantsApiCreateParticipantBulk.RequestBody,
+      data?: Paths.RaceApiRaceApiCreateRace.RequestBody,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiCreateParticipantBulk.Responses.$201>
+    ): OperationResponse<Paths.RaceApiRaceApiCreateRace.Responses.$200>
   }
-  ['/api/participants/race/{race_id}/invalid_swim_time/']: {
+  ['/api/races/{race_id}/heats']: {
     /**
-     * participants_api_participants_with_invalid_swim_time - Participants With Invalid Swim Time
+     * race_api_race_api_get_race_heats - Get Race Heats
+     */
+    'get'(
+      parameters: Parameters<Paths.RaceApiRaceApiGetRaceHeats.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiRaceApiGetRaceHeats.Responses.$200>
+  }
+  ['/api/races/{race_id}/participants/invalid_swim_time/']: {
+    /**
+     * race_api_race_api_get_race_participants_with_invalid_swim_time - Get Race Participants With Invalid Swim Time
      * 
      * Returns all the active participants of the given race that have an invalid swim time.
      */
     'get'(
-      parameters: Parameters<Paths.ParticipantsApiParticipantsWithInvalidSwimTime.PathParameters>,
+      parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipantsWithInvalidSwimTime.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiParticipantsWithInvalidSwimTime.Responses.$200>
+    ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipantsWithInvalidSwimTime.Responses.$200>
   }
-  ['/api/participants/race/{race_id}']: {
+  ['/api/races/{race_id}/participants']: {
     /**
-     * participants_api_get_participants_for_race - Get Participants For Race
+     * race_api_race_api_get_race_participants - Get Race Participants
      */
     'get'(
-      parameters: Parameters<Paths.ParticipantsApiGetParticipantsForRace.QueryParameters & Paths.ParticipantsApiGetParticipantsForRace.PathParameters>,
+      parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipants.QueryParameters & Paths.RaceApiRaceApiGetRaceParticipants.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiGetParticipantsForRace.Responses.$200>
-  }
-  ['/api/participants/recently_edited']: {
-    /**
-     * participants_api_recently_edited_participants - Recently Edited Participants
-     * 
-     * Returns the most recently edited participants.
-     */
-    'get'(
-      parameters?: Parameters<Paths.ParticipantsApiRecentlyEditedParticipants.QueryParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiRecentlyEditedParticipants.Responses.$200>
-  }
-  ['/api/participants/comment/{comment_id}']: {
-    /**
-     * participants_api_delete_participant_comment - Delete Participant Comment
-     */
-    'delete'(
-      parameters: Parameters<Paths.ParticipantsApiDeleteParticipantComment.PathParameters>,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiDeleteParticipantComment.Responses.$204>
-  }
-  ['/api/participants/{participant_id}/reactivate']: {
-    /**
-     * participants_api_reactivate_participant - Reactivate Participant
-     */
-    'patch'(
-      parameters: Parameters<Paths.ParticipantsApiReactivateParticipant.PathParameters>,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiReactivateParticipant.Responses.$201>
-  }
-  ['/api/participants/{participant_id}/change_race_type']: {
-    /**
-     * participants_api_change_participant_race_type - Change Participant Race Type
-     */
-    'patch'(
-      parameters: Parameters<Paths.ParticipantsApiChangeParticipantRaceType.PathParameters>,
-      data?: Paths.ParticipantsApiChangeParticipantRaceType.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiChangeParticipantRaceType.Responses.$201>
-  }
-  ['/api/participants/{participant_id}/change_heat']: {
-    /**
-     * participants_api_change_participant_heat - Change Participant Heat
-     */
-    'patch'(
-      parameters: Parameters<Paths.ParticipantsApiChangeParticipantHeat.PathParameters>,
-      data?: Paths.ParticipantsApiChangeParticipantHeat.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiChangeParticipantHeat.Responses.$200>
-  }
-  ['/api/participants/{participant_id}/remove_heat']: {
-    /**
-     * participants_api_remove_participant_heat - Remove Participant Heat
-     */
-    'patch'(
-      parameters: Parameters<Paths.ParticipantsApiRemoveParticipantHeat.PathParameters>,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiRemoveParticipantHeat.Responses.$201>
-  }
-  ['/api/participants/{participant_id}/deactivate']: {
-    /**
-     * participants_api_deactivate_participant - Deactivate Participant
-     */
-    'patch'(
-      parameters: Parameters<Paths.ParticipantsApiDeactivateParticipant.PathParameters>,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiDeactivateParticipant.Responses.$201>
-  }
-  ['/api/participants/{participant_id}/comments']: {
-    /**
-     * participants_api_get_participant_comments - Get Participant Comments
-     */
-    'get'(
-      parameters: Parameters<Paths.ParticipantsApiGetParticipantComments.PathParameters>,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiGetParticipantComments.Responses.$200>
-    /**
-     * participants_api_create_participant_comment - Create Participant Comment
-     */
-    'post'(
-      parameters: Parameters<Paths.ParticipantsApiCreateParticipantComment.PathParameters>,
-      data?: Paths.ParticipantsApiCreateParticipantComment.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiCreateParticipantComment.Responses.$201>
-  }
-  ['/api/participants/comments']: {
-    /**
-     * participants_api_get_all_participant_comments - Get All Participant Comments
-     */
-    'get'(
-      parameters?: Parameters<Paths.ParticipantsApiGetAllParticipantComments.QueryParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiGetAllParticipantComments.Responses.$200>
-  }
-  ['/api/participants/{participant_id}']: {
-    /**
-     * participants_api_get_participant_details - Get Participant Details
-     */
-    'get'(
-      parameters: Parameters<Paths.ParticipantsApiGetParticipantDetails.PathParameters>,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiGetParticipantDetails.Responses.$200>
-    /**
-     * participants_api_update_participant - Update Participant
-     */
-    'patch'(
-      parameters: Parameters<Paths.ParticipantsApiUpdateParticipant.PathParameters>,
-      data?: Paths.ParticipantsApiUpdateParticipant.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiUpdateParticipant.Responses.$201>
-  }
-  ['/api/races/racetypes']: {
-    /**
-     * race_api_get_race_types - Get Race Types
-     */
-    'get'(
-      parameters?: Parameters<UnknownParamsObject> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RaceApiGetRaceTypes.Responses.$200>
-    /**
-     * race_api_create_race_type - Create Race Type
-     */
-    'post'(
-      parameters?: Parameters<UnknownParamsObject> | null,
-      data?: Paths.RaceApiCreateRaceType.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RaceApiCreateRaceType.Responses.$200 | Paths.RaceApiCreateRaceType.Responses.$201>
-  }
-  ['/api/races/racetypes/{race_type_id}']: {
-    /**
-     * race_api_update_race_type - Update Race Type
-     */
-    'patch'(
-      parameters: Parameters<Paths.RaceApiUpdateRaceType.PathParameters>,
-      data?: Paths.RaceApiUpdateRaceType.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RaceApiUpdateRaceType.Responses.$201>
-    /**
-     * race_api_delete_race - Delete Race
-     */
-    'delete'(
-      parameters: Parameters<Paths.RaceApiDeleteRace.PathParameters>,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RaceApiDeleteRace.Responses.$204>
-  }
-  ['/api/races/']: {
-    /**
-     * race_api_get_races - Get Races
-     */
-    'get'(
-      parameters?: Parameters<UnknownParamsObject> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RaceApiGetRaces.Responses.$200>
-    /**
-     * race_api_create_race - Create Race
-     */
-    'post'(
-      parameters?: Parameters<UnknownParamsObject> | null,
-      data?: Paths.RaceApiCreateRace.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RaceApiCreateRace.Responses.$200>
+    ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipants.Responses.$200>
   }
   ['/api/races/{race_id}/stats']: {
     /**
-     * race_api_get_race_stats - Get Race Stats
+     * race_api_race_api_get_race_stats - Get Race Stats
      */
     'get'(
-      parameters: Parameters<Paths.RaceApiGetRaceStats.PathParameters>,
+      parameters: Parameters<Paths.RaceApiRaceApiGetRaceStats.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RaceApiGetRaceStats.Responses.$200>
+    ): OperationResponse<Paths.RaceApiRaceApiGetRaceStats.Responses.$200>
   }
   ['/api/races/{race_id}/participants/disabled']: {
     /**
-     * race_api_race_participants_disabled - Race Participants Disabled
+     * race_api_race_api_get_race_participants_disabled - Get Race Participants Disabled
      */
     'get'(
-      parameters: Parameters<Paths.RaceApiRaceParticipantsDisabled.PathParameters>,
+      parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipantsDisabled.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RaceApiRaceParticipantsDisabled.Responses.$200>
+    ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipantsDisabled.Responses.$200>
   }
   ['/api/races/{race_id}/racetypes/bib_info']: {
     /**
-     * race_api_get_race_types_bib_info_for_race - Get Race Types Bib Info For Race
+     * race_api_race_api_get_race_bib_info_per_race_type - Get Race Bib Info Per Race Type
      */
     'get'(
-      parameters: Parameters<Paths.RaceApiGetRaceTypesBibInfoForRace.PathParameters>,
+      parameters: Parameters<Paths.RaceApiRaceApiGetRaceBibInfoPerRaceType.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RaceApiGetRaceTypesBibInfoForRace.Responses.$200>
+    ): OperationResponse<Paths.RaceApiRaceApiGetRaceBibInfoPerRaceType.Responses.$200>
   }
   ['/api/races/{race_id}']: {
     /**
-     * race_api_delete_race - Delete Race
+     * race_api_race_api_delete_race - Delete Race
      */
     'delete'(
-      parameters: Parameters<Paths.RaceApiDeleteRace.PathParameters>,
+      parameters: Parameters<Paths.RaceApiRaceApiDeleteRace.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RaceApiDeleteRace.Responses.$204>
+    ): OperationResponse<Paths.RaceApiRaceApiDeleteRace.Responses.$204>
     /**
-     * race_api_get_race - Get Race
+     * race_api_race_api_get_race - Get Race
      */
     'get'(
-      parameters: Parameters<Paths.RaceApiGetRace.PathParameters>,
+      parameters: Parameters<Paths.RaceApiRaceApiGetRace.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RaceApiGetRace.Responses.$200>
+    ): OperationResponse<Paths.RaceApiRaceApiGetRace.Responses.$200>
   }
-  ['/api/heats/race/{race_id}']: {
+  ['/api/race_types/{race_type_id}']: {
     /**
-     * heats_api_get_heats_for_race - Get Heats For Race
+     * race_api_race_type_api_delete_race - Delete Race
      */
-    'get'(
-      parameters: Parameters<Paths.HeatsApiGetHeatsForRace.PathParameters>,
+    'delete'(
+      parameters: Parameters<Paths.RaceApiRaceTypeApiDeleteRace.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.HeatsApiGetHeatsForRace.Responses.$200>
+    ): OperationResponse<Paths.RaceApiRaceTypeApiDeleteRace.Responses.$204>
+    /**
+     * race_api_race_type_api_update_race_type - Update Race Type
+     */
+    'patch'(
+      parameters: Parameters<Paths.RaceApiRaceTypeApiUpdateRaceType.PathParameters>,
+      data?: Paths.RaceApiRaceTypeApiUpdateRaceType.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiRaceTypeApiUpdateRaceType.Responses.$201>
+  }
+  ['/api/race_types/']: {
+    /**
+     * race_api_race_type_api_get_race_types - Get Race Types
+     */
+    'get'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiRaceTypeApiGetRaceTypes.Responses.$200>
+    /**
+     * race_api_race_type_api_create_race_type - Create Race Type
+     */
+    'post'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: Paths.RaceApiRaceTypeApiCreateRaceType.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiRaceTypeApiCreateRaceType.Responses.$200 | Paths.RaceApiRaceTypeApiCreateRaceType.Responses.$201>
+  }
+  ['/api/heats/{heat_id}/participants']: {
+    /**
+     * heats_api_get_heat_participants - Get Heat Participants
+     */
+    'get'(
+      parameters: Parameters<Paths.HeatsApiGetHeatParticipants.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.HeatsApiGetHeatParticipants.Responses.$200>
   }
   ['/api/heats/{heat_id}']: {
     /**
@@ -2104,6 +2625,280 @@ export interface PathsDictionary {
       data?: Paths.HeatsApiCreateHeat.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.HeatsApiCreateHeat.Responses.$200 | Paths.HeatsApiCreateHeat.Responses.$201>
+  }
+  ['/api/participants/import']: {
+    /**
+     * participants_api_participant_api_create_participant_bulk - Create Participant Bulk
+     */
+    'post'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: Paths.ParticipantsApiParticipantApiCreateParticipantBulk.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiCreateParticipantBulk.Responses.$201>
+  }
+  ['/api/participants/recently_edited']: {
+    /**
+     * participants_api_participant_api_recently_edited_participants - Recently Edited Participants
+     * 
+     * Returns the most recently edited participants.
+     */
+    'get'(
+      parameters?: Parameters<Paths.ParticipantsApiParticipantApiRecentlyEditedParticipants.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiRecentlyEditedParticipants.Responses.$200>
+  }
+  ['/api/participants/{participant_id}/reactivate']: {
+    /**
+     * participants_api_participant_api_reactivate_participant - Reactivate Participant
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiParticipantApiReactivateParticipant.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiReactivateParticipant.Responses.$201>
+  }
+  ['/api/participants/{participant_id}/change_race_type']: {
+    /**
+     * participants_api_participant_api_change_participant_race_type - Change Participant Race Type
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiParticipantApiChangeParticipantRaceType.PathParameters>,
+      data?: Paths.ParticipantsApiParticipantApiChangeParticipantRaceType.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiChangeParticipantRaceType.Responses.$201>
+  }
+  ['/api/participants/{participant_id}/change_heat']: {
+    /**
+     * participants_api_participant_api_change_participant_heat - Change Participant Heat
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiParticipantApiChangeParticipantHeat.PathParameters>,
+      data?: Paths.ParticipantsApiParticipantApiChangeParticipantHeat.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiChangeParticipantHeat.Responses.$200>
+  }
+  ['/api/participants/{participant_id}/remove_heat']: {
+    /**
+     * participants_api_participant_api_remove_participant_heat - Remove Participant Heat
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiParticipantApiRemoveParticipantHeat.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiRemoveParticipantHeat.Responses.$201>
+  }
+  ['/api/participants/{participant_id}/deactivate']: {
+    /**
+     * participants_api_participant_api_deactivate_participant - Deactivate Participant
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiParticipantApiDeactivateParticipant.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiDeactivateParticipant.Responses.$201>
+  }
+  ['/api/participants/{participant_id}/comments']: {
+    /**
+     * participants_api_participant_api_get_participant_comments - Get Participant Comments
+     */
+    'get'(
+      parameters: Parameters<Paths.ParticipantsApiParticipantApiGetParticipantComments.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiGetParticipantComments.Responses.$200>
+    /**
+     * participants_api_participant_api_create_participant_comment - Create Participant Comment
+     */
+    'post'(
+      parameters: Parameters<Paths.ParticipantsApiParticipantApiCreateParticipantComment.PathParameters>,
+      data?: Paths.ParticipantsApiParticipantApiCreateParticipantComment.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiCreateParticipantComment.Responses.$201>
+  }
+  ['/api/participants/{participant_id}']: {
+    /**
+     * participants_api_participant_api_get_participant - Get Participant
+     */
+    'get'(
+      parameters: Parameters<Paths.ParticipantsApiParticipantApiGetParticipant.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiGetParticipant.Responses.$200>
+    /**
+     * participants_api_participant_api_update_participant - Update Participant
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiParticipantApiUpdateParticipant.PathParameters>,
+      data?: Paths.ParticipantsApiParticipantApiUpdateParticipant.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiUpdateParticipant.Responses.$201>
+  }
+  ['/api/participants/comments/']: {
+    /**
+     * participants_api_comment_api_get_all_participant_comments - Get All Participant Comments
+     */
+    'get'(
+      parameters?: Parameters<Paths.ParticipantsApiCommentApiGetAllParticipantComments.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiCommentApiGetAllParticipantComments.Responses.$200>
+  }
+  ['/api/participants/comments/{comment_id}']: {
+    /**
+     * participants_api_comment_api_delete_participant_comment - Delete Participant Comment
+     */
+    'delete'(
+      parameters: Parameters<Paths.ParticipantsApiCommentApiDeleteParticipantComment.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiCommentApiDeleteParticipantComment.Responses.$204>
+  }
+  ['/api/relay_teams/{relay_team_id}/comments']: {
+    /**
+     * participants_api_relay_team_api_create_relay_team_comment - Create Relay Team Comment
+     */
+    'post'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiCreateRelayTeamComment.PathParameters>,
+      data?: Paths.ParticipantsApiRelayTeamApiCreateRelayTeamComment.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiCreateRelayTeamComment.Responses.$201>
+    /**
+     * participants_api_relay_team_api_get_relay_team_comments - Get Relay Team Comments
+     */
+    'get'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiGetRelayTeamComments.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiGetRelayTeamComments.Responses.$200>
+  }
+  ['/api/relay_teams/{relay_team_id}/change_race_type']: {
+    /**
+     * participants_api_relay_team_api_change_relay_team_race_type - Change Relay Team Race Type
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamRaceType.PathParameters>,
+      data?: Paths.ParticipantsApiRelayTeamApiChangeRelayTeamRaceType.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamRaceType.Responses.$201>
+  }
+  ['/api/relay_teams/{relay_team_id}/change_heat']: {
+    /**
+     * participants_api_relay_team_api_change_relay_team_heat - Change Relay Team Heat
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.PathParameters>,
+      data?: Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.Responses.$200>
+  }
+  ['/api/relay_teams/{relay_team_id}/remove_heat']: {
+    /**
+     * participants_api_relay_team_api_remove_relay_team_heat - Remove Relay Team Heat
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiRemoveRelayTeamHeat.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiRemoveRelayTeamHeat.Responses.$201>
+  }
+  ['/api/relay_teams/{relay_team_id}/deactivate']: {
+    /**
+     * participants_api_relay_team_api_deactivate_relay_team - Deactivate Relay Team
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiDeactivateRelayTeam.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiDeactivateRelayTeam.Responses.$201>
+  }
+  ['/api/relay_teams/{relay_team_id}/reactivate']: {
+    /**
+     * participants_api_relay_team_api_reactivate_relay_team - Reactivate Relay Team
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiReactivateRelayTeam.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiReactivateRelayTeam.Responses.$201>
+  }
+  ['/api/relay_teams/{relay_team_id}/participants']: {
+    /**
+     * participants_api_relay_team_api_add_participant_to_relay_team - Add Participant To Relay Team
+     */
+    'post'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiAddParticipantToRelayTeam.PathParameters>,
+      data?: Paths.ParticipantsApiRelayTeamApiAddParticipantToRelayTeam.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiAddParticipantToRelayTeam.Responses.$201>
+    /**
+     * participants_api_relay_team_api_get_relay_team_participants - Get Relay Team Participants
+     */
+    'get'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiGetRelayTeamParticipants.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiGetRelayTeamParticipants.Responses.$200>
+  }
+  ['/api/relay_teams/{relay_team_id}/participants/{relay_participant_id}']: {
+    /**
+     * participants_api_relay_team_api_update_relay_participant - Update Relay Participant
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiUpdateRelayParticipant.PathParameters>,
+      data?: Paths.ParticipantsApiRelayTeamApiUpdateRelayParticipant.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiUpdateRelayParticipant.Responses.$201>
+  }
+  ['/api/relay_teams/participants/{relay_participant_id}']: {
+    /**
+     * participants_api_relay_team_api_get_relay_participant - Get Relay Participant
+     */
+    'get'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiGetRelayParticipant.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiGetRelayParticipant.Responses.$200>
+  }
+  ['/api/relay_teams/{relay_team_id}']: {
+    /**
+     * participants_api_relay_team_api_update_relay_team - Update Relay Team
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiUpdateRelayTeam.PathParameters>,
+      data?: Paths.ParticipantsApiRelayTeamApiUpdateRelayTeam.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiUpdateRelayTeam.Responses.$200>
+  }
+  ['/api/relay_teams/{relay_team_name}']: {
+    /**
+     * participants_api_relay_team_api_get_relay_team_by_name - Get Relay Team By Name
+     */
+    'get'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiGetRelayTeamByName.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiGetRelayTeamByName.Responses.$200>
+  }
+  ['/api/relay_teams/']: {
+    /**
+     * participants_api_relay_team_api_create_relay_team - Create Relay Team
+     */
+    'post'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: Paths.ParticipantsApiRelayTeamApiCreateRelayTeam.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiCreateRelayTeam.Responses.$201>
+  }
+  ['/api/relay_teams/comments/{comment_id}']: {
+    /**
+     * participants_api_comment_api_delete_relay_team_comment - Delete Relay Team Comment
+     */
+    'delete'(
+      parameters: Parameters<Paths.ParticipantsApiCommentApiDeleteRelayTeamComment.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiCommentApiDeleteRelayTeamComment.Responses.$204>
   }
 }
 

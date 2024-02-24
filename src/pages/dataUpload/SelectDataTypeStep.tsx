@@ -125,7 +125,7 @@ const SelectDataTypeStep = (props: {
     queryKey: ["getRaceTypes"],
     queryFn: () =>
       getApiClient().then((client) =>
-        client.race_api_get_race_types().then((res) => res.data),
+        client.race_api_race_type_api_get_race_types().then((res) => res.data),
       ),
   });
 
@@ -133,7 +133,7 @@ const SelectDataTypeStep = (props: {
     queryKey: ["getRaces"],
     queryFn: () =>
       getApiClient()
-        .then((client) => client.race_api_get_races())
+        .then((client) => client.race_api_race_api_get_races())
         .then((res) => res.data),
   });
 

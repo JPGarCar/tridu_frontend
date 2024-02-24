@@ -106,7 +106,7 @@ function CreateHeatDialog(props: {
     queryKey: ["raceTypes"],
     queryFn: () =>
       getApiClient()
-        .then((client) => client.race_api_get_race_types())
+        .then((client) => client.race_api_race_type_api_get_race_types())
         .then((res) => res.data),
   });
 
@@ -241,7 +241,7 @@ function HeatListCard(props: {
     queryFn: () =>
       getApiClient().then((apiClient) =>
         apiClient
-          .heats_api_get_heats_for_race({ race_id: raceId })
+          .race_api_race_api_get_race_heats({ race_id: raceId })
           .then((res) => res.data),
       ),
   });
@@ -475,7 +475,7 @@ function HeatParticipantList(props: { heatId: number }) {
     queryFn: () =>
       getApiClient()
         .then((client) =>
-          client.participants_api_get_participants_for_heat({
+          client.heats_api_get_heat_participants({
             heat_id: props.heatId,
           }),
         )

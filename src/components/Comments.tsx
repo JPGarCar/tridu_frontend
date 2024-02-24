@@ -1,30 +1,30 @@
 import { Box, Card, IconButton, Typography } from "@mui/material";
-import { Components } from "../services/api/openapi";
 import { DateTime } from "luxon";
 import { Delete } from "@mui/icons-material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
-import { useApiServiceContext } from "../context/ApiContext.tsx";
 
 function CommentCard(props: {
-  comment: Components.Schemas.ParticipantCommentSchema;
+  comment: {
+    creation_date: string;
+    id?: number | null | undefined;
+    writer_name?: string | undefined;
+    comment: string;
+  };
+  deleteCommentApiCall: (commentId: number) => Promise<void>;
   onCommentDelete: () => void;
 }) {
   const dateCreated = DateTime.fromISO(props.comment.creation_date);
 
   const { pushAlert } = useSnackbarServiceContext();
 
-  const { getApiClient } = useApiServiceContext();
-
   const handleOnClickDelete = async () => {
-    const api = await getApiClient();
-    await api.participants_api_delete_participant_comment(
-      // @ts-expect-error I dont know why this doesnt work
-      { comment_id: props.comment.id ?? undefined },
-    );
+    if (props.comment.id) {
+      await props.deleteCommentApiCall(props.comment.id);
 
-    pushAlert("Comment deleted.", "success");
-    props.onCommentDelete();
+      pushAlert("Comment deleted.", "success");
+      props.onCommentDelete();
+    }
   };
 
   return (

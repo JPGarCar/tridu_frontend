@@ -21,15 +21,22 @@ const CreateParticipant = () => {
 
   const [activeStep, setActiveStep] = useState(0);
 
-  const [newUserId, setNewUserId] = useState<number | null>(null);
+  const [newUserData, setNewUserData] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
   const [raceIdSelected, setRaceIdSelected] = useState<number | null>(null);
 
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);
   };
 
-  const handleUserCreation = (userId: number) => {
-    setNewUserId(userId);
+  const handleBack = () => {
+    setActiveStep((prevStep) => prevStep - 1);
+  };
+
+  const handleUserCreation = (userId: number, userName: string) => {
+    setNewUserData({ id: userId, name: userName });
     handleNext();
   };
 
@@ -43,7 +50,7 @@ const CreateParticipant = () => {
   };
 
   const handleFinish = () => {
-    navigator(`/participants/${newUserId}`);
+    navigator(`/participants/${newUserData?.id}`);
   };
 
   return (
@@ -73,11 +80,13 @@ const CreateParticipant = () => {
               <CreateUserStep handelSuccess={handleUserCreation} />
             ) : activeStep == 1 ? (
               <SelectRaceStep handleSuccess={handleRaceSelect} />
-            ) : raceIdSelected && newUserId ? (
+            ) : raceIdSelected && newUserData ? (
               <CreateParticipantStep
                 raceId={raceIdSelected}
-                userId={newUserId}
+                userId={newUserData.id}
+                handleBack={handleBack}
                 handleSuccess={handelParticipantCreation}
+                userName={newUserData.name}
               />
             ) : (
               <>Error...</>

@@ -2,6 +2,7 @@ import {
   Alert,
   Box,
   Button,
+  ButtonBase,
   Card,
   CardActions,
   CardContent,
@@ -16,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Components } from "../services/api/openapi";
 import { useEffect, useState } from "react";
@@ -218,7 +219,7 @@ function ParticipantPICard(props: { userId: string }) {
 function ParticipantRaceListCard(props: {
   userId: string;
   activeParticipantId: number | null;
-  setActiveParticipant: (arg0: number | null) => void;
+  setActiveParticipantInfo: (arg0: { id: number; type: string } | null) => void;
 }) {
   const { getApiClient } = useApiServiceContext();
 
@@ -227,50 +228,60 @@ function ParticipantRaceListCard(props: {
     queryFn: () =>
       getApiClient()
         .then((client) =>
-          client.participants_api_get_participants_for_user(props.userId),
+          client.accounts_api_get_user_participations(props.userId),
         )
         .then((res) => res.data),
   });
 
-  const participants = participantsQuery.isLoading
+  const participations = participantsQuery.isLoading
     ? null
-    : (participantsQuery.data as Components.Schemas.ParticipantSchema[]);
+    : (participantsQuery.data as Components.Schemas.ParticipationSchema[]);
 
   useEffect(() => {
     if (
       props.activeParticipantId == null &&
-      participants &&
-      participants.length == 1
+      participations &&
+      participations.length == 1
     ) {
-      props.setActiveParticipant(participants[0].id ?? null);
+      props.setActiveParticipantInfo({
+        id: participations[0].id,
+        type: participations[0].type,
+      });
     }
-  }, [participants, props.activeParticipantId, participantsQuery.data]);
+  }, [participations, props.activeParticipantId, participantsQuery.data]);
   // we add only activeParticipantId so that we run this when activeParticipantId is null and also when participantsQuery has some data!
 
   return participantsQuery.isLoading ? (
     <Skeleton />
   ) : (
     <CustomCard title={"Races"}>
-      {participants ? (
-        participants.length > 0 ? (
+      {participations ? (
+        participations.length > 0 ? (
           <Stack spacing={2}>
-            {participants.map((participant) => {
+            {participations.map((participation) => {
               return (
                 <Card
                   sx={
-                    participant.id === props.activeParticipantId
+                    participation.id === props.activeParticipantId
                       ? {
                           border: 2,
                           borderColor: "success.main",
                         }
                       : {}
                   }
-                  key={participant.id}
+                  key={participation.id}
                   onClick={() => {
-                    props.setActiveParticipant(participant.id ?? null);
+                    props.setActiveParticipantInfo({
+                      id: participation.id,
+                      type: participation.type,
+                    });
                   }}
                 >
-                  <CardContent>{participant.race.name}</CardContent>
+                  <CardContent>
+                    <Typography>
+                      {participation.race.name} | {participation.type}
+                    </Typography>
+                  </CardContent>
                 </Card>
               );
             })}
@@ -301,7 +312,7 @@ function CommentInput(props: {
       formikHelpers.setSubmitting(true);
 
       const apiClient = await getApiClient();
-      await apiClient.participants_api_create_participant_comment(
+      await apiClient.participants_api_participant_api_create_participant_comment(
         {
           participant_id: props.participant_id,
         },
@@ -402,21 +413,22 @@ function ParticipantInformation(props: {
     onSubmit: async (values) => {
       const apiClient = await getApiClient();
       try {
-        const response = await apiClient.participants_api_update_participant(
-          { participant_id: props.participant.id ?? 0 },
-          {
-            bib_number: values.bib_num,
-            is_ftt: values.is_ftt,
-            team: values.team,
-            swim_time: swimTimeDestructor(values.swimTime)?.toISO(),
-            origin: {
-              city: values.city,
-              province: values.province,
-              country: values.country,
+        const response =
+          await apiClient.participants_api_participant_api_update_participant(
+            { participant_id: props.participant.id ?? 0 },
+            {
+              bib_number: values.bib_num,
+              is_ftt: values.is_ftt,
+              team: values.team,
+              swim_time: swimTimeDestructor(values.swimTime)?.toISO(),
+              origin: {
+                city: values.city,
+                province: values.province,
+                country: values.country,
+              },
+              location: values.location,
             },
-            location: values.location,
-          },
-        );
+          );
 
         pushAlert("Edits saved successfully!", "success");
         props.setParticipant(response.data);
@@ -432,9 +444,10 @@ function ParticipantInformation(props: {
 
   const deactivateParticipant = async () => {
     const api = await getApiClient();
-    const response = await api.participants_api_deactivate_participant(
-      props.participant.id ?? 0,
-    );
+    const response =
+      await api.participants_api_participant_api_deactivate_participant(
+        props.participant.id ?? 0,
+      );
 
     props.setParticipant(response.data);
 
@@ -443,9 +456,10 @@ function ParticipantInformation(props: {
 
   const reactivateParticipant = async () => {
     const api = await getApiClient();
-    const response = await api.participants_api_reactivate_participant(
-      props.participant.id ?? 0,
-    );
+    const response =
+      await api.participants_api_participant_api_reactivate_participant(
+        props.participant.id ?? 0,
+      );
 
     props.setParticipant(response.data);
 
@@ -570,9 +584,258 @@ function ParticipantInformation(props: {
   );
 }
 
-function ParticipantRaceType(props: {
-  setParticipant: (arg0: Components.Schemas.ParticipantSchema) => void;
-  participant: Components.Schemas.ParticipantSchema;
+function RelayTeamInformation(props: {
+  relayTeam: Components.Schemas.RelayTeamSchema;
+  setRelayTeam: (arg0: Components.Schemas.RelayTeamSchema) => void;
+}) {
+  const { pushAlert } = useSnackbarServiceContext();
+
+  const { getApiClient } = useApiServiceContext();
+
+  const RelayTeamParticipantFormSchema = Yup.object({
+    bib_num: Yup.number()
+      .required()
+      .positive("Must be positive!")
+      .integer("Must be a full integer!"),
+    team: Yup.string().required(),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      bib_num: props.relayTeam.bib_number,
+      team: props.relayTeam.name,
+    },
+    enableReinitialize: true,
+    validationSchema: RelayTeamParticipantFormSchema,
+    onSubmit: async (values) => {
+      const apiClient = await getApiClient();
+      const response =
+        await apiClient.participants_api_relay_team_api_update_relay_team(
+          { relay_team_id: props.relayTeam.id ?? 0 },
+          {
+            bib_number: values.bib_num,
+            name: values.team,
+          },
+        );
+
+      pushAlert("Edits saved successfully!", "success");
+      props.setRelayTeam(response.data);
+      setIsEditing(false);
+    },
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleEditButton = () => {
+    if (isEditing) {
+      formik.resetForm();
+      pushAlert("Changes canceled!", "warning");
+    }
+    setIsEditing((prevState) => !prevState);
+  };
+
+  const deactivateRelayTeam = async () => {
+    if (props.relayTeam.id) {
+      const api = await getApiClient();
+      const response =
+        await api.participants_api_relay_team_api_deactivate_relay_team({
+          relay_team_id: props.relayTeam.id,
+        });
+
+      props.setRelayTeam(response.data);
+    }
+  };
+
+  const reactivateRelayTeam = async () => {
+    if (props.relayTeam.id) {
+      const api = await getApiClient();
+      const response =
+        await api.participants_api_relay_team_api_reactivate_relay_team({
+          relay_team_id: props.relayTeam.id,
+        });
+
+      props.setRelayTeam(response.data);
+    }
+  };
+
+  return (
+    <form onSubmit={formik.handleSubmit}>
+      <Stack spacing={2} sx={{ m: 2 }}>
+        <Box sx={{ pl: 2 }}>
+          <EditableRowStackTextField
+            label={"Bib #:"}
+            data={formik.values.bib_num.toString()}
+            editing={isEditing}
+            id={"bib_num"}
+            onChange={formik.handleChange}
+            error={formik.errors.bib_num}
+          />
+        </Box>
+        <Box sx={{ pl: 2 }}>
+          <EditableRowStackTextField
+            label={"Team Name:"}
+            data={formik.values.team}
+            editing={isEditing}
+            id={"team"}
+            onChange={formik.handleChange}
+            error={formik.errors.team}
+          />
+        </Box>
+        <Grid container direction={"row"} gap={2}>
+          <Grid>
+            <Button onClick={handleEditButton}>
+              {isEditing ? "Cancel" : "Edit"}
+            </Button>
+            {isEditing ? (
+              <Button type={"submit"} color={"success"}>
+                Save
+              </Button>
+            ) : null}
+          </Grid>
+          <Grid>
+            {props.relayTeam.is_active ? (
+              <Button
+                color={"error"}
+                onClick={() => {
+                  void deactivateRelayTeam();
+                }}
+              >
+                De-Activate
+              </Button>
+            ) : (
+              <Button
+                color={"success"}
+                onClick={() => {
+                  void reactivateRelayTeam();
+                }}
+              >
+                Re-Activate
+              </Button>
+            )}
+          </Grid>
+        </Grid>
+      </Stack>
+    </form>
+  );
+}
+
+function RelayTeamParticipantInformation(props: {
+  setRelayParticipant: (
+    arg0: Components.Schemas.RelayTeamParticipantSchema,
+  ) => void;
+  relayParticipant: Components.Schemas.RelayTeamParticipantSchema;
+}) {
+  const { pushAlert } = useSnackbarServiceContext();
+
+  const { getApiClient } = useApiServiceContext();
+
+  const RelayTeamParticipantFormSchema = Yup.object({
+    city: Yup.string().notRequired(),
+    province: Yup.string().notRequired(),
+    country: Yup.string().notRequired(),
+    location: Yup.string().notRequired(),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      city: props.relayParticipant.origin?.city ?? "",
+      province: props.relayParticipant.origin?.province ?? "",
+      country: props.relayParticipant.origin?.country ?? "",
+      location: props.relayParticipant.location,
+    },
+    enableReinitialize: true,
+    validationSchema: RelayTeamParticipantFormSchema,
+    onSubmit: async (values) => {
+      const apiClient = await getApiClient();
+      const response =
+        await apiClient.participants_api_relay_team_api_update_relay_participant(
+          {
+            relay_team_id: props.relayParticipant.team.id ?? 0,
+            relay_participant_id: props.relayParticipant.id ?? 0,
+          },
+          {
+            origin: {
+              city: values.city,
+              province: values.province,
+              country: values.country,
+            },
+            location: values.location,
+          },
+        );
+
+      pushAlert("Edits saved successfully!", "success");
+      props.setRelayParticipant(response.data);
+      setIsEditing(false);
+    },
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleEditButton = () => {
+    if (isEditing) {
+      formik.resetForm();
+      pushAlert("Changes canceled!", "warning");
+    }
+    setIsEditing((prevState) => !prevState);
+  };
+
+  return (
+    <form onSubmit={formik.handleSubmit}>
+      <Grid container flexDirection={"column"} sx={{ m: 2 }} gap={2}>
+        <Grid xs sx={{ ml: 2 }}>
+          <Stack spacing={2}>
+            <EditableRowStackTextField
+              label={"City:"}
+              data={formik.values.city}
+              editing={isEditing}
+              id={"city"}
+              onChange={formik.handleChange}
+              error={formik.errors.city}
+            />
+            <EditableRowStackTextField
+              label={"Province:"}
+              data={formik.values.province}
+              editing={isEditing}
+              id={"province"}
+              onChange={formik.handleChange}
+              error={formik.errors.province}
+            />
+            <EditableRowStackTextField
+              label={"Country:"}
+              data={formik.values.country}
+              editing={isEditing}
+              id={"country"}
+              onChange={formik.handleChange}
+              error={formik.errors.country}
+            />
+            <EditableRowStackTextField
+              label={"Location:"}
+              data={formik.values.location}
+              editing={isEditing}
+              id={"location"}
+              onChange={formik.handleChange}
+              error={formik.errors.location}
+            />
+          </Stack>
+        </Grid>
+        <Grid xs>
+          <Button onClick={handleEditButton}>
+            {isEditing ? "Cancel" : "Edit"}
+          </Button>
+          {isEditing ? (
+            <Button type={"submit"} color={"success"}>
+              Save
+            </Button>
+          ) : null}
+        </Grid>
+      </Grid>
+    </form>
+  );
+}
+
+function RaceTypeField<T>(props: {
+  raceTypeId: number;
+  onChangeRaceType: (raceType: Components.Schemas.RaceTypeSchema) => Promise<T>;
 }) {
   const { getApiClient } = useApiServiceContext();
 
@@ -580,7 +843,7 @@ function ParticipantRaceType(props: {
     queryKey: ["getRaceTypes"],
     queryFn: () =>
       getApiClient().then((client) =>
-        client.race_api_get_race_types().then((res) => res.data),
+        client.race_api_race_type_api_get_race_types().then((res) => res.data),
       ),
   });
 
@@ -590,33 +853,20 @@ function ParticipantRaceType(props: {
 
   const formik = useFormik({
     initialValues: {
-      raceTypeId: props.participant.race_type.id,
+      raceTypeId: props.raceTypeId,
     },
     enableReinitialize: true,
     onSubmit: async (values, formikHelpers) => {
       formikHelpers.setSubmitting(true);
 
-      const raceType = getRaceType(values.raceTypeId ?? 0);
+      const raceType = getRaceType(values.raceTypeId);
 
-      const api = await getApiClient();
-
-      try {
-        const response =
-          await api.participants_api_change_participant_race_type(
-            { participant_id: props.participant.id ?? 0 },
-            raceType,
-          );
+      if (raceType) {
+        await props.onChangeRaceType(raceType);
 
         setIsEditing(false);
-        props.setParticipant(response.data);
         formikHelpers.setSubmitting(false);
         pushAlert("Race type edit saved successfully!", "success");
-      } catch (e) {
-        const error = getAxiosError(e);
-
-        if (error != null) {
-          pushAlert(error.response?.data ?? "There was an error", "error");
-        }
       }
 
       return null;
@@ -651,7 +901,7 @@ function ParticipantRaceType(props: {
         <EditableRowStackSelectField
           label={"Race Type:"}
           value={formik.values.raceTypeId}
-          valueLabel={getRaceType(formik.values.raceTypeId ?? 0)?.name}
+          valueLabel={getRaceType(formik.values.raceTypeId)?.name}
           editing={isEditing}
           id={"raceTypeId"}
           options={raceTypesQuery.data.map((racetype) => ({
@@ -674,9 +924,79 @@ function ParticipantRaceType(props: {
   );
 }
 
-function ParticipantRaceHeat(props: {
+function ParticipantRaceType(props: {
   setParticipant: (arg0: Components.Schemas.ParticipantSchema) => void;
   participant: Components.Schemas.ParticipantSchema;
+}) {
+  const { getApiClient } = useApiServiceContext();
+
+  const handleChangeRaceType = async (
+    raceType: Components.Schemas.RaceTypeSchema,
+  ) => {
+    const api = await getApiClient();
+
+    const response =
+      await api.participants_api_participant_api_change_participant_race_type(
+        { participant_id: props.participant.id ?? 0 },
+        raceType,
+      );
+
+    props.setParticipant(response.data);
+
+    return response.data;
+  };
+
+  if (props.participant.race_type.id == undefined) {
+    return <>Error... The participant must have a race type already!</>;
+  }
+
+  return (
+    <RaceTypeField
+      raceTypeId={props.participant.race_type.id}
+      onChangeRaceType={handleChangeRaceType}
+    />
+  );
+}
+
+function RelayTeamRaceType(props: {
+  setRelayTeam: (arg0: Components.Schemas.RelayTeamSchema) => void;
+  relayTeam: Components.Schemas.RelayTeamSchema;
+}) {
+  const { getApiClient } = useApiServiceContext();
+
+  const handleChangeRaceType = async (
+    raceType: Components.Schemas.RaceTypeSchema,
+  ) => {
+    const api = await getApiClient();
+
+    const response =
+      await api.participants_api_relay_team_api_change_relay_team_race_type(
+        { relay_team_id: props.relayTeam.id ?? 0 },
+        raceType,
+      );
+
+    props.setRelayTeam(response.data);
+
+    return response.data;
+  };
+
+  if (props.relayTeam.race_type.id == undefined) {
+    return <>Error... The participant must have a race type already!</>;
+  }
+
+  return (
+    <RaceTypeField
+      raceTypeId={props.relayTeam.race_type.id}
+      onChangeRaceType={handleChangeRaceType}
+    />
+  );
+}
+
+function RaceHeatField<T>(props: {
+  raceId: number;
+  heatId: number | null;
+  onChangeHeat: (heat: Components.Schemas.HeatSchema) => Promise<T>;
+  onRemoveHeat: () => Promise<T>;
 }) {
   const { getApiClient } = useApiServiceContext();
 
@@ -685,8 +1005,8 @@ function ParticipantRaceHeat(props: {
     queryFn: () =>
       getApiClient().then((client) =>
         client
-          .heats_api_get_heats_for_race({
-            race_id: props.participant.race.id ?? 0,
+          .race_api_race_api_get_race_heats({
+            race_id: props.raceId,
           })
           .then((res) => res.data),
       ),
@@ -698,7 +1018,7 @@ function ParticipantRaceHeat(props: {
 
   const formik = useFormik({
     initialValues: {
-      heatId: props.participant.heat?.id ?? -1,
+      heatId: props.heatId ?? -1,
     },
     enableReinitialize: true,
     onSubmit: async (values, formikHelpers) => {
@@ -706,26 +1026,13 @@ function ParticipantRaceHeat(props: {
 
       const heat = getHeat(values.heatId);
 
-      const api = await getApiClient();
+      if (heat) {
+        await props.onChangeHeat(heat);
 
-      try {
-        const response = await api.participants_api_change_participant_heat(
-          { participant_id: props.participant.id ?? 0 },
-          heat,
-        );
-        props.setParticipant(response.data);
         formikHelpers.setSubmitting(false);
         setIsEditing(false);
         pushAlert("Heat saved successfully!", "success");
-      } catch (e) {
-        const error = getAxiosError(e);
-
-        if (error != null) {
-          pushAlert(error.response?.data ?? "There was an error", "error");
-        }
       }
-
-      return null;
     },
   });
 
@@ -748,22 +1055,8 @@ function ParticipantRaceHeat(props: {
   };
 
   const handleRemoveButton = async () => {
-    const api = await getApiClient();
-
-    try {
-      const response = await api.participants_api_remove_participant_heat({
-        participant_id: props.participant.id ?? 0,
-      });
-      props.setParticipant(response.data);
-      pushAlert("Removed from heat!", "success");
-    } catch (e) {
-      const error = getAxiosError(e);
-      if (error != null) {
-        pushAlert(error.response?.data ?? "There was an error", "error");
-      }
-    }
-
-    return null;
+    await props.onRemoveHeat();
+    pushAlert("Removed from heat!", "success");
   };
 
   return (
@@ -785,7 +1078,7 @@ function ParticipantRaceHeat(props: {
           error={formik.errors.heatId}
         />
       )}
-      {props.participant.heat == null ? (
+      {props.heatId == null ? (
         <Button onClick={handleEditButton}>
           {isEditing ? "Cancel" : "Edit"}
         </Button>
@@ -809,17 +1102,105 @@ function ParticipantRaceHeat(props: {
   );
 }
 
-function ParticipantRaceCard(props: { participantId: number }) {
-  const queryClient = useQueryClient();
-
+function ParticipantRaceHeat(props: {
+  setParticipant: (arg0: Components.Schemas.ParticipantSchema) => void;
+  participant: Components.Schemas.ParticipantSchema;
+}) {
   const { getApiClient } = useApiServiceContext();
+
+  const handleChangeHeat = async (heat: Components.Schemas.HeatSchema) => {
+    const api = await getApiClient();
+
+    const response =
+      await api.participants_api_participant_api_change_participant_heat(
+        { participant_id: props.participant.id ?? 0 },
+        heat,
+      );
+    props.setParticipant(response.data);
+    return response.data;
+  };
+
+  const handleRemoveHeat = async () => {
+    const api = await getApiClient();
+
+    const response =
+      await api.participants_api_participant_api_remove_participant_heat({
+        participant_id: props.participant.id ?? 0,
+      });
+    props.setParticipant(response.data);
+    return response.data;
+  };
+
+  if (props.participant.race.id == undefined) {
+    return <>Error... Participant must have a race assigned!</>;
+  }
+
+  return (
+    <RaceHeatField
+      raceId={props.participant.race.id}
+      heatId={props.participant.heat?.id ?? null}
+      onChangeHeat={handleChangeHeat}
+      onRemoveHeat={handleRemoveHeat}
+    />
+  );
+}
+
+function RelayTeamRaceHeat(props: {
+  setRelayTeam: (arg0: Components.Schemas.RelayTeamSchema) => void;
+  relayTeam: Components.Schemas.RelayTeamSchema;
+}) {
+  const { getApiClient } = useApiServiceContext();
+
+  const handleChangeHeat = async (heat: Components.Schemas.HeatSchema) => {
+    const api = await getApiClient();
+
+    const response =
+      await api.participants_api_relay_team_api_change_relay_team_heat(
+        { relay_team_id: props.relayTeam.id ?? 0 },
+        heat,
+      );
+    props.setRelayTeam(response.data);
+    return response.data;
+  };
+
+  const handleRemoveHeat = async () => {
+    const api = await getApiClient();
+
+    const response =
+      await api.participants_api_relay_team_api_remove_relay_team_heat({
+        relay_team_id: props.relayTeam.id ?? 0,
+      });
+    props.setRelayTeam(response.data);
+    return response.data;
+  };
+
+  if (props.relayTeam.race.id == undefined) {
+    return <>Error... Participant must have a race assigned!</>;
+  }
+
+  return (
+    <RaceHeatField
+      raceId={props.relayTeam.race.id}
+      heatId={props.relayTeam.heat?.id ?? null}
+      onChangeHeat={handleChangeHeat}
+      onRemoveHeat={handleRemoveHeat}
+    />
+  );
+}
+
+function ParticipantRaceCard(props: { participantId: number }) {
+  const { getApiClient } = useApiServiceContext();
+
+  const queryClient = useQueryClient();
 
   const commentsQuery = useQuery({
     queryKey: ["getComments", props.participantId],
     queryFn: () =>
       getApiClient()
         .then((client) =>
-          client.participants_api_get_participant_comments(props.participantId),
+          client.participants_api_participant_api_get_participant_comments(
+            props.participantId,
+          ),
         )
         .then((res) => res.data),
   });
@@ -829,7 +1210,7 @@ function ParticipantRaceCard(props: { participantId: number }) {
     queryFn: () =>
       getApiClient()
         .then((api) =>
-          api.participants_api_get_participant_details({
+          api.participants_api_participant_api_get_participant({
             participant_id: props.participantId,
           }),
         )
@@ -847,6 +1228,13 @@ function ParticipantRaceCard(props: { participantId: number }) {
       ["getParticipant", props.participantId],
       participant,
     );
+  };
+
+  const deleteParticipantComment = async (comment_id: number) => {
+    const api = await getApiClient();
+    await api.participants_api_comment_api_delete_participant_comment({
+      comment_id: comment_id,
+    });
   };
 
   return (
@@ -915,14 +1303,13 @@ function ParticipantRaceCard(props: { participantId: number }) {
               <>No comments...</>
             ) : (
               <Stack spacing={2} direction={"column-reverse"}>
-                {(
-                  commentsQuery.data as Components.Schemas.ParticipantCommentSchema[]
-                ).map((comment) => {
+                {commentsQuery.data.map((comment) => {
                   return (
                     <CommentCard
                       key={comment.id}
                       comment={comment}
                       onCommentDelete={refreshComments}
+                      deleteCommentApiCall={deleteParticipantComment}
                     />
                   );
                 })}
@@ -949,15 +1336,246 @@ function ParticipantRaceCard(props: { participantId: number }) {
   );
 }
 
+function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
+  const queryClient = useQueryClient();
+
+  const navigate = useNavigate();
+
+  const { getApiClient } = useApiServiceContext();
+
+  const relayParticipantQuery = useQuery({
+    queryKey: ["getRelayParticipant", props.relayParticipantId],
+    queryFn: () =>
+      getApiClient()
+        .then((api) =>
+          api.participants_api_relay_team_api_get_relay_participant({
+            relay_participant_id: props.relayParticipantId,
+          }),
+        )
+        .then((res) => res.data),
+  });
+
+  const commentsQuery = useQuery({
+    queryKey: ["getComments", relayParticipantQuery.data?.team.id],
+    queryFn: () =>
+      getApiClient()
+        .then((client) =>
+          client.participants_api_relay_team_api_get_relay_team_comments(
+            props.relayParticipantId,
+          ),
+        )
+        .then((res) => res.data),
+    enabled: relayParticipantQuery.data != undefined,
+  });
+
+  const relayTeamMembersQuery = useQuery({
+    queryKey: ["getRelayTeammembers", relayParticipantQuery.data?.team.id],
+    queryFn: () =>
+      getApiClient()
+        .then((api) =>
+          api.participants_api_relay_team_api_get_relay_team_participants({
+            relay_team_id: relayParticipantQuery.data?.team.id ?? -1,
+          }),
+        )
+        .then((res) => res.data),
+    enabled: relayParticipantQuery.data != undefined,
+  });
+
+  const refreshComments = () => {
+    void commentsQuery.refetch();
+  };
+
+  const deleteRelayTeamComment = async (comment_id: number) => {
+    const api = await getApiClient();
+    await api.participants_api_comment_api_delete_relay_team_comment({
+      comment_id: comment_id,
+    });
+  };
+
+  const setRelayParticipant = (
+    participant: Components.Schemas.RelayTeamParticipantSchema,
+  ) => {
+    queryClient.setQueryData(
+      ["getRelayParticipant", props.relayParticipantId],
+      participant,
+    );
+  };
+
+  const setRelayTeam = (relayTeam: Components.Schemas.RelayTeamSchema) => {
+    const relayParticipant = relayParticipantQuery.data;
+
+    if (relayParticipant) {
+      relayParticipant.team = relayTeam;
+
+      setRelayParticipant(relayParticipant);
+    }
+  };
+
+  return (
+    <Card
+      variant={"outlined"}
+      sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+    >
+      <Box textAlign={"center"} sx={{ p: 0.75 }}>
+        {relayParticipantQuery.isLoading ? (
+          <Skeleton />
+        ) : relayParticipantQuery.isError ||
+          relayParticipantQuery.data == undefined ? (
+          <>Error...</>
+        ) : (
+          <>
+            <Typography variant={"h5"} component={"div"}>
+              {relayParticipantQuery.data.team.race.name} -{" "}
+              {relayParticipantQuery.data.team.name}{" "}
+              {relayParticipantQuery.data.team.bib_number}
+            </Typography>
+            {relayParticipantQuery.data.is_active ? null : (
+              <Alert sx={{ m: 2 }} icon={<Error />} severity={"error"}>
+                Inactive participant! Participant will not show up on heat or
+                other exports.
+              </Alert>
+            )}
+          </>
+        )}
+      </Box>
+      <Divider />
+      <Grid container flexGrow={1}>
+        {relayParticipantQuery.isLoading ? (
+          <Skeleton />
+        ) : relayParticipantQuery.isError ||
+          relayParticipantQuery.data == undefined ? (
+          <>Error...</>
+        ) : (
+          <Grid xs>
+            <Grid container direction={"row"}>
+              <Grid flexGrow={1}>
+                <RelayTeamParticipantInformation
+                  setRelayParticipant={setRelayParticipant}
+                  relayParticipant={relayParticipantQuery.data}
+                />
+              </Grid>
+              <Divider orientation={"vertical"} flexItem />
+              <Grid flexGrow={1}>
+                <RelayTeamInformation
+                  relayTeam={relayParticipantQuery.data.team}
+                  setRelayTeam={setRelayTeam}
+                />
+              </Grid>
+            </Grid>
+            <Divider flexItem />
+            <Grid sx={{ m: 2 }} container gap={4} spacing={2}>
+              <Grid>
+                <RelayTeamRaceType
+                  setRelayTeam={setRelayTeam}
+                  relayTeam={relayParticipantQuery.data.team}
+                />
+              </Grid>
+              <Grid>
+                <RelayTeamRaceHeat
+                  setRelayTeam={setRelayTeam}
+                  relayTeam={relayParticipantQuery.data.team}
+                />
+              </Grid>
+            </Grid>
+            <Divider flexItem />
+            <Grid>
+              <Box sx={{ m: 3 }}>
+                <Typography variant={"h6"}>Team Members</Typography>
+                {relayTeamMembersQuery.isLoading ? (
+                  <Skeleton />
+                ) : relayTeamMembersQuery.isError ||
+                  relayTeamMembersQuery.data == undefined ? (
+                  <>Error...</>
+                ) : (
+                  <Stack spacing={2} sx={{ mt: 2 }}>
+                    {relayTeamMembersQuery.data
+                      .filter(
+                        (relayTeamParticipant) =>
+                          relayTeamParticipant.id != props.relayParticipantId,
+                      )
+                      .map((relayTeamParticipant) => {
+                        return (
+                          <Card>
+                            <ButtonBase
+                              onClick={() => {
+                                navigate(
+                                  `/participants/${relayTeamParticipant.user.id}`,
+                                );
+                              }}
+                            >
+                              <Box sx={{ p: 2 }}>
+                                {relayTeamParticipant.user.first_name}{" "}
+                                {relayTeamParticipant.user.last_name}
+                              </Box>
+                            </ButtonBase>
+                          </Card>
+                        );
+                      })}
+                  </Stack>
+                )}
+              </Box>
+            </Grid>
+          </Grid>
+        )}
+        <Divider orientation={"vertical"} flexItem />
+        <Grid
+          container
+          xs={4}
+          flexDirection={"column"}
+          alignContent={"stretch"}
+        >
+          <Grid xs sx={{ p: 1, maxHeight: "100%", overflow: "auto" }}>
+            {commentsQuery.isLoading ? (
+              <>Loading...</>
+            ) : commentsQuery.isError ? (
+              <>Error...</>
+            ) : commentsQuery.data === undefined ? (
+              <>No comments...</>
+            ) : (
+              <Stack spacing={2} direction={"column-reverse"}>
+                {commentsQuery.data.map((comment) => {
+                  return (
+                    <CommentCard
+                      key={comment.id}
+                      comment={comment}
+                      onCommentDelete={refreshComments}
+                      deleteCommentApiCall={deleteRelayTeamComment}
+                    />
+                  );
+                })}
+              </Stack>
+            )}
+          </Grid>
+          <Divider flexItem />
+          <Grid flexWrap={"nowrap"} sx={{ p: 1 }}>
+            {relayParticipantQuery.isLoading ? (
+              <Skeleton />
+            ) : relayParticipantQuery.isError ||
+              relayParticipantQuery.data == undefined ? (
+              <>Error...</>
+            ) : (
+              <CommentInput
+                participant_id={relayParticipantQuery.data.id ?? 0}
+                onCommentSubmit={refreshComments}
+              />
+            )}
+          </Grid>
+        </Grid>
+      </Grid>
+    </Card>
+  );
+}
+
 const Participant = () => {
   const { userId } = useParams();
 
-  const [activeParticipantId, setActiveParticipantId] = useState<number | null>(
-    null,
-  );
+  const [activeParticipantInfo, setActiveParticipantInfo] = useState<{
+    id: number;
+    type: string;
+  } | null>(null);
 
   useEffect(() => {
-    setActiveParticipantId(null);
+    setActiveParticipantInfo(null);
   }, [userId]);
 
   return (
@@ -968,16 +1586,22 @@ const Participant = () => {
             <ParticipantPICard userId={userId ?? ""} />
             <ParticipantRaceListCard
               userId={userId ?? ""}
-              activeParticipantId={activeParticipantId}
-              setActiveParticipant={setActiveParticipantId}
+              activeParticipantId={activeParticipantInfo?.id ?? null}
+              setActiveParticipantInfo={setActiveParticipantInfo}
             />
           </Stack>
         </Grid>
         <Grid xs>
-          {activeParticipantId != null ? (
-            <ParticipantRaceCard participantId={activeParticipantId} />
+          {activeParticipantInfo != null ? (
+            activeParticipantInfo.type === "participant" ? (
+              <ParticipantRaceCard participantId={activeParticipantInfo.id} />
+            ) : (
+              <RelayParticipantRaceCard
+                relayParticipantId={activeParticipantInfo.id}
+              />
+            )
           ) : (
-            <div>Select a race first!</div>
+            <Typography>Select a race first!</Typography>
           )}
         </Grid>
       </Grid>

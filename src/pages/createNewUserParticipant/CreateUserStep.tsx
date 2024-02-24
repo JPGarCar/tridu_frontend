@@ -15,7 +15,9 @@ import { DateTime } from "luxon";
 import StepCardLayout from "./StepCardLayout.tsx";
 import { useApiServiceContext } from "../../context/ApiContext.tsx";
 
-const CreateUserStep = (props: { handelSuccess: (arg0: number) => void }) => {
+const CreateUserStep = (props: {
+  handelSuccess: (arg0: number, arg1: string) => void;
+}) => {
   const { getApiClient } = useApiServiceContext();
 
   const genderOptions = [
@@ -57,7 +59,10 @@ const CreateUserStep = (props: { handelSuccess: (arg0: number) => void }) => {
       });
 
       if (response.data.id) {
-        props.handelSuccess(response.data.id);
+        props.handelSuccess(
+          response.data.id,
+          `${response.data.first_name} ${response.data.last_name}`,
+        );
       }
     },
   });

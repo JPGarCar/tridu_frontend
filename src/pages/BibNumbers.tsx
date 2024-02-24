@@ -12,7 +12,7 @@ const BibNumbers = () => {
     queryFn: () =>
       getApiClient().then((client) =>
         client
-          .race_api_get_race_types_bib_info_for_race({ race_id: 1 })
+          .race_api_race_api_get_race_bib_info_per_race_type({ race_id: 1 })
           .then((res) => res.data),
       ),
   });
