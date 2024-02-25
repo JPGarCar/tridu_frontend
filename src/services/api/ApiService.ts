@@ -64,9 +64,7 @@ export function useApiService(
             authService.logout();
             snackBarService.pushAlert("You must log in again!", "warning");
           }
-        }
-
-        if (
+        } else if (
           error.response != undefined &&
           error.response.status >= 400 &&
           error.response.status < 500

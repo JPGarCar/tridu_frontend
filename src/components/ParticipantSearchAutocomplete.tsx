@@ -7,7 +7,7 @@ import { useApiServiceContext } from "../context/ApiContext.tsx";
 
 const ParticipantSearchAutocomplete = () => {
   const [options, setOptions] = useState<
-    Components.Schemas.ParticipantSchema[]
+    Components.Schemas.ParticipationSchema[]
   >([]);
 
   const [inputValue, setInputValue] = useState("");
@@ -27,13 +27,13 @@ const ParticipantSearchAutocomplete = () => {
       setInputValue(value);
 
       const api = await getApiClient();
-      const response = await api.race_api_race_api_get_race_participants({
+      const response = await api.race_api_race_api_get_race_participations({
         bib_number: Number(value.toString()),
-        limit: 5,
+        limit: 6,
         race_id: 1,
       });
 
-      setOptions(response.data.items);
+      setOptions(response.data);
     }
   };
 

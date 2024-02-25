@@ -475,6 +475,11 @@ declare namespace Components {
             id: number;
             race: /* RaceSchema */ RaceSchema;
             type: /* ParticipationTypes */ ParticipationTypes;
+            user: /* UserSchema */ UserSchema;
+            /**
+             * Bib Number
+             */
+            bib_number: number;
         }
         /**
          * ParticipationTypes
@@ -1804,6 +1809,44 @@ declare namespace Paths {
             export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
         }
     }
+    namespace RaceApiRaceApiGetRaceParticipations {
+        namespace Parameters {
+            /**
+             * Bib Number
+             */
+            export type BibNumber = number;
+            /**
+             * Limit
+             */
+            export type Limit = number;
+            /**
+             * Offset
+             */
+            export type Offset = number;
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        export interface QueryParameters {
+            bib_number?: /* Bib Number */ Parameters.BibNumber;
+            limit?: /* Limit */ Parameters.Limit;
+            offset?: /* Offset */ Parameters.Offset;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /**
+             * ParticipationSchema
+             * A simple Participation schema that allows returning IDs for Participant and RelayParticipant Models.
+             */
+            Components.Schemas.ParticipationSchema[];
+        }
+    }
     namespace RaceApiRaceApiGetRaceStats {
         namespace Parameters {
             /**
@@ -2009,6 +2052,16 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipants.Responses.$200>
+  /**
+   * race_api_race_api_get_race_participations - Get Race Participations
+   * 
+   * Returns all the normal and Relay Participants for this race.
+   */
+  'race_api_race_api_get_race_participations'(
+    parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipations.QueryParameters & Paths.RaceApiRaceApiGetRaceParticipations.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipations.Responses.$200>
   /**
    * race_api_race_api_get_race_stats - Get Race Stats
    */
@@ -2495,6 +2548,18 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipants.Responses.$200>
+  }
+  ['/api/races/{race_id}/participations']: {
+    /**
+     * race_api_race_api_get_race_participations - Get Race Participations
+     * 
+     * Returns all the normal and Relay Participants for this race.
+     */
+    'get'(
+      parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipations.QueryParameters & Paths.RaceApiRaceApiGetRaceParticipations.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipations.Responses.$200>
   }
   ['/api/races/{race_id}/stats']: {
     /**
