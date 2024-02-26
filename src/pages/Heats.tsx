@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   ButtonBase,
@@ -50,8 +51,6 @@ function CreateHeatDialog(props: {
   handleClose: () => void;
   raceId: number;
 }) {
-  const raceId = 1;
-
   const queryClient = useQueryClient();
 
   const { getApiClient } = useApiServiceContext();
@@ -70,7 +69,7 @@ function CreateHeatDialog(props: {
 
   const formik = useFormik({
     initialValues: {
-      raceId: raceId,
+      raceId: props.raceId,
       raceType: "",
       termination: "",
       startDateTime: DateTime.now(),
@@ -226,6 +225,115 @@ function CreateHeatDialog(props: {
   );
 }
 
+function AutoScheduleDialog(props: {
+  isOpen: boolean;
+  handleClose: () => void;
+  raceId: number;
+}) {
+  const { getApiClient } = useApiServiceContext();
+  const { pushAlert } = useSnackbarServiceContext();
+
+  const [goodToSchedule, setGoodToSchedule] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
+
+  const handleAutoSchedule = async () => {
+    if (goodToSchedule) {
+      const api = await getApiClient();
+      const response = await api.race_api_race_api_auto_schedule_race_heats({
+        race_id: props.raceId,
+      });
+
+      if (response.data) {
+        pushAlert("Auto scheduling successful!", "success");
+        props.handleClose();
+      } else {
+        pushAlert("There was an error, please check in with Admin!", "error");
+      }
+    }
+  };
+
+  const handleCheckAutoSchedule = async () => {
+    const api = await getApiClient();
+    const response =
+      await api.race_api_race_api_get_race_ready_for_auto_schedule_heats({
+        race_id: props.raceId,
+      });
+
+    if (response.data.length == 0) {
+      setGoodToSchedule(true);
+    } else {
+      setErrors(response.data);
+    }
+  };
+
+  return (
+    <Dialog
+      open={props.isOpen}
+      onClose={() => {
+        props.handleClose();
+      }}
+    >
+      <DialogTitle>Heat Auto Schedule Wizzard</DialogTitle>
+      <DialogContent>
+        <Typography>
+          This wizard will automatically schedule ALL participants and relay
+          teams. Any existing assignments will be overwritten!
+        </Typography>
+        <Divider sx={{ my: 2 }} />
+        <Grid container alignContent={"center"}>
+          <Grid xs={6}>
+            <Typography>
+              Before continuing, check to see if your settings are good for the
+              auto scheduler.
+            </Typography>
+          </Grid>
+          <Grid xs={6}>
+            <Button
+              onClick={() => {
+                void handleCheckAutoSchedule();
+              }}
+              variant={"outlined"}
+              color={"secondary"}
+            >
+              Check Settings
+            </Button>
+          </Grid>
+        </Grid>
+        {goodToSchedule ? (
+          <Typography>System looks good!</Typography>
+        ) : errors.length > 0 ? (
+          <Stack spacing={2}>
+            {errors.map((error, index) => (
+              <Alert severity={"warning"} key={index}>
+                {error}
+              </Alert>
+            ))}
+          </Stack>
+        ) : null}
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={() => {
+            props.handleClose();
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          type={"button"}
+          color={"success"}
+          disabled={!goodToSchedule}
+          onClick={() => {
+            void handleAutoSchedule();
+          }}
+        >
+          Auto Schedule
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 function HeatListCard(props: {
   activeHeatId: number;
   setActiveHeatId: (arg0: number) => void;
@@ -248,6 +356,9 @@ function HeatListCard(props: {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const [isAutoScheduleDialogOpen, setIsAutoScheduleDialogOpen] =
+    useState(false);
+
   const getFormattedHeatStartDateTime = (datetimeString: string) => {
     const dateTime = DateTime.fromISO(datetimeString);
 
@@ -268,24 +379,46 @@ function HeatListCard(props: {
 
   return (
     <CustomCard title={"Heats"}>
-      <Grid sx={{ pt: 0 }}>
-        <Button
-          size={"small"}
-          color={"success"}
-          variant={"outlined"}
-          onClick={() => {
-            setIsDialogOpen(true);
-          }}
-        >
-          New
-        </Button>
-        <CreateHeatDialog
-          isOpen={isDialogOpen}
-          handleClose={() => {
-            setIsDialogOpen(false);
-          }}
-          raceId={raceId}
-        />
+      <CreateHeatDialog
+        isOpen={isDialogOpen}
+        handleClose={() => {
+          setIsDialogOpen(false);
+        }}
+        raceId={raceId}
+      />
+      <AutoScheduleDialog
+        isOpen={isAutoScheduleDialogOpen}
+        handleClose={() => {
+          setIsAutoScheduleDialogOpen(false);
+          void heatsQuery.refetch();
+        }}
+        raceId={raceId}
+      />
+      <Grid sx={{ pt: 0, pb: 2 }} container gap={2}>
+        <Grid>
+          <Button
+            size={"small"}
+            color={"success"}
+            variant={"outlined"}
+            onClick={() => {
+              setIsDialogOpen(true);
+            }}
+          >
+            New
+          </Button>
+        </Grid>
+        <Grid>
+          <Button
+            size={"small"}
+            variant={"outlined"}
+            color={"success"}
+            onClick={() => {
+              setIsAutoScheduleDialogOpen(true);
+            }}
+          >
+            Auto Schedule
+          </Button>
+        </Grid>
       </Grid>
       <Divider />
       <Stack spacing={2} sx={{ mt: 2 }}>
@@ -294,51 +427,55 @@ function HeatListCard(props: {
         ) : heatsQuery.data === undefined ? (
           <div>Error...</div>
         ) : (
-          heatsQuery.data.map((heat) => {
-            return (
-              <Card
-                sx={
-                  heat.id === props.activeHeatId
-                    ? {
-                        border: 2,
-                        borderColor: "success.main",
-                      }
-                    : {}
-                }
-                key={heat.id}
-              >
-                <CardContent>
-                  <Grid container>
-                    <Grid
-                      xs={10}
-                      onClick={() => {
-                        if (heat.id) {
-                          props.setActiveHeatId(heat.id);
+          heatsQuery.data
+            .sort((a, b) => {
+              return a.name.localeCompare(b.name);
+            })
+            .map((heat) => {
+              return (
+                <Card
+                  sx={
+                    heat.id === props.activeHeatId
+                      ? {
+                          border: 2,
+                          borderColor: "success.main",
                         }
-                      }}
-                    >
-                      <Typography
-                        variant={"body1"}
-                      >{`${heat.race_type.name} ${heat.termination} - ${heat.participant_count}/${heat.ideal_capacity}`}</Typography>
-                      <Typography variant={"caption"}>
-                        {getFormattedHeatStartDateTime(heat.start_datetime)} |{" "}
-                        {heat.pool} Pool
-                      </Typography>
-                    </Grid>
-                    <Grid xs>
-                      <IconButton
+                      : {}
+                  }
+                  key={heat.id}
+                >
+                  <CardContent>
+                    <Grid container>
+                      <Grid
+                        xs={10}
                         onClick={() => {
-                          void handleHeatDelete(heat.id ?? -1);
+                          if (heat.id) {
+                            props.setActiveHeatId(heat.id);
+                          }
                         }}
                       >
-                        <DeleteSharp color={"error"} />
-                      </IconButton>
+                        <Typography
+                          variant={"body1"}
+                        >{`${heat.race_type.name} ${heat.termination} - ${heat.participant_count}/${heat.ideal_capacity}`}</Typography>
+                        <Typography variant={"caption"}>
+                          {getFormattedHeatStartDateTime(heat.start_datetime)} |{" "}
+                          {heat.pool} Pool
+                        </Typography>
+                      </Grid>
+                      <Grid xs>
+                        <IconButton
+                          onClick={() => {
+                            void handleHeatDelete(heat.id ?? -1);
+                          }}
+                        >
+                          <DeleteSharp color={"error"} />
+                        </IconButton>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            );
-          })
+                  </CardContent>
+                </Card>
+              );
+            })
         )}
       </Stack>
     </CustomCard>
@@ -475,7 +612,7 @@ function HeatParticipantList(props: { heatId: number }) {
     queryFn: () =>
       getApiClient()
         .then((client) =>
-          client.heats_api_get_heat_participants({
+          client.heats_api_get_heat_participations({
             heat_id: props.heatId,
           }),
         )
@@ -500,32 +637,34 @@ function HeatParticipantList(props: { heatId: number }) {
   ) : participantsQuery.isError || participantsQuery.data === undefined ? (
     <div>Error... {participantsQuery.error?.message}</div>
   ) : (
-    <Grid>
-      {participantsQuery.data.map((participant) => {
-        return (
-          <Grid key={participant.id} xs={6}>
-            <Card>
-              <ButtonBase
-                sx={{ width: "100%", justifyContent: "start" }}
-                onClick={() => {
-                  navigator(`/participants/${participant.user.id}`);
-                }}
-              >
-                <CardContent>
-                  <Typography variant={"body1"}>
-                    {participant.bib_number} |{" "}
-                    {`${participant.user.first_name} ${participant.user.last_name}`}
-                  </Typography>
-                  <Typography variant={"body2"}>
-                    Swim Time:{" "}
-                    {getFormattedSwimTime(participant.swim_time ?? null)}
-                  </Typography>
-                </CardContent>
-              </ButtonBase>
-            </Card>
-          </Grid>
-        );
-      })}
+    <Grid container spacing={2}>
+      {participantsQuery.data
+        .sort((a, b) => b.swim_time?.localeCompare(a.swim_time ?? "") ?? -1)
+        .map((participant) => {
+          return (
+            <Grid key={participant.id} xs={6}>
+              <Card>
+                <ButtonBase
+                  sx={{ width: "100%", justifyContent: "start" }}
+                  onClick={() => {
+                    navigator(`/participants/${participant.user.id}`);
+                  }}
+                >
+                  <CardContent>
+                    <Typography variant={"body1"}>
+                      {participant.bib_number} |{" "}
+                      {`${participant.user.first_name} ${participant.user.last_name}`}
+                    </Typography>
+                    <Typography variant={"body2"}>
+                      Swim Time:{" "}
+                      {getFormattedSwimTime(participant.swim_time ?? null)}
+                    </Typography>
+                  </CardContent>
+                </ButtonBase>
+              </Card>
+            </Grid>
+          );
+        })}
     </Grid>
   );
 }
@@ -599,7 +738,9 @@ function HeatInformationCard(props: { heatId: number }) {
         </Grid>
       </Grid>
       <Divider flexItem />
-      <HeatParticipantList heatId={props.heatId} />
+      <Box sx={{ p: 2 }}>
+        <HeatParticipantList heatId={props.heatId} />
+      </Box>
     </Card>
   );
 }

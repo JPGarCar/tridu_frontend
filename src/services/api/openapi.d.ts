@@ -480,6 +480,10 @@ declare namespace Components {
              * Bib Number
              */
             bib_number: number;
+            /**
+             * Swim Time
+             */
+            swim_time: /* Swim Time */ string /* duration */ | null;
         }
         /**
          * ParticipationTypes
@@ -516,10 +520,6 @@ declare namespace Components {
          */
         export interface PatchParticipantSchema {
             origin?: /* LocationSchema */ LocationSchema | null;
-            /**
-             * ID
-             */
-            id?: /* ID */ number | null;
             /**
              * Bib Number
              */
@@ -1061,6 +1061,27 @@ declare namespace Paths {
             export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema[];
         }
     }
+    namespace HeatsApiGetHeatParticipations {
+        namespace Parameters {
+            /**
+             * Heat Id
+             */
+            export type HeatId = number;
+        }
+        export interface PathParameters {
+            heat_id: /* Heat Id */ Parameters.HeatId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /**
+             * ParticipationSchema
+             * A simple Participation schema that allows returning IDs for Participant and RelayParticipant Models.
+             */
+            Components.Schemas.ParticipationSchema[];
+        }
+    }
     namespace HeatsApiUpdateHeat {
         namespace Parameters {
             /**
@@ -1143,14 +1164,18 @@ declare namespace Paths {
     namespace ParticipantsApiParticipantApiChangeParticipantHeat {
         namespace Parameters {
             /**
+             * Heat Id
+             */
+            export type HeatId = number;
+            /**
              * Participant Id
              */
             export type ParticipantId = number;
         }
         export interface PathParameters {
             participant_id: /* Participant Id */ Parameters.ParticipantId;
+            heat_id: /* Heat Id */ Parameters.HeatId;
         }
-        export type RequestBody = /* HeatSchema */ Components.Schemas.HeatSchema;
         namespace Responses {
             export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
             export type $404 = /**
@@ -1397,14 +1422,18 @@ declare namespace Paths {
     namespace ParticipantsApiRelayTeamApiChangeRelayTeamHeat {
         namespace Parameters {
             /**
+             * Heat Id
+             */
+            export type HeatId = number;
+            /**
              * Relay Team Id
              */
             export type RelayTeamId = number;
         }
         export interface PathParameters {
             relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+            heat_id: /* Heat Id */ Parameters.HeatId;
         }
-        export type RequestBody = /* HeatSchema */ Components.Schemas.HeatSchema;
         namespace Responses {
             export type $200 = /* RelayTeamSchema */ Components.Schemas.RelayTeamSchema;
             export type $404 = /**
@@ -1664,6 +1693,28 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
+    namespace RaceApiRaceApiAutoScheduleRaceHeats {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = boolean;
+            export type $400 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
     namespace RaceApiRaceApiCreateRace {
         export type RequestBody = /* CreateRaceSchema */ Components.Schemas.CreateRaceSchema;
         namespace Responses {
@@ -1733,9 +1784,16 @@ declare namespace Paths {
              * Race Id
              */
             export type RaceId = number;
+            /**
+             * Race Type Id
+             */
+            export type RaceTypeId = number;
         }
         export interface PathParameters {
             race_id: /* Race Id */ Parameters.RaceId;
+        }
+        export interface QueryParameters {
+            race_type_id?: /* Race Type Id */ Parameters.RaceTypeId;
         }
         namespace Responses {
             /**
@@ -1845,6 +1903,23 @@ declare namespace Paths {
              * A simple Participation schema that allows returning IDs for Participant and RelayParticipant Models.
              */
             Components.Schemas.ParticipationSchema[];
+        }
+    }
+    namespace RaceApiRaceApiGetRaceReadyForAutoScheduleHeats {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = string[];
         }
     }
     namespace RaceApiRaceApiGetRaceStats {
@@ -2030,10 +2105,28 @@ export interface OperationMethods {
    * race_api_race_api_get_race_heats - Get Race Heats
    */
   'race_api_race_api_get_race_heats'(
-    parameters: Parameters<Paths.RaceApiRaceApiGetRaceHeats.PathParameters>,
+    parameters: Parameters<Paths.RaceApiRaceApiGetRaceHeats.QueryParameters & Paths.RaceApiRaceApiGetRaceHeats.PathParameters>,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RaceApiRaceApiGetRaceHeats.Responses.$200>
+  /**
+   * race_api_race_api_get_race_ready_for_auto_schedule_heats - Get Race Ready For Auto Schedule Heats
+   * 
+   * Returns empty list if ready, else a list of errors.
+   */
+  'race_api_race_api_get_race_ready_for_auto_schedule_heats'(
+    parameters: Parameters<Paths.RaceApiRaceApiGetRaceReadyForAutoScheduleHeats.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiRaceApiGetRaceReadyForAutoScheduleHeats.Responses.$200>
+  /**
+   * race_api_race_api_auto_schedule_race_heats - Auto Schedule Race Heats
+   */
+  'race_api_race_api_auto_schedule_race_heats'(
+    parameters: Parameters<Paths.RaceApiRaceApiAutoScheduleRaceHeats.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiRaceApiAutoScheduleRaceHeats.Responses.$200>
   /**
    * race_api_race_api_get_race_participants_with_invalid_swim_time - Get Race Participants With Invalid Swim Time
    * 
@@ -2143,6 +2236,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.HeatsApiGetHeatParticipants.Responses.$200>
   /**
+   * heats_api_get_heat_participations - Get Heat Participations
+   */
+  'heats_api_get_heat_participations'(
+    parameters: Parameters<Paths.HeatsApiGetHeatParticipations.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.HeatsApiGetHeatParticipations.Responses.$200>
+  /**
    * heats_api_get_heat - Get Heat
    */
   'heats_api_get_heat'(
@@ -2213,7 +2314,7 @@ export interface OperationMethods {
    */
   'participants_api_participant_api_change_participant_heat'(
     parameters: Parameters<Paths.ParticipantsApiParticipantApiChangeParticipantHeat.PathParameters>,
-    data?: Paths.ParticipantsApiParticipantApiChangeParticipantHeat.RequestBody,
+    data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiParticipantApiChangeParticipantHeat.Responses.$200>
   /**
@@ -2309,7 +2410,7 @@ export interface OperationMethods {
    */
   'participants_api_relay_team_api_change_relay_team_heat'(
     parameters: Parameters<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.PathParameters>,
-    data?: Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.RequestBody,
+    data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.Responses.$200>
   /**
@@ -2522,10 +2623,32 @@ export interface PathsDictionary {
      * race_api_race_api_get_race_heats - Get Race Heats
      */
     'get'(
-      parameters: Parameters<Paths.RaceApiRaceApiGetRaceHeats.PathParameters>,
+      parameters: Parameters<Paths.RaceApiRaceApiGetRaceHeats.QueryParameters & Paths.RaceApiRaceApiGetRaceHeats.PathParameters>,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.RaceApiRaceApiGetRaceHeats.Responses.$200>
+  }
+  ['/api/races/{race_id}/heats/auto_schedule/ready']: {
+    /**
+     * race_api_race_api_get_race_ready_for_auto_schedule_heats - Get Race Ready For Auto Schedule Heats
+     * 
+     * Returns empty list if ready, else a list of errors.
+     */
+    'get'(
+      parameters: Parameters<Paths.RaceApiRaceApiGetRaceReadyForAutoScheduleHeats.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiRaceApiGetRaceReadyForAutoScheduleHeats.Responses.$200>
+  }
+  ['/api/races/{race_id}/heats/auto_schedule']: {
+    /**
+     * race_api_race_api_auto_schedule_race_heats - Auto Schedule Race Heats
+     */
+    'post'(
+      parameters: Parameters<Paths.RaceApiRaceApiAutoScheduleRaceHeats.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiRaceApiAutoScheduleRaceHeats.Responses.$200>
   }
   ['/api/races/{race_id}/participants/invalid_swim_time/']: {
     /**
@@ -2655,6 +2778,16 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.HeatsApiGetHeatParticipants.Responses.$200>
   }
+  ['/api/heats/{heat_id}/participations']: {
+    /**
+     * heats_api_get_heat_participations - Get Heat Participations
+     */
+    'get'(
+      parameters: Parameters<Paths.HeatsApiGetHeatParticipations.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.HeatsApiGetHeatParticipations.Responses.$200>
+  }
   ['/api/heats/{heat_id}']: {
     /**
      * heats_api_get_heat - Get Heat
@@ -2733,13 +2866,13 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiParticipantApiChangeParticipantRaceType.Responses.$201>
   }
-  ['/api/participants/{participant_id}/change_heat']: {
+  ['/api/participants/{participant_id}/change_heat/{heat_id}']: {
     /**
      * participants_api_participant_api_change_participant_heat - Change Participant Heat
      */
     'patch'(
       parameters: Parameters<Paths.ParticipantsApiParticipantApiChangeParticipantHeat.PathParameters>,
-      data?: Paths.ParticipantsApiParticipantApiChangeParticipantHeat.RequestBody,
+      data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiParticipantApiChangeParticipantHeat.Responses.$200>
   }
@@ -2847,13 +2980,13 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamRaceType.Responses.$201>
   }
-  ['/api/relay_teams/{relay_team_id}/change_heat']: {
+  ['/api/relay_teams/{relay_team_id}/change_heat/{heat_id}']: {
     /**
      * participants_api_relay_team_api_change_relay_team_heat - Change Relay Team Heat
      */
     'patch'(
       parameters: Parameters<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.PathParameters>,
-      data?: Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.RequestBody,
+      data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiRelayTeamApiChangeRelayTeamHeat.Responses.$200>
   }

@@ -834,10 +834,12 @@ function RelayTeamParticipantInformation(props: {
 }
 
 function RaceTypeField<T>(props: {
-  raceTypeId: number;
+  raceType: Components.Schemas.RaceTypeSchema;
   onChangeRaceType: (raceType: Components.Schemas.RaceTypeSchema) => Promise<T>;
 }) {
   const { getApiClient } = useApiServiceContext();
+
+  const [isEditing, setIsEditing] = useState(false);
 
   const raceTypesQuery = useQuery({
     queryKey: ["getRaceTypes"],
@@ -845,15 +847,15 @@ function RaceTypeField<T>(props: {
       getApiClient().then((client) =>
         client.race_api_race_type_api_get_race_types().then((res) => res.data),
       ),
+    enabled: isEditing,
+    initialData: () => [props.raceType],
   });
-
-  const [isEditing, setIsEditing] = useState(false);
 
   const { pushAlert } = useSnackbarServiceContext();
 
   const formik = useFormik({
     initialValues: {
-      raceTypeId: props.raceTypeId,
+      raceTypeId: props.raceType.id ?? -1,
     },
     enableReinitialize: true,
     onSubmit: async (values, formikHelpers) => {
@@ -884,8 +886,8 @@ function RaceTypeField<T>(props: {
   const getRaceType = (
     id: number,
   ): Components.Schemas.RaceTypeSchema | undefined => {
-    if (raceTypesQuery.data == undefined) {
-      return undefined;
+    if (props.raceType.id == id) {
+      return props.raceType;
     }
 
     return raceTypesQuery.data.find((raceType) => {
@@ -895,23 +897,19 @@ function RaceTypeField<T>(props: {
 
   return (
     <form onSubmit={formik.handleSubmit}>
-      {raceTypesQuery.isLoading || raceTypesQuery.data == undefined ? (
-        <Skeleton variant={"text"} />
-      ) : (
-        <EditableRowStackSelectField
-          label={"Race Type:"}
-          value={formik.values.raceTypeId}
-          valueLabel={getRaceType(formik.values.raceTypeId)?.name}
-          editing={isEditing}
-          id={"raceTypeId"}
-          options={raceTypesQuery.data.map((racetype) => ({
-            value: racetype.id ?? 0,
-            key: racetype.name,
-          }))}
-          onChange={formik.handleChange}
-          error={formik.errors.raceTypeId}
-        />
-      )}
+      <EditableRowStackSelectField
+        label={"Race Type:"}
+        value={formik.values.raceTypeId}
+        valueLabel={getRaceType(formik.values.raceTypeId)?.name}
+        editing={isEditing}
+        id={"raceTypeId"}
+        options={raceTypesQuery.data.map((racetype) => ({
+          value: racetype.id ?? 0,
+          key: racetype.name,
+        }))}
+        onChange={formik.handleChange}
+        error={formik.errors.raceTypeId}
+      />
       <Button onClick={handleEditButton}>
         {isEditing ? "Cancel" : "Edit"}
       </Button>
@@ -952,7 +950,7 @@ function ParticipantRaceType(props: {
 
   return (
     <RaceTypeField
-      raceTypeId={props.participant.race_type.id}
+      raceType={props.participant.race_type}
       onChangeRaceType={handleChangeRaceType}
     />
   );
@@ -986,7 +984,7 @@ function RelayTeamRaceType(props: {
 
   return (
     <RaceTypeField
-      raceTypeId={props.relayTeam.race_type.id}
+      raceType={props.relayTeam.race_type}
       onChangeRaceType={handleChangeRaceType}
     />
   );
@@ -994,11 +992,14 @@ function RelayTeamRaceType(props: {
 
 function RaceHeatField<T>(props: {
   raceId: number;
-  heatId: number | null;
+  heat: Components.Schemas.HeatSchema | null;
+  raceTypeId: number;
   onChangeHeat: (heat: Components.Schemas.HeatSchema) => Promise<T>;
   onRemoveHeat: () => Promise<T>;
 }) {
   const { getApiClient } = useApiServiceContext();
+
+  const [isEditing, setIsEditing] = useState(false);
 
   const raceHeatsQuery = useQuery({
     queryKey: ["getRaceHeats"],
@@ -1007,18 +1008,19 @@ function RaceHeatField<T>(props: {
         client
           .race_api_race_api_get_race_heats({
             race_id: props.raceId,
+            race_type_id: props.raceTypeId,
           })
           .then((res) => res.data),
       ),
+    enabled: isEditing,
+    initialData: () => (props.heat == null ? [] : [props.heat]),
   });
-
-  const [isEditing, setIsEditing] = useState(false);
 
   const { pushAlert } = useSnackbarServiceContext();
 
   const formik = useFormik({
     initialValues: {
-      heatId: props.heatId ?? -1,
+      heatId: props.heat?.id ?? -1,
     },
     enableReinitialize: true,
     onSubmit: async (values, formikHelpers) => {
@@ -1037,13 +1039,20 @@ function RaceHeatField<T>(props: {
   });
 
   const getHeat = (id: number): Components.Schemas.HeatSchema | undefined => {
-    if (raceHeatsQuery.data == undefined) {
-      return undefined;
+    if (props.heat && props.heat.id == id) {
+      return props.heat;
     }
 
     return raceHeatsQuery.data.find((heat) => {
       return heat.id == id;
     });
+  };
+
+  const getHeatName = (heat: Components.Schemas.HeatSchema | null): string => {
+    if (heat) {
+      return `${heat.name} | ${heat.race_type.name}`;
+    }
+    return "No Heat";
   };
 
   const handleEditButton = () => {
@@ -1061,24 +1070,20 @@ function RaceHeatField<T>(props: {
 
   return (
     <form onSubmit={formik.handleSubmit}>
-      {raceHeatsQuery.isLoading || raceHeatsQuery.data == undefined ? (
-        <Skeleton variant={"text"} />
-      ) : (
-        <EditableRowStackSelectField
-          label={"Heat:"}
-          value={formik.values.heatId}
-          valueLabel={getHeat(formik.values.heatId)?.name ?? "No Heat"}
-          editing={isEditing}
-          id={"heatId"}
-          options={raceHeatsQuery.data.map((heat) => ({
-            value: heat.id ?? 0,
-            key: heat.name,
-          }))}
-          onChange={formik.handleChange}
-          error={formik.errors.heatId}
-        />
-      )}
-      {props.heatId == null ? (
+      <EditableRowStackSelectField
+        label={"Heat:"}
+        value={formik.values.heatId}
+        valueLabel={getHeatName(getHeat(formik.values.heatId) ?? null)}
+        editing={isEditing}
+        id={"heatId"}
+        options={raceHeatsQuery.data.map((heat) => ({
+          value: heat.id ?? 0,
+          key: getHeatName(heat),
+        }))}
+        onChange={formik.handleChange}
+        error={formik.errors.heatId}
+      />
+      {props.heat?.id == null ? (
         <Button onClick={handleEditButton}>
           {isEditing ? "Cancel" : "Edit"}
         </Button>
@@ -1112,10 +1117,10 @@ function ParticipantRaceHeat(props: {
     const api = await getApiClient();
 
     const response =
-      await api.participants_api_participant_api_change_participant_heat(
-        { participant_id: props.participant.id ?? 0 },
-        heat,
-      );
+      await api.participants_api_participant_api_change_participant_heat({
+        participant_id: props.participant.id ?? -1,
+        heat_id: heat.id ?? -1,
+      });
     props.setParticipant(response.data);
     return response.data;
   };
@@ -1138,7 +1143,8 @@ function ParticipantRaceHeat(props: {
   return (
     <RaceHeatField
       raceId={props.participant.race.id}
-      heatId={props.participant.heat?.id ?? null}
+      heat={props.participant.heat ?? null}
+      raceTypeId={props.participant.race_type.id ?? -1}
       onChangeHeat={handleChangeHeat}
       onRemoveHeat={handleRemoveHeat}
     />
@@ -1155,10 +1161,10 @@ function RelayTeamRaceHeat(props: {
     const api = await getApiClient();
 
     const response =
-      await api.participants_api_relay_team_api_change_relay_team_heat(
-        { relay_team_id: props.relayTeam.id ?? 0 },
-        heat,
-      );
+      await api.participants_api_relay_team_api_change_relay_team_heat({
+        relay_team_id: props.relayTeam.id ?? -1,
+        heat_id: heat.id ?? -1,
+      });
     props.setRelayTeam(response.data);
     return response.data;
   };
@@ -1175,13 +1181,14 @@ function RelayTeamRaceHeat(props: {
   };
 
   if (props.relayTeam.race.id == undefined) {
-    return <>Error... Participant must have a race assigned!</>;
+    return <>Error... Relay Team must have a race assigned!</>;
   }
 
   return (
     <RaceHeatField
       raceId={props.relayTeam.race.id}
-      heatId={props.relayTeam.heat?.id ?? null}
+      heat={props.relayTeam.heat ?? null}
+      raceTypeId={props.relayTeam.race_type.id ?? -1}
       onChangeHeat={handleChangeHeat}
       onRemoveHeat={handleRemoveHeat}
     />
