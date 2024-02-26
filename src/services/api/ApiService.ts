@@ -75,9 +75,10 @@ export function useApiService(
             snackBarService.pushAlert(
               errorObjectSchema.title + ": " + errorObjectSchema.details,
               "warning",
+              8000,
             );
           } else {
-            snackBarService.pushAlert(error.message, "warning");
+            snackBarService.pushAlert(error.message, "warning", 10000);
           }
         } else if (
           error.response != undefined &&
@@ -87,6 +88,7 @@ export function useApiService(
             "Critical error, please contact admin ASAP! Details: " +
               error.message,
             "error",
+            12000,
           );
         }
 
