@@ -483,7 +483,7 @@ declare namespace Components {
             /**
              * Swim Time
              */
-            swim_time: /* Swim Time */ string /* duration */ | null;
+            swim_time?: /* Swim Time */ string /* duration */ | null;
         }
         /**
          * ParticipationTypes
@@ -496,24 +496,28 @@ declare namespace Components {
             /**
              * Termination
              */
-            termination: string;
+            termination?: /* Termination */ string | null;
             /**
              * Start Datetime
              */
-            start_datetime: string; // date-time
+            start_datetime?: /* Start Datetime */ string /* date-time */ | null;
             /**
              * HEX Color Code
              * Color hex code with #
              */
-            color: string;
+            color?: /**
+             * HEX Color Code
+             * Color hex code with #
+             */
+            string | null;
             /**
              * Ideal Capacity
              */
-            ideal_capacity?: number;
+            ideal_capacity?: /* Ideal Capacity */ number | null;
             /**
              * Pool
              */
-            pool?: string;
+            pool?: /* Pool */ string | null;
         }
         /**
          * PatchParticipantSchema
@@ -540,6 +544,23 @@ declare namespace Components {
              * Location
              */
             location?: /* Location */ string | null;
+        }
+        /**
+         * PatchRaceTypeSchema
+         */
+        export interface PatchRaceTypeSchema {
+            /**
+             * Name
+             */
+            name?: /* Name */ string | null;
+            /**
+             * Participants Allowed
+             */
+            participants_allowed?: /* Participants Allowed */ number | null;
+            /**
+             * Ftt Allowed
+             */
+            ftt_allowed?: /* Ftt Allowed */ number | null;
         }
         /**
          * PatchRelayParticipantSchema
@@ -1992,7 +2013,7 @@ declare namespace Paths {
         export interface PathParameters {
             race_type_id: /* Race Type Id */ Parameters.RaceTypeId;
         }
-        export type RequestBody = /* CreateRaceTypeSchema */ Components.Schemas.CreateRaceTypeSchema;
+        export type RequestBody = /* PatchRaceTypeSchema */ Components.Schemas.PatchRaceTypeSchema;
         namespace Responses {
             export type $201 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
             export type $404 = /**

@@ -22,6 +22,8 @@ import { useFormik } from "formik";
 import { Components } from "../services/api/openapi";
 import { useState } from "react";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
+import getChangedValues from "../services/helpers.ts";
+import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
 
 function CreateRaceTypeDialog(props: {
   isOpen: boolean;
@@ -100,39 +102,45 @@ function EditRaceTypeDialog(props: {
 }) {
   const { getApiClient } = useApiServiceContext();
 
+  const { pushAlert } = useSnackbarServiceContext();
+
   const HeatFormCreateSchema = Yup.object({
     name: Yup.string().required(),
-    participantsAllowed: Yup.number().default(0).min(0),
-    fttParticipantsAllowed: Yup.number().default(0).min(0),
+    participants_allowed: Yup.number().default(0).min(0),
+    ftt_allowed: Yup.number().default(0).min(0),
   });
 
+  const initialValues =
+    props.raceType == null
+      ? {
+          name: "",
+          participants_allowed: 0,
+          ftt_allowed: 0,
+        }
+      : {
+          name: props.raceType.name,
+          participants_allowed: props.raceType.participants_allowed,
+          ftt_allowed: props.raceType.ftt_allowed,
+        };
+
   const formik = useFormik({
-    initialValues:
-      props.raceType == null
-        ? {
-            name: "",
-            participantsAllowed: 0,
-            fttParticipantsAllowed: 0,
-          }
-        : {
-            name: props.raceType.name,
-            participantsAllowed: props.raceType.participants_allowed,
-            fttParticipantsAllowed: props.raceType.ftt_allowed,
-          },
+    initialValues: initialValues,
     validationSchema: HeatFormCreateSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
+      const changedValues = getChangedValues(values, initialValues);
+
       const api = await getApiClient();
       const response = await api.race_api_race_type_api_update_race_type(
         { race_type_id: props.raceType?.id ?? 0 },
-        {
-          name: values.name,
-          participants_allowed: values.participantsAllowed,
-          ftt_allowed: values.fttParticipantsAllowed,
-        },
+        changedValues,
       );
 
       props.handleClose(response.data);
+      pushAlert(
+        `${props.raceType?.name} Race Type updated successfully!`,
+        "success",
+      );
     },
   });
 
@@ -158,20 +166,20 @@ function EditRaceTypeDialog(props: {
             <TextField
               label={"Participants Allowed"}
               type={"number"}
-              value={formik.values.participantsAllowed}
+              value={formik.values.participants_allowed}
               onChange={formik.handleChange}
-              id={"participantsAllowed"}
-              error={formik.errors.participantsAllowed != undefined}
-              helperText={formik.errors.participantsAllowed ?? ""}
+              id={"participants_allowed"}
+              error={formik.errors.participants_allowed != undefined}
+              helperText={formik.errors.participants_allowed ?? ""}
             />
             <TextField
               label={"FTT Participants Allowed"}
               type={"number"}
-              value={formik.values.fttParticipantsAllowed}
+              value={formik.values.ftt_allowed}
               onChange={formik.handleChange}
-              id={"fttParticipantsAllowed"}
-              error={formik.errors.fttParticipantsAllowed != undefined}
-              helperText={formik.errors.fttParticipantsAllowed ?? ""}
+              id={"ftt_allowed"}
+              error={formik.errors.ftt_allowed != undefined}
+              helperText={formik.errors.ftt_allowed ?? ""}
             />
           </Stack>
         </DialogContent>

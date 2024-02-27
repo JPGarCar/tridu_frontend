@@ -29,12 +29,12 @@ import {
   EditableRowStackSwitch,
   EditableRowStackTextField,
 } from "../components/EditableRowComponents.tsx";
-import { getAxiosError } from "../services/api/apiError.ts";
 import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
 import { CommentCard } from "../components/Comments.tsx";
 import * as Yup from "yup";
 import CustomCard from "../components/CustomCard.tsx";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
+import getChangedValues from "../services/helpers.ts";
 
 function ParticipantPICard(props: { userId: string }) {
   const { pushAlert } = useSnackbarServiceContext();
@@ -56,9 +56,9 @@ function ParticipantPICard(props: { userId: string }) {
   const [isEditing, setIsEditing] = useState(false);
 
   const UserFormSchema = Yup.object({
-    firstName: Yup.string().required(),
-    lastName: Yup.string().required(),
-    dob: Yup.string()
+    first_name: Yup.string().required(),
+    last_name: Yup.string().required(),
+    date_of_birth: Yup.string()
       .required()
       .matches(/^\d{4}-\d{2}-\d{2}$/, "Must format YYYY-MM-DD"),
     gender: Yup.string().required(),
@@ -70,17 +70,17 @@ function ParticipantPICard(props: { userId: string }) {
     initialValues:
       userQuery.isLoading || user == undefined
         ? {
-            firstName: "",
-            lastName: "",
-            dob: "",
+            first_name: "",
+            last_name: "",
+            date_of_birth: "",
             gender: "",
             email: "",
             phone: "",
           }
         : {
-            firstName: user.first_name,
-            lastName: user.last_name,
-            dob: user.date_of_birth,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            date_of_birth: user.date_of_birth,
             gender: user.gender,
             email: user.email,
             phone: user.phone_number,
@@ -90,24 +90,28 @@ function ParticipantPICard(props: { userId: string }) {
     onSubmit: async (values, formikHelpers) => {
       formikHelpers.setSubmitting(true);
 
-      const apiClient = await getApiClient();
-      const response = await apiClient.accounts_api_update_user(
-        { user_id: user?.id ?? 0 },
-        {
-          first_name: values.firstName,
-          last_name: values.lastName,
-          date_of_birth: values.dob,
-          gender: values.gender,
-          email: values.email,
-          phone_number: values.phone,
-        },
-      );
+      if (user) {
+        const changedValues = getChangedValues(values, {
+          first_name: user.first_name,
+          last_name: user.last_name,
+          date_of_birth: user.date_of_birth,
+          gender: user.gender,
+          email: user.email,
+          phone: user.phone_number,
+        });
 
-      formikHelpers.setSubmitting(false);
-      formikHelpers.resetForm();
-      queryClient.setQueryData(["getUserById", props.userId], response.data);
-      setIsEditing(false);
-      pushAlert("Edits saved successfully!", "success");
+        const apiClient = await getApiClient();
+        const response = await apiClient.accounts_api_update_user(
+          { user_id: user.id ?? -1 },
+          changedValues,
+        );
+
+        formikHelpers.setSubmitting(false);
+        formikHelpers.resetForm();
+        queryClient.setQueryData(["getUserById", props.userId], response.data);
+        setIsEditing(false);
+        pushAlert("Edits saved successfully!", "success");
+      }
     },
   });
 
@@ -128,33 +132,33 @@ function ParticipantPICard(props: { userId: string }) {
           <Stack spacing={2} sx={{ ml: 2 }}>
             <EditableRowStackTextField
               label={"First Name:"}
-              data={formik.values.firstName}
-              id={"firstName"}
+              data={formik.values.first_name}
+              id={"first_name"}
               editing={isEditing}
               onChange={formik.handleChange}
-              error={formik.errors.firstName}
+              error={formik.errors.first_name}
             />
             <EditableRowStackTextField
               label={"Last Name:"}
-              data={formik.values.lastName}
-              id={"lastName"}
+              data={formik.values.last_name}
+              id={"last_name"}
               editing={isEditing}
               onChange={formik.handleChange}
-              error={formik.errors.lastName}
+              error={formik.errors.last_name}
             />
             <Stack direction={"row"} spacing={4}>
               <EditableRowStackTextField
                 label={"DOB (Y-M-D):"}
-                data={formik.values.dob}
-                id={"dob"}
+                data={formik.values.date_of_birth}
+                id={"date_of_birth"}
                 editing={isEditing}
                 onChange={formik.handleChange}
-                error={formik.errors.dob}
+                error={formik.errors.date_of_birth}
               />
               <EditableRowStackTextField
                 label={"Age:"}
                 data={Math.abs(
-                  DateTime.fromISO(formik.values.dob ?? "").minus({
+                  DateTime.fromISO(formik.values.date_of_birth ?? "").minus({
                     year: DateTime.now().year,
                   }).year,
                 ).toString()}
@@ -388,7 +392,7 @@ function ParticipantInformation(props: {
       .integer("Must be a full integer!"),
     is_ftt: Yup.boolean().required(),
     team: Yup.string().notRequired(),
-    swimTime: Yup.string()
+    swim_time: Yup.string()
       .notRequired()
       .matches(/^\d{2}:\d{2}$/, "Must be in format MM:SS"),
     city: Yup.string().notRequired(),
@@ -397,46 +401,42 @@ function ParticipantInformation(props: {
     location: Yup.string().notRequired(),
   });
 
-  const formik = useFormik({
-    initialValues: {
-      bib_num: props.participant.bib_number,
-      is_ftt: props.participant.is_ftt,
-      team: props.participant.team,
-      swimTime: swimTimeCreator(props.participant.swim_time ?? null),
+  const initialValues = {
+    bib_num: props.participant.bib_number,
+    is_ftt: props.participant.is_ftt,
+    team: props.participant.team,
+    swim_time: swimTimeCreator(props.participant.swim_time ?? null),
+    origin: {
       city: props.participant.origin?.city ?? "",
       province: props.participant.origin?.province ?? "",
       country: props.participant.origin?.country ?? "",
-      location: props.participant.location,
     },
+    location: props.participant.location,
+  };
+
+  const formik = useFormik({
+    initialValues: initialValues,
     enableReinitialize: true,
     validationSchema: ParticipantFormSchema,
     onSubmit: async (values) => {
-      const apiClient = await getApiClient();
-      try {
-        const response =
-          await apiClient.participants_api_participant_api_update_participant(
-            { participant_id: props.participant.id ?? 0 },
-            {
-              bib_number: values.bib_num,
-              is_ftt: values.is_ftt,
-              team: values.team,
-              swim_time: swimTimeDestructor(values.swimTime)?.toISO(),
-              origin: {
-                city: values.city,
-                province: values.province,
-                country: values.country,
-              },
-              location: values.location,
-            },
-          );
+      const changedValues = getChangedValues(values, initialValues);
 
-        pushAlert("Edits saved successfully!", "success");
-        props.setParticipant(response.data);
-        setIsEditing(false);
-      } catch (e) {
-        console.log("Error:");
-        console.log(getAxiosError(e));
+      if ("swim_time" in changedValues) {
+        // @ts-expect-error okay to send null, sending undefined doesnt work
+        changedValues.swim_time =
+          swimTimeDestructor(changedValues.swim_time ?? "")?.toISO() ?? null;
       }
+
+      const apiClient = await getApiClient();
+      const response =
+        await apiClient.participants_api_participant_api_update_participant(
+          { participant_id: props.participant.id ?? 0 },
+          changedValues,
+        );
+
+      pushAlert("Edits saved successfully!", "success");
+      props.setParticipant(response.data);
+      setIsEditing(false);
     },
   });
 
@@ -505,11 +505,11 @@ function ParticipantInformation(props: {
               />
               <EditableRowStackTextField
                 label={"Swim Time (MM:SS):"}
-                data={formik.values.swimTime}
+                data={formik.values.swim_time}
                 editing={isEditing}
-                id={"swimTime"}
+                id={"swim_time"}
                 onChange={formik.handleChange}
-                error={formik.errors.swimTime}
+                error={formik.errors.swim_time}
               />
             </Stack>
           </Grid>
@@ -517,27 +517,27 @@ function ParticipantInformation(props: {
             <Stack spacing={2}>
               <EditableRowStackTextField
                 label={"City:"}
-                data={formik.values.city}
+                data={formik.values.origin.city}
                 editing={isEditing}
-                id={"city"}
+                id={"origin.city"}
                 onChange={formik.handleChange}
-                error={formik.errors.city}
+                error={formik.errors.origin?.city}
               />
               <EditableRowStackTextField
                 label={"Province:"}
-                data={formik.values.province}
+                data={formik.values.origin.province}
                 editing={isEditing}
-                id={"province"}
+                id={"origin.province"}
                 onChange={formik.handleChange}
-                error={formik.errors.province}
+                error={formik.errors.origin?.city}
               />
               <EditableRowStackTextField
                 label={"Country:"}
-                data={formik.values.country}
+                data={formik.values.origin.country}
                 editing={isEditing}
-                id={"country"}
+                id={"origin.country"}
                 onChange={formik.handleChange}
-                error={formik.errors.country}
+                error={formik.errors.origin?.country}
               />
               <EditableRowStackTextField
                 label={"Location:"}
@@ -736,16 +736,22 @@ function RelayTeamParticipantInformation(props: {
     location: Yup.string().notRequired(),
   });
 
-  const formik = useFormik({
-    initialValues: {
+  const initialValues = {
+    origin: {
       city: props.relayParticipant.origin?.city ?? "",
       province: props.relayParticipant.origin?.province ?? "",
       country: props.relayParticipant.origin?.country ?? "",
-      location: props.relayParticipant.location,
     },
+    location: props.relayParticipant.location,
+  };
+
+  const formik = useFormik({
+    initialValues: initialValues,
     enableReinitialize: true,
     validationSchema: RelayTeamParticipantFormSchema,
     onSubmit: async (values) => {
+      const changedValues = getChangedValues(values, initialValues);
+
       const apiClient = await getApiClient();
       const response =
         await apiClient.participants_api_relay_team_api_update_relay_participant(
@@ -753,14 +759,7 @@ function RelayTeamParticipantInformation(props: {
             relay_team_id: props.relayParticipant.team.id ?? 0,
             relay_participant_id: props.relayParticipant.id ?? 0,
           },
-          {
-            origin: {
-              city: values.city,
-              province: values.province,
-              country: values.country,
-            },
-            location: values.location,
-          },
+          changedValues,
         );
 
       pushAlert("Edits saved successfully!", "success");
@@ -786,27 +785,27 @@ function RelayTeamParticipantInformation(props: {
           <Stack spacing={2}>
             <EditableRowStackTextField
               label={"City:"}
-              data={formik.values.city}
+              data={formik.values.origin.city}
               editing={isEditing}
-              id={"city"}
+              id={"origin.city"}
               onChange={formik.handleChange}
-              error={formik.errors.city}
+              error={formik.errors.origin?.city}
             />
             <EditableRowStackTextField
               label={"Province:"}
-              data={formik.values.province}
+              data={formik.values.origin.province}
               editing={isEditing}
-              id={"province"}
+              id={"origin.province"}
               onChange={formik.handleChange}
-              error={formik.errors.province}
+              error={formik.errors.origin?.province}
             />
             <EditableRowStackTextField
               label={"Country:"}
-              data={formik.values.country}
+              data={formik.values.origin.country}
               editing={isEditing}
-              id={"country"}
+              id={"origin.country"}
               onChange={formik.handleChange}
-              error={formik.errors.country}
+              error={formik.errors.origin?.country}
             />
             <EditableRowStackTextField
               label={"Location:"}

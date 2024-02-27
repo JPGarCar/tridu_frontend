@@ -40,6 +40,7 @@ import { useNavigate } from "react-router-dom";
 import { TimePicker } from "@mui/x-date-pickers";
 import { DeleteSharp } from "@mui/icons-material";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
+import getChangedValues from "../services/helpers.ts";
 
 const PoolOptions = [
   { key: "RECREATION", value: "Recreation" },
@@ -493,32 +494,35 @@ function HeatInformationForm(props: {
   const HeatFormSchema = Yup.object({
     termination: Yup.string().length(1, "Length must be 1!"),
     color: Yup.string(),
-    startDateTime: Yup.date().required(),
-    idealCapacity: Yup.number().required().min(0, "Min value is 0!"),
+    start_datetime: Yup.date().required(),
+    ideal_capacity: Yup.number().required().min(0, "Min value is 0!"),
     pool: Yup.string().required(),
   });
 
+  const initalValues = {
+    termination: props.heat.termination,
+    color: props.heat.color,
+    start_datetime: DateTime.fromISO(props.heat.start_datetime),
+    ideal_capacity: props.heat.ideal_capacity,
+    pool: props.heat.pool,
+  };
+
   const formik = useFormik({
-    initialValues: {
-      termination: props.heat.termination,
-      color: props.heat.color,
-      startDateTime: DateTime.fromISO(props.heat.start_datetime),
-      idealCapacity: props.heat.ideal_capacity,
-      pool: props.heat.pool,
-    },
+    initialValues: initalValues,
     validationSchema: HeatFormSchema,
     onSubmit: async (values) => {
+      const changedValues = getChangedValues(values, initalValues);
+
+      if ("start_datetime" in changedValues && changedValues.start_datetime) {
+        // @ts-expect-error We must return an ISO string, so its fine
+        changedValues.start_datetime = changedValues.start_datetime.toISO();
+      }
+
       const api = await getApiClient();
       const response = await api.heats_api_update_heat(
         //@ts-expect-error I don't know why this is happens!
         { heat_id: props.heat.id ?? undefined },
-        {
-          termination: values.termination,
-          color: values.color,
-          start_datetime: values.startDateTime.toISO(),
-          ideal_capacity: values.idealCapacity,
-          pool: values.pool,
-        },
+        changedValues,
       );
 
       props.onHeatUpdate(response.data);
@@ -559,10 +563,10 @@ function HeatInformationForm(props: {
             />
             <EditableRowStackNumberField
               label={"Ideal Capacity: "}
-              data={formik.values.idealCapacity}
+              data={formik.values.ideal_capacity}
               editing={isEditing}
-              id={"idealCapacity"}
-              error={formik.errors.idealCapacity}
+              id={"ideal_capacity"}
+              error={formik.errors.ideal_capacity}
               onChange={formik.handleChange}
             />
             <EditableRowStackSelectField
@@ -577,10 +581,10 @@ function HeatInformationForm(props: {
             />
             <EditableRowStackTimeField
               label={"Start Time: "}
-              data={formik.values.startDateTime}
+              data={formik.values.start_datetime}
               editing={isEditing}
-              id={"startDateTime"}
-              error={formik.errors.startDateTime}
+              id={"start_datetime"}
+              error={formik.errors.start_datetime}
               setFieldValue={(arg0, arg1, arg2) => {
                 void formik.setFieldValue(arg0, arg1, arg2);
               }}
