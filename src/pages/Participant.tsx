@@ -399,6 +399,7 @@ function ParticipantInformation(props: {
     province: Yup.string().notRequired(),
     country: Yup.string().notRequired(),
     location: Yup.string().notRequired(),
+    waiver_signed: Yup.boolean().required(),
   });
 
   const initialValues = {
@@ -412,6 +413,7 @@ function ParticipantInformation(props: {
       country: props.participant.origin?.country ?? "",
     },
     location: props.participant.location,
+    waiver_signed: props.participant.waiver_signed,
   };
 
   const formik = useFormik({
@@ -510,6 +512,13 @@ function ParticipantInformation(props: {
                 id={"swim_time"}
                 onChange={formik.handleChange}
                 error={formik.errors.swim_time}
+              />
+              <EditableRowStackSwitch
+                label={"Waiver Signed:"}
+                checked={formik.values.waiver_signed}
+                editing={isEditing}
+                id={"waiver_signed"}
+                onChange={formik.handleChange}
               />
             </Stack>
           </Grid>
@@ -721,9 +730,9 @@ function RelayTeamInformation(props: {
 
 function RelayTeamParticipantInformation(props: {
   setRelayParticipant: (
-    arg0: Components.Schemas.RelayTeamParticipantSchema,
+    arg0: Components.Schemas.RelayParticipantSchema,
   ) => void;
-  relayParticipant: Components.Schemas.RelayTeamParticipantSchema;
+  relayParticipant: Components.Schemas.RelayParticipantSchema;
 }) {
   const { pushAlert } = useSnackbarServiceContext();
 
@@ -734,6 +743,7 @@ function RelayTeamParticipantInformation(props: {
     province: Yup.string().notRequired(),
     country: Yup.string().notRequired(),
     location: Yup.string().notRequired(),
+    waiver_signed: Yup.boolean().required(),
   });
 
   const initialValues = {
@@ -743,6 +753,7 @@ function RelayTeamParticipantInformation(props: {
       country: props.relayParticipant.origin?.country ?? "",
     },
     location: props.relayParticipant.location,
+    waiver_signed: props.relayParticipant.waiver_signed,
   };
 
   const formik = useFormik({
@@ -814,6 +825,13 @@ function RelayTeamParticipantInformation(props: {
               id={"location"}
               onChange={formik.handleChange}
               error={formik.errors.location}
+            />
+            <EditableRowStackSwitch
+              label={"Waiver Signed:"}
+              checked={formik.values.waiver_signed}
+              editing={isEditing}
+              id={"waiver_signed"}
+              onChange={formik.handleChange}
             />
           </Stack>
         </Grid>
@@ -1399,7 +1417,7 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
   };
 
   const setRelayParticipant = (
-    participant: Components.Schemas.RelayTeamParticipantSchema,
+    participant: Components.Schemas.RelayParticipantSchema,
   ) => {
     queryClient.setQueryData(
       ["getRelayParticipant", props.relayParticipantId],

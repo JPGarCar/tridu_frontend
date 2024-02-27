@@ -159,6 +159,10 @@ declare namespace Components {
              * Location
              */
             location?: /* Location */ string | null;
+            /**
+             * Waiver Signed
+             */
+            waiver_signed?: boolean;
         }
         /**
          * CreateRaceSchema
@@ -202,6 +206,10 @@ declare namespace Components {
              * Team
              */
             team_id: number;
+            /**
+             * Waiver Signed
+             */
+            waiver_signed?: boolean;
         }
         /**
          * CreateRelayTeamSchema
@@ -463,6 +471,10 @@ declare namespace Components {
              * Location
              */
             location?: /* Location */ string | null;
+            /**
+             * Waiver Signed
+             */
+            waiver_signed?: boolean;
         }
         /**
          * ParticipationSchema
@@ -544,6 +556,10 @@ declare namespace Components {
              * Location
              */
             location?: /* Location */ string | null;
+            /**
+             * Waiver Signed
+             */
+            waiver_signed?: /* Waiver Signed */ boolean | null;
         }
         /**
          * PatchRaceTypeSchema
@@ -571,6 +587,10 @@ declare namespace Components {
              * Location
              */
             location?: /* Location */ string | null;
+            /**
+             * Waiver Signed
+             */
+            waiver_signed?: /* Waiver Signed */ boolean | null;
         }
         /**
          * PatchRelayTeamSchema
@@ -708,6 +728,34 @@ declare namespace Components {
             ftt_allowed: number;
         }
         /**
+         * RelayParticipantSchema
+         */
+        export interface RelayParticipantSchema {
+            origin?: /* LocationSchema */ LocationSchema | null;
+            user: /* UserSchema */ UserSchema;
+            team: /* RelayTeamSchema */ RelayTeamSchema;
+            /**
+             * ID
+             */
+            id?: /* ID */ number | null;
+            /**
+             * Date Changed
+             */
+            date_changed: string; // date-time
+            /**
+             * Is Active
+             */
+            is_active?: boolean;
+            /**
+             * Location
+             */
+            location?: /* Location */ string | null;
+            /**
+             * Waiver Signed
+             */
+            waiver_signed?: boolean;
+        }
+        /**
          * RelayTeamCommentCreateSchema
          */
         export interface RelayTeamCommentCreateSchema {
@@ -740,30 +788,6 @@ declare namespace Components {
              * Creation Date
              */
             creation_date: string; // date-time
-        }
-        /**
-         * RelayTeamParticipantSchema
-         */
-        export interface RelayTeamParticipantSchema {
-            origin?: /* LocationSchema */ LocationSchema | null;
-            user: /* UserSchema */ UserSchema;
-            team: /* RelayTeamSchema */ RelayTeamSchema;
-            /**
-             * ID
-             */
-            id?: /* ID */ number | null;
-            /**
-             * Date Changed
-             */
-            date_changed: string; // date-time
-            /**
-             * Is Active
-             */
-            is_active?: boolean;
-            /**
-             * Location
-             */
-            location?: /* Location */ string | null;
         }
         /**
          * RelayTeamSchema
@@ -1427,7 +1451,7 @@ declare namespace Paths {
         }
         export type RequestBody = /* CreateRelayParticipantSchema */ Components.Schemas.CreateRelayParticipantSchema;
         namespace Responses {
-            export type $201 = /* RelayTeamParticipantSchema */ Components.Schemas.RelayTeamParticipantSchema;
+            export type $201 = /* RelayParticipantSchema */ Components.Schemas.RelayParticipantSchema;
             export type $404 = /**
              * ErrorObjectSchema
              * Schema for the error object as described in decisions_api.md
@@ -1555,7 +1579,7 @@ declare namespace Paths {
             relay_participant_id: /* Relay Participant Id */ Parameters.RelayParticipantId;
         }
         namespace Responses {
-            export type $200 = /* RelayTeamParticipantSchema */ Components.Schemas.RelayTeamParticipantSchema;
+            export type $200 = /* RelayParticipantSchema */ Components.Schemas.RelayParticipantSchema;
             export type $404 = /**
              * ErrorObjectSchema
              * Schema for the error object as described in decisions_api.md
@@ -1613,7 +1637,7 @@ declare namespace Paths {
             /**
              * Response
              */
-            export type $200 = /* RelayTeamParticipantSchema */ Components.Schemas.RelayTeamParticipantSchema[];
+            export type $200 = /* RelayParticipantSchema */ Components.Schemas.RelayParticipantSchema[];
         }
     }
     namespace ParticipantsApiRelayTeamApiReactivateRelayTeam {
@@ -1676,7 +1700,7 @@ declare namespace Paths {
         }
         export type RequestBody = /* PatchRelayParticipantSchema */ Components.Schemas.PatchRelayParticipantSchema;
         namespace Responses {
-            export type $201 = /* RelayTeamParticipantSchema */ Components.Schemas.RelayTeamParticipantSchema;
+            export type $201 = /* RelayParticipantSchema */ Components.Schemas.RelayParticipantSchema;
             export type $404 = /**
              * ErrorObjectSchema
              * Schema for the error object as described in decisions_api.md

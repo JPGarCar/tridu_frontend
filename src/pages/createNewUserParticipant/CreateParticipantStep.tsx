@@ -26,6 +26,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 import CustomTabPanel from "../../components/CustomTabPanel.tsx";
 import { useState } from "react";
 import { Components } from "../../services/api/openapi";
+import { EditableRowStackSwitch } from "../../components/EditableRowComponents.tsx";
 
 function RelayTeamMemberPanel(props: {
   raceId: number;
@@ -101,6 +102,7 @@ function RelayTeamMemberPanel(props: {
   const relayTeamParticipantFormik = useFormik({
     initialValues: {
       location: "",
+      waiver_signed: false,
     },
     onSubmit: async (values, formikHelpers) => {
       if (relayTeam?.id) {
@@ -113,6 +115,7 @@ function RelayTeamMemberPanel(props: {
             user_id: props.userId,
             team_id: relayTeam.id,
             location: values.location,
+            waiver_signed: values.waiver_signed,
           },
         );
 
@@ -282,6 +285,13 @@ function RelayTeamMemberPanel(props: {
                 }
                 onChange={relayTeamParticipantFormik.handleChange}
               />
+              <EditableRowStackSwitch
+                label={"Waiver Signed"}
+                checked={relayTeamParticipantFormik.values.waiver_signed}
+                editing={true}
+                id={"waiver_signed"}
+                onChange={relayTeamParticipantFormik.handleChange}
+              />
               {relayTeamParticipantFormik.isSubmitting ? (
                 <CircularProgress />
               ) : (
@@ -318,6 +328,7 @@ const CreateParticipantStep = (props: {
     province: Yup.string(),
     country: Yup.string(),
     raceType: Yup.number().required(),
+    waiver_signed: Yup.boolean().required(),
   });
 
   const participantFormik = useFormik({
@@ -330,6 +341,7 @@ const CreateParticipantStep = (props: {
       province: "",
       country: "",
       raceType: 0,
+      waiver_signed: true,
     },
     validationSchema: ParticipantFormSchema,
     onSubmit: async (values, formikHelpers) => {
@@ -350,6 +362,7 @@ const CreateParticipantStep = (props: {
           },
           race_id: props.raceId,
           race_type_id: values.raceType,
+          waiver_signed: values.waiver_signed,
         },
       );
 
@@ -398,6 +411,13 @@ const CreateParticipantStep = (props: {
                   ? participantFormik.errors.bibNo
                   : ""
               }
+              onChange={participantFormik.handleChange}
+            />
+            <EditableRowStackSwitch
+              label={"Waiver Signed"}
+              checked={participantFormik.values.waiver_signed}
+              editing={true}
+              id={"waiver_signed"}
               onChange={participantFormik.handleChange}
             />
             <TextField
