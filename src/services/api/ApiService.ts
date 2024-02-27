@@ -6,12 +6,14 @@ import { SnackbarServiceProps } from "../../@types/snackbar_service";
 import { AuthServiceProps } from "../../@types/auth-service";
 import { getErrorObjectSchema } from "./apiError.ts";
 
+import definition from "./../../assets/openapi-runtime.json";
+
 export function useApiService(
   authService: AuthServiceProps,
   snackBarService: SnackbarServiceProps,
 ): ApiServiceProps {
   const api = new OpenAPIClientAxios({
-    definition: `${import.meta.env.VITE_API_URL}/api/openapi.json`,
+    definition: definition,
     withServer: {
       url: `${import.meta.env.VITE_API_URL}`,
     },

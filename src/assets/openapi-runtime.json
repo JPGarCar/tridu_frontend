@@ -1,0 +1,899 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "",
+    "version": ""
+  },
+  "paths": {
+    "/api/users/active/non-staff": {
+      "get": {
+        "operationId": "accounts_api_get_active_non_staff_users",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/users/import": {
+      "post": {
+        "operationId": "accounts_api_create_users_bulk",
+        "parameters": [],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/users/action/clean_gender": {
+      "post": {
+        "operationId": "accounts_api_admin_action_clean_gender",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/api/users/{user_id}/participations": {
+      "get": {
+        "operationId": "accounts_api_get_user_participations",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/users/{user_id}/participants": {
+      "post": {
+        "operationId": "accounts_api_create_user_participant",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      },
+      "get": {
+        "operationId": "accounts_api_get_user_participants",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/users/{user_id}": {
+      "get": {
+        "operationId": "accounts_api_get_user_by_id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      },
+      "patch": {
+        "operationId": "accounts_api_update_user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/users/{username}": {
+      "get": {
+        "operationId": "accounts_api_get_user_by_username",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "username",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/users/": {
+      "post": {
+        "operationId": "accounts_api_create_user",
+        "parameters": [],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/races/": {
+      "get": {
+        "operationId": "race_api_race_api_get_races",
+        "parameters": [],
+        "responses": {}
+      },
+      "post": {
+        "operationId": "race_api_race_api_create_race",
+        "parameters": [],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/races/{race_id}/heats": {
+      "get": {
+        "operationId": "race_api_race_api_get_race_heats",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "race_type_id",
+            "required": false
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/races/{race_id}/heats/auto_schedule/ready": {
+      "get": {
+        "operationId": "race_api_race_api_get_race_ready_for_auto_schedule_heats",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/races/{race_id}/heats/auto_schedule": {
+      "post": {
+        "operationId": "race_api_race_api_auto_schedule_race_heats",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/races/{race_id}/participants/invalid_swim_time/": {
+      "get": {
+        "operationId": "race_api_race_api_get_race_participants_with_invalid_swim_time",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/races/{race_id}/participants": {
+      "get": {
+        "operationId": "race_api_race_api_get_race_participants",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "bib_number",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/races/{race_id}/participations": {
+      "get": {
+        "operationId": "race_api_race_api_get_race_participations",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "bib_number",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/races/{race_id}/stats": {
+      "get": {
+        "operationId": "race_api_race_api_get_race_stats",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/races/{race_id}/participants/disabled": {
+      "get": {
+        "operationId": "race_api_race_api_get_race_participants_disabled",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/races/{race_id}/racetypes/bib_info": {
+      "get": {
+        "operationId": "race_api_race_api_get_race_bib_info_per_race_type",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/races/{race_id}": {
+      "delete": {
+        "operationId": "race_api_race_api_delete_race",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      },
+      "get": {
+        "operationId": "race_api_race_api_get_race",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/race_types/{race_type_id}": {
+      "delete": {
+        "operationId": "race_api_race_type_api_delete_race",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_type_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      },
+      "patch": {
+        "operationId": "race_api_race_type_api_update_race_type",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_type_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/race_types/": {
+      "get": {
+        "operationId": "race_api_race_type_api_get_race_types",
+        "parameters": [],
+        "responses": {}
+      },
+      "post": {
+        "operationId": "race_api_race_type_api_create_race_type",
+        "parameters": [],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/heats/{heat_id}/participants": {
+      "get": {
+        "operationId": "heats_api_get_heat_participants",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "heat_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/heats/{heat_id}/participations": {
+      "get": {
+        "operationId": "heats_api_get_heat_participations",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "heat_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/heats/{heat_id}": {
+      "get": {
+        "operationId": "heats_api_get_heat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "heat_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      },
+      "patch": {
+        "operationId": "heats_api_update_heat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "heat_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      },
+      "delete": {
+        "operationId": "heats_api_delete_heat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "heat_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/heats/": {
+      "post": {
+        "operationId": "heats_api_create_heat",
+        "parameters": [],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/participants/import": {
+      "post": {
+        "operationId": "participants_api_participant_api_create_participant_bulk",
+        "parameters": [],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/participants/recently_edited": {
+      "get": {
+        "operationId": "participants_api_participant_api_recently_edited_participants",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "count",
+            "required": false
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/participants/{participant_id}/reactivate": {
+      "patch": {
+        "operationId": "participants_api_participant_api_reactivate_participant",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/participants/{participant_id}/change_race_type": {
+      "patch": {
+        "operationId": "participants_api_participant_api_change_participant_race_type",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/participants/{participant_id}/change_heat/{heat_id}": {
+      "patch": {
+        "operationId": "participants_api_participant_api_change_participant_heat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "heat_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/participants/{participant_id}/remove_heat": {
+      "patch": {
+        "operationId": "participants_api_participant_api_remove_participant_heat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/participants/{participant_id}/deactivate": {
+      "patch": {
+        "operationId": "participants_api_participant_api_deactivate_participant",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/participants/{participant_id}/comments": {
+      "get": {
+        "operationId": "participants_api_participant_api_get_participant_comments",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      },
+      "post": {
+        "operationId": "participants_api_participant_api_create_participant_comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/participants/{participant_id}": {
+      "get": {
+        "operationId": "participants_api_participant_api_get_participant",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      },
+      "patch": {
+        "operationId": "participants_api_participant_api_update_participant",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/participants/comments/": {
+      "get": {
+        "operationId": "participants_api_comment_api_get_all_participant_comments",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/participants/comments/{comment_id}": {
+      "delete": {
+        "operationId": "participants_api_comment_api_delete_participant_comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "comment_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/relay_teams/{relay_team_id}/comments": {
+      "post": {
+        "operationId": "participants_api_relay_team_api_create_relay_team_comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      },
+      "get": {
+        "operationId": "participants_api_relay_team_api_get_relay_team_comments",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/relay_teams/{relay_team_id}/change_race_type": {
+      "patch": {
+        "operationId": "participants_api_relay_team_api_change_relay_team_race_type",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/relay_teams/{relay_team_id}/change_heat/{heat_id}": {
+      "patch": {
+        "operationId": "participants_api_relay_team_api_change_relay_team_heat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "heat_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/relay_teams/{relay_team_id}/remove_heat": {
+      "patch": {
+        "operationId": "participants_api_relay_team_api_remove_relay_team_heat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/relay_teams/{relay_team_id}/deactivate": {
+      "patch": {
+        "operationId": "participants_api_relay_team_api_deactivate_relay_team",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/relay_teams/{relay_team_id}/reactivate": {
+      "patch": {
+        "operationId": "participants_api_relay_team_api_reactivate_relay_team",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/relay_teams/{relay_team_id}/participants": {
+      "post": {
+        "operationId": "participants_api_relay_team_api_add_participant_to_relay_team",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      },
+      "get": {
+        "operationId": "participants_api_relay_team_api_get_relay_team_participants",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/relay_teams/{relay_team_id}/participants/{relay_participant_id}": {
+      "patch": {
+        "operationId": "participants_api_relay_team_api_update_relay_participant",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "relay_participant_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/relay_teams/participants/{relay_participant_id}": {
+      "get": {
+        "operationId": "participants_api_relay_team_api_get_relay_participant",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_participant_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/relay_teams/{relay_team_id}": {
+      "patch": {
+        "operationId": "participants_api_relay_team_api_update_relay_team",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/relay_teams/{relay_team_name}": {
+      "get": {
+        "operationId": "participants_api_relay_team_api_get_relay_team_by_name",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_name",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/relay_teams/": {
+      "post": {
+        "operationId": "participants_api_relay_team_api_create_relay_team",
+        "parameters": [],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/relay_teams/comments/{comment_id}": {
+      "delete": {
+        "operationId": "participants_api_comment_api_delete_relay_team_comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "comment_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    }
+  },
+  "components": {},
+  "servers": []
+}

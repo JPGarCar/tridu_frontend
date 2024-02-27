@@ -8,3 +8,5 @@ API
 - Api-queries.ts -> functions that use api.ts
 
 To consume api in our app we use TanStack Query ex(https://openapistack.co/docs/examples/tanstack-query/)
+
+To grab the json file use ```npx openapicmd read --strip openapi_client_axios --format json http://localhost:8000/api/openapi.json > openapi-runtime.json```
