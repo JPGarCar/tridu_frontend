@@ -5,6 +5,8 @@ import {
   ButtonBase,
   Card,
   Container,
+  Divider,
+  Pagination,
   Skeleton,
   Stack,
   Table,
@@ -19,27 +21,189 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
 import ParticipantSearchAutocomplete from "../components/ParticipantSearchAutocomplete.tsx";
+import { ChangeEvent, useMemo, useState } from "react";
 
-const Dashboard = () => {
-  const race_id = 1;
-  const refetchInterval = 60000; // 60 seconds
+const refetchInterval = 60000; // 60 seconds
+const perPageCount = 2;
+
+function InactiveParticipantsListCard(props: { race_id: number }) {
+  const { getApiClient } = useApiServiceContext();
 
   const navigate = useNavigate();
 
-  const { getApiClient } = useApiServiceContext();
+  const [page, setPage] = useState(1);
+  const handleChange = (_event: ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
 
   const disabledParticipantsQuery = useQuery({
-    queryKey: ["disabledParticipants", race_id],
+    queryKey: ["disabledParticipants", props.race_id],
     queryFn: () =>
       getApiClient()
         .then((api) =>
           api.race_api_race_api_get_race_participants_disabled({
-            race_id: race_id,
+            race_id: props.race_id,
           }),
         )
         .then((res) => res.data),
     refetchInterval: refetchInterval,
   });
+
+  const pageCount = useMemo(() => {
+    const arrayLength = disabledParticipantsQuery.data?.length ?? 0;
+    return arrayLength == 0 ? 1 : arrayLength / perPageCount;
+  }, [disabledParticipantsQuery.data]);
+
+  return (
+    <CustomCard title={"Inactive Participants"}>
+      {disabledParticipantsQuery.isLoading ? (
+        <Skeleton />
+      ) : disabledParticipantsQuery.isError ||
+        disabledParticipantsQuery.data == undefined ? (
+        <>Error...</>
+      ) : (
+        <Box>
+          <Grid container justifyContent={"space-between"} gap={2}>
+            <Grid>
+              <Pagination
+                count={pageCount}
+                page={page}
+                onChange={handleChange}
+                size={"small"}
+              />
+            </Grid>
+            <Grid>
+              <Typography>
+                Count {disabledParticipantsQuery.data.length}
+              </Typography>
+            </Grid>
+          </Grid>
+          <Divider sx={{ my: 2 }} />
+          <Stack spacing={2}>
+            {disabledParticipantsQuery.data.length == 0 ? (
+              <Container>No Inactive Participants</Container>
+            ) : (
+              disabledParticipantsQuery.data
+                .slice(page * pageCount, page * pageCount + pageCount)
+                .map((participant) => {
+                  return (
+                    <Card key={participant.id}>
+                      <ButtonBase
+                        sx={{ width: "100%" }}
+                        onClick={() => {
+                          navigate(`/participants/${participant.user.id}`);
+                        }}
+                      >
+                        <Box sx={{ m: 2 }}>
+                          <Typography>
+                            {participant.bib_number} |{" "}
+                            {participant.user.first_name}{" "}
+                            {participant.user.last_name}
+                          </Typography>
+                        </Box>
+                      </ButtonBase>
+                    </Card>
+                  );
+                })
+            )}
+          </Stack>
+        </Box>
+      )}
+    </CustomCard>
+  );
+}
+
+function InvalidSwiMTimeParticipantsListCard(props: { race_id: number }) {
+  const { getApiClient } = useApiServiceContext();
+
+  const navigate = useNavigate();
+
+  const [page, setPage] = useState(1);
+  const handleChange = (_event: ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
+
+  const invalidSwimTimeParticipantsQuery = useQuery({
+    queryKey: ["invalidSwimTimeParticipantsQuery", props.race_id],
+    queryFn: () =>
+      getApiClient()
+        .then((api) =>
+          api.race_api_race_api_get_race_participants_with_invalid_swim_time({
+            race_id: props.race_id,
+          }),
+        )
+        .then((res) => res.data),
+    refetchInterval: refetchInterval,
+  });
+
+  const pageCount = useMemo(() => {
+    const arrayLength = invalidSwimTimeParticipantsQuery.data?.length ?? 0;
+    return arrayLength == 0 ? 1 : arrayLength / perPageCount;
+  }, [invalidSwimTimeParticipantsQuery.data]);
+
+  return (
+    <CustomCard title={"Invalid Swim Time Participants"}>
+      {invalidSwimTimeParticipantsQuery.isLoading ? (
+        <Skeleton />
+      ) : invalidSwimTimeParticipantsQuery.isError ||
+        invalidSwimTimeParticipantsQuery.data == undefined ? (
+        <>Error...</>
+      ) : (
+        <Box>
+          <Grid container justifyContent={"space-between"} gap={2}>
+            <Grid>
+              <Pagination
+                count={pageCount}
+                page={page}
+                onChange={handleChange}
+                size={"small"}
+              />
+            </Grid>
+            <Grid>
+              <Typography>
+                Count {invalidSwimTimeParticipantsQuery.data.length}
+              </Typography>
+            </Grid>
+          </Grid>
+          <Divider sx={{ my: 2 }} />
+          <Stack spacing={2}>
+            {invalidSwimTimeParticipantsQuery.data.length == 0 ? (
+              <Container>No Participants with invalid swim time</Container>
+            ) : (
+              invalidSwimTimeParticipantsQuery.data.map((participant) => {
+                return (
+                  <Card key={participant.id}>
+                    <ButtonBase
+                      sx={{ width: "100%" }}
+                      onClick={() => {
+                        navigate(`/participants/${participant.user.id}`);
+                      }}
+                    >
+                      <Box sx={{ m: 2 }}>
+                        <Typography>
+                          {participant.bib_number} |{" "}
+                          {participant.user.first_name}{" "}
+                          {participant.user.last_name}
+                        </Typography>
+                      </Box>
+                    </ButtonBase>
+                  </Card>
+                );
+              })
+            )}
+          </Stack>
+        </Box>
+      )}
+    </CustomCard>
+  );
+}
+
+const Dashboard = () => {
+  const race_id = 1;
+
+  const navigate = useNavigate();
+
+  const { getApiClient } = useApiServiceContext();
 
   const recentEditedParticipantsQuery = useQuery({
     queryKey: ["recentEditedParticipantsQuery", race_id],
@@ -47,19 +211,6 @@ const Dashboard = () => {
       getApiClient()
         .then((api) =>
           api.participants_api_participant_api_recently_edited_participants(),
-        )
-        .then((res) => res.data),
-    refetchInterval: refetchInterval,
-  });
-
-  const invalidSwimTimeParticipantsQuery = useQuery({
-    queryKey: ["invalidSwimTimeParticipantsQuery", race_id],
-    queryFn: () =>
-      getApiClient()
-        .then((api) =>
-          api.race_api_race_api_get_race_participants_with_invalid_swim_time({
-            race_id: race_id,
-          }),
         )
         .then((res) => res.data),
     refetchInterval: refetchInterval,
@@ -103,8 +254,9 @@ const Dashboard = () => {
           <ParticipantSearchAutocomplete />
         </Grid>
       </Grid>
-      <Grid container gap={2} justifyContent={"space-around"}>
-        <Grid xs={12}>
+
+      <Grid container columnSpacing={2} rowSpacing={2}>
+        <Grid xs={9}>
           <CustomCard title={"Race Stats"}>
             {raceStatsQuery.isLoading ? (
               <Skeleton />
@@ -181,44 +333,7 @@ const Dashboard = () => {
             )}
           </CustomCard>
         </Grid>
-        <Grid sx={{ maxHeight: "100%", overflow: "auto" }}>
-          <CustomCard title={"Inactive Participants"}>
-            {disabledParticipantsQuery.isLoading ? (
-              <Skeleton />
-            ) : disabledParticipantsQuery.isError ||
-              disabledParticipantsQuery.data == undefined ? (
-              <>Error...</>
-            ) : (
-              <Stack spacing={2}>
-                {disabledParticipantsQuery.data.length == 0 ? (
-                  <Container>No Inactive Participants</Container>
-                ) : (
-                  disabledParticipantsQuery.data.map((participant) => {
-                    return (
-                      <Card key={participant.id}>
-                        <ButtonBase
-                          sx={{ width: "100%" }}
-                          onClick={() => {
-                            navigate(`/participants/${participant.user.id}`);
-                          }}
-                        >
-                          <Box sx={{ m: 2 }}>
-                            <Typography>
-                              {participant.bib_number} |{" "}
-                              {participant.user.first_name}{" "}
-                              {participant.user.last_name}
-                            </Typography>
-                          </Box>
-                        </ButtonBase>
-                      </Card>
-                    );
-                  })
-                )}
-              </Stack>
-            )}
-          </CustomCard>
-        </Grid>
-        <Grid sx={{ maxHeight: "100%", overflow: "auto" }}>
+        <Grid xs={3}>
           <CustomCard title={"Recently Edited Participants"}>
             {recentEditedParticipantsQuery.isLoading ? (
               <Skeleton />
@@ -226,7 +341,7 @@ const Dashboard = () => {
               recentEditedParticipantsQuery.data == undefined ? (
               <>Error...</>
             ) : (
-              <Stack spacing={2}>
+              <Stack spacing={1.5}>
                 {recentEditedParticipantsQuery.data.length == 0 ? (
                   <Container>No Participants Recently Edited</Container>
                 ) : (
@@ -239,7 +354,7 @@ const Dashboard = () => {
                             navigate(`/participants/${participant.user.id}`);
                           }}
                         >
-                          <Box sx={{ m: 2 }}>
+                          <Box sx={{ m: 1.5 }}>
                             <Typography>
                               {participant.bib_number} |{" "}
                               {participant.user.first_name}{" "}
@@ -255,42 +370,11 @@ const Dashboard = () => {
             )}
           </CustomCard>
         </Grid>
-        <Grid sx={{ maxHeight: "100%", overflow: "auto" }}>
-          <CustomCard title={"Invalid Swim Time Participants"}>
-            {invalidSwimTimeParticipantsQuery.isLoading ? (
-              <Skeleton />
-            ) : invalidSwimTimeParticipantsQuery.isError ||
-              invalidSwimTimeParticipantsQuery.data == undefined ? (
-              <>Error...</>
-            ) : (
-              <Stack spacing={2}>
-                {invalidSwimTimeParticipantsQuery.data.length == 0 ? (
-                  <Container>No Participants with invalid swim time</Container>
-                ) : (
-                  invalidSwimTimeParticipantsQuery.data.map((participant) => {
-                    return (
-                      <Card key={participant.id}>
-                        <ButtonBase
-                          sx={{ width: "100%" }}
-                          onClick={() => {
-                            navigate(`/participants/${participant.user.id}`);
-                          }}
-                        >
-                          <Box sx={{ m: 2 }}>
-                            <Typography>
-                              {participant.bib_number} |{" "}
-                              {participant.user.first_name}{" "}
-                              {participant.user.last_name}
-                            </Typography>
-                          </Box>
-                        </ButtonBase>
-                      </Card>
-                    );
-                  })
-                )}
-              </Stack>
-            )}
-          </CustomCard>
+        <Grid>
+          <InactiveParticipantsListCard race_id={race_id} />
+        </Grid>
+        <Grid>
+          <InvalidSwiMTimeParticipantsListCard race_id={race_id} />
         </Grid>
       </Grid>
     </Stack>
