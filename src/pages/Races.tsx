@@ -24,6 +24,7 @@ import { useState } from "react";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
 import getChangedValues from "../services/helpers.ts";
 import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
+import { EditableRowStackSwitch } from "../components/EditableRowComponents.tsx";
 
 function CreateRaceTypeDialog(props: {
   isOpen: boolean;
@@ -104,10 +105,11 @@ function EditRaceTypeDialog(props: {
 
   const { pushAlert } = useSnackbarServiceContext();
 
-  const HeatFormCreateSchema = Yup.object({
+  const RaceTypePatchSchema = Yup.object({
     name: Yup.string().required(),
     participants_allowed: Yup.number().default(0).min(0),
     ftt_allowed: Yup.number().default(0).min(0),
+    needs_swim_time: Yup.boolean().required().default(true),
   });
 
   const initialValues =
@@ -116,16 +118,18 @@ function EditRaceTypeDialog(props: {
           name: "",
           participants_allowed: 0,
           ftt_allowed: 0,
+          needs_swim_time: true,
         }
       : {
           name: props.raceType.name,
           participants_allowed: props.raceType.participants_allowed,
           ftt_allowed: props.raceType.ftt_allowed,
+          needs_swim_time: props.raceType.needs_swim_time,
         };
 
   const formik = useFormik({
     initialValues: initialValues,
-    validationSchema: HeatFormCreateSchema,
+    validationSchema: RaceTypePatchSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
       const changedValues = getChangedValues(values, initialValues);
@@ -180,6 +184,13 @@ function EditRaceTypeDialog(props: {
               id={"ftt_allowed"}
               error={formik.errors.ftt_allowed != undefined}
               helperText={formik.errors.ftt_allowed ?? ""}
+            />
+            <EditableRowStackSwitch
+              label={"Needs Swim Time"}
+              checked={formik.values.needs_swim_time}
+              editing={true}
+              id={"needs_swim_time"}
+              onChange={formik.handleChange}
             />
           </Stack>
         </DialogContent>
@@ -340,6 +351,11 @@ const Races = () => {
                         <Grid xs={9}>
                           <Typography variant={"body1"}>
                             {raceType.name}
+                          </Typography>
+                          <Typography variant={"subtitle2"}>
+                            {raceType.needs_swim_time
+                              ? "Needs Swim Time"
+                              : "No Swim Time Needed"}
                           </Typography>
                         </Grid>
                         <Grid xs container justifyContent={"space-around"}>

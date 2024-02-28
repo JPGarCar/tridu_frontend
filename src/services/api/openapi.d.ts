@@ -189,6 +189,10 @@ declare namespace Components {
              * Ftt Allowed
              */
             ftt_allowed?: number;
+            /**
+             * Needs Swim Time
+             */
+            needs_swim_time?: boolean;
         }
         /**
          * CreateRelayParticipantSchema
@@ -577,6 +581,10 @@ declare namespace Components {
              * Ftt Allowed
              */
             ftt_allowed?: /* Ftt Allowed */ number | null;
+            /**
+             * Needs Swim Time
+             */
+            needs_swim_time?: /* Needs Swim Time */ boolean | null;
         }
         /**
          * PatchRelayParticipantSchema
@@ -672,6 +680,10 @@ declare namespace Components {
              */
             ftt_allowed?: number;
             /**
+             * Needs Swim Time
+             */
+            needs_swim_time?: boolean;
+            /**
              * Smallest Bib
              */
             smallest_bib: number;
@@ -704,6 +716,10 @@ declare namespace Components {
              * Ftt Allowed
              */
             ftt_allowed?: number;
+            /**
+             * Needs Swim Time
+             */
+            needs_swim_time?: boolean;
         }
         /**
          * RaceTypeStatSchema
