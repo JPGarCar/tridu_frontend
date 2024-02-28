@@ -2,6 +2,11 @@ import Grid from "@mui/material/Unstable_Grid2";
 import { Box, Button, Typography } from "@mui/material";
 import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
+import Papa from "papaparse";
+import { saveAs } from "file-saver";
+import { flatten } from "flat";
+
+const race_id = 1;
 
 const Admin = () => {
   const { pushAlert } = useSnackbarServiceContext();
@@ -15,10 +20,30 @@ const Admin = () => {
     pushAlert(response.data.toString(), "info");
   };
 
+  const downloadInvalidSwimTimeParticipants = async () => {
+    const api = await getApiClient();
+    const response =
+      await api.race_api_race_api_get_race_participants_with_invalid_swim_time({
+        race_id: race_id,
+      });
+
+    if (response.data) {
+      const flattenedObjs = response.data.map((participant) =>
+        flatten(participant),
+      );
+
+      const csv = Papa.unparse(flattenedObjs);
+      const file = new File([csv], "InvalidSwimTimeParticipants.csv", {
+        type: "text/csv;charset=utf-8",
+      });
+      saveAs(file);
+    }
+  };
+
   return (
     <Box sx={{ m: 2 }}>
       <Typography>Actions</Typography>
-      <Grid container gap={2}>
+      <Grid container rowSpacing={2} columnSpacing={2}>
         <Grid>
           <Button
             onClick={() => {
@@ -27,6 +52,16 @@ const Admin = () => {
             variant={"contained"}
           >
             Clean Up Gender
+          </Button>
+        </Grid>
+        <Grid>
+          <Button
+            onClick={() => {
+              void downloadInvalidSwimTimeParticipants();
+            }}
+            variant={"contained"}
+          >
+            Download Invalid Swim Time Participants
           </Button>
         </Grid>
       </Grid>

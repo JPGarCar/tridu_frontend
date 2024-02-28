@@ -51,7 +51,7 @@ function InactiveParticipantsListCard(props: { race_id: number }) {
 
   const pageCount = useMemo(() => {
     const arrayLength = disabledParticipantsQuery.data?.length ?? 0;
-    return arrayLength == 0 ? 1 : arrayLength / perPageCount;
+    return Math.ceil((arrayLength == 0 ? 1 : arrayLength) / perPageCount);
   }, [disabledParticipantsQuery.data]);
 
   return (
@@ -84,7 +84,10 @@ function InactiveParticipantsListCard(props: { race_id: number }) {
               <Container>No Inactive Participants</Container>
             ) : (
               disabledParticipantsQuery.data
-                .slice(page * pageCount, page * pageCount + pageCount)
+                .slice(
+                  (page - 1) * perPageCount,
+                  (page - 1) * perPageCount + perPageCount,
+                )
                 .map((participant) => {
                   return (
                     <Card key={participant.id}>
@@ -138,7 +141,7 @@ function InvalidSwiMTimeParticipantsListCard(props: { race_id: number }) {
 
   const pageCount = useMemo(() => {
     const arrayLength = invalidSwimTimeParticipantsQuery.data?.length ?? 0;
-    return arrayLength == 0 ? 1 : arrayLength / perPageCount;
+    return Math.ceil((arrayLength == 0 ? 1 : arrayLength) / perPageCount);
   }, [invalidSwimTimeParticipantsQuery.data]);
 
   return (
@@ -170,26 +173,31 @@ function InvalidSwiMTimeParticipantsListCard(props: { race_id: number }) {
             {invalidSwimTimeParticipantsQuery.data.length == 0 ? (
               <Container>No Participants with invalid swim time</Container>
             ) : (
-              invalidSwimTimeParticipantsQuery.data.map((participant) => {
-                return (
-                  <Card key={participant.id}>
-                    <ButtonBase
-                      sx={{ width: "100%" }}
-                      onClick={() => {
-                        navigate(`/participants/${participant.user.id}`);
-                      }}
-                    >
-                      <Box sx={{ m: 2 }}>
-                        <Typography>
-                          {participant.bib_number} |{" "}
-                          {participant.user.first_name}{" "}
-                          {participant.user.last_name}
-                        </Typography>
-                      </Box>
-                    </ButtonBase>
-                  </Card>
-                );
-              })
+              invalidSwimTimeParticipantsQuery.data
+                .slice(
+                  (page - 1) * perPageCount,
+                  (page - 1) * perPageCount + perPageCount,
+                )
+                .map((participant) => {
+                  return (
+                    <Card key={participant.id}>
+                      <ButtonBase
+                        sx={{ width: "100%" }}
+                        onClick={() => {
+                          navigate(`/participants/${participant.user.id}`);
+                        }}
+                      >
+                        <Box sx={{ m: 2 }}>
+                          <Typography>
+                            {participant.bib_number} |{" "}
+                            {participant.user.first_name}{" "}
+                            {participant.user.last_name}
+                          </Typography>
+                        </Box>
+                      </ButtonBase>
+                    </Card>
+                  );
+                })
             )}
           </Stack>
         </Box>
