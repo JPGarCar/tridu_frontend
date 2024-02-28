@@ -24,7 +24,7 @@ import ParticipantSearchAutocomplete from "../components/ParticipantSearchAutoco
 import { ChangeEvent, useMemo, useState } from "react";
 
 const refetchInterval = 60000; // 60 seconds
-const perPageCount = 2;
+const perPageCount = 10;
 
 function InactiveParticipantsListCard(props: { race_id: number }) {
   const { getApiClient } = useApiServiceContext();
