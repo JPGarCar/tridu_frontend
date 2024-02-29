@@ -510,6 +510,7 @@ function HeatInformationForm(props: {
   const formik = useFormik({
     initialValues: initalValues,
     validationSchema: HeatFormSchema,
+    enableReinitialize: true,
     onSubmit: async (values) => {
       const changedValues = getChangedValues(values, initalValues);
 

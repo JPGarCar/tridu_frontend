@@ -385,25 +385,30 @@ function ParticipantInformation(props: {
     });
   };
 
-  const ParticipantFormSchema = Yup.object({
-    bib_num: Yup.number()
-      .required()
-      .positive("Must be positive!")
-      .integer("Must be a full integer!"),
-    is_ftt: Yup.boolean().required(),
-    team: Yup.string().notRequired(),
-    swim_time: Yup.string()
-      .notRequired()
-      .matches(/^\d{2}:\d{2}$/, "Must be in format MM:SS"),
-    city: Yup.string().notRequired(),
-    province: Yup.string().notRequired(),
-    country: Yup.string().notRequired(),
-    location: Yup.string().notRequired(),
-    waiver_signed: Yup.boolean().required(),
-  });
+  const ParticipantFormSchema: Yup.ObjectSchema<Components.Schemas.PatchParticipantSchema> =
+    Yup.object({
+      bib_number: Yup.number()
+        .required()
+        .positive("Must be positive!")
+        .integer("Must be a full integer!"),
+      is_ftt: Yup.boolean().required(),
+      team: Yup.string().notRequired(),
+      swim_time: Yup.string()
+        .notRequired()
+        .matches(/^\d{2}:\d{2}$/, "Must be in format MM:SS"),
+      origin: Yup.object()
+        .shape({
+          city: Yup.string().defined().default(""),
+          province: Yup.string().defined().default(""),
+          country: Yup.string().defined().default(""),
+        })
+        .notRequired(),
+      location: Yup.string().notRequired(),
+      waiver_signed: Yup.boolean().required(),
+    });
 
-  const initialValues = {
-    bib_num: props.participant.bib_number,
+  const initialValues: Components.Schemas.PatchParticipantSchema = {
+    bib_number: props.participant.bib_number,
     is_ftt: props.participant.is_ftt,
     team: props.participant.team,
     swim_time: swimTimeCreator(props.participant.swim_time ?? null),
@@ -416,7 +421,7 @@ function ParticipantInformation(props: {
     waiver_signed: props.participant.waiver_signed,
   };
 
-  const formik = useFormik({
+  const formik = useFormik<Components.Schemas.PatchParticipantSchema>({
     initialValues: initialValues,
     enableReinitialize: true,
     validationSchema: ParticipantFormSchema,
@@ -424,7 +429,6 @@ function ParticipantInformation(props: {
       const changedValues = getChangedValues(values, initialValues);
 
       if ("swim_time" in changedValues) {
-        // @ts-expect-error okay to send null, sending undefined doesnt work
         changedValues.swim_time =
           swimTimeDestructor(changedValues.swim_time ?? "")?.toISO() ?? null;
       }
@@ -484,15 +488,15 @@ function ParticipantInformation(props: {
             <Stack spacing={2}>
               <EditableRowStackTextField
                 label={"Bib #:"}
-                data={formik.values.bib_num.toString()}
+                data={formik.values.bib_number?.toString()}
                 editing={isEditing}
-                id={"bib_num"}
+                id={"bib_number"}
                 onChange={formik.handleChange}
-                error={formik.errors.bib_num}
+                error={formik.errors.bib_number}
               />
               <EditableRowStackSwitch
                 label={"Is FTT:"}
-                checked={formik.values.is_ftt}
+                checked={formik.values.is_ftt ?? false}
                 editing={isEditing}
                 id={"is_ftt"}
                 onChange={formik.handleChange}
@@ -515,7 +519,7 @@ function ParticipantInformation(props: {
               />
               <EditableRowStackSwitch
                 label={"Waiver Signed:"}
-                checked={formik.values.waiver_signed}
+                checked={formik.values.waiver_signed ?? false}
                 editing={isEditing}
                 id={"waiver_signed"}
                 onChange={formik.handleChange}
@@ -526,26 +530,32 @@ function ParticipantInformation(props: {
             <Stack spacing={2}>
               <EditableRowStackTextField
                 label={"City:"}
-                data={formik.values.origin.city}
+                data={formik.values.origin?.city}
                 editing={isEditing}
                 id={"origin.city"}
                 onChange={formik.handleChange}
+                //@ts-expect-error We know for Origin we will get an object
+                //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 error={formik.errors.origin?.city}
               />
               <EditableRowStackTextField
                 label={"Province:"}
-                data={formik.values.origin.province}
+                data={formik.values.origin?.province}
                 editing={isEditing}
                 id={"origin.province"}
                 onChange={formik.handleChange}
+                //@ts-expect-error We know for Origin we will get an object
+                //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 error={formik.errors.origin?.city}
               />
               <EditableRowStackTextField
                 label={"Country:"}
-                data={formik.values.origin.country}
+                data={formik.values.origin?.country}
                 editing={isEditing}
                 id={"origin.country"}
                 onChange={formik.handleChange}
+                //@ts-expect-error We know for Origin we will get an object
+                //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 error={formik.errors.origin?.country}
               />
               <EditableRowStackTextField
@@ -601,18 +611,19 @@ function RelayTeamInformation(props: {
 
   const { getApiClient } = useApiServiceContext();
 
-  const RelayTeamParticipantFormSchema = Yup.object({
-    bib_num: Yup.number()
-      .required()
-      .positive("Must be positive!")
-      .integer("Must be a full integer!"),
-    team: Yup.string().required(),
-  });
+  const RelayTeamParticipantFormSchema: Yup.ObjectSchema<Components.Schemas.PatchRelayTeamSchema> =
+    Yup.object({
+      bib_number: Yup.number()
+        .required()
+        .positive("Must be positive!")
+        .integer("Must be a full integer!"),
+      name: Yup.string().required(),
+    });
 
-  const formik = useFormik({
+  const formik = useFormik<Components.Schemas.PatchRelayTeamSchema>({
     initialValues: {
-      bib_num: props.relayTeam.bib_number,
-      team: props.relayTeam.name,
+      bib_number: props.relayTeam.bib_number,
+      name: props.relayTeam.name,
     },
     enableReinitialize: true,
     validationSchema: RelayTeamParticipantFormSchema,
@@ -622,8 +633,8 @@ function RelayTeamInformation(props: {
         await apiClient.participants_api_relay_team_api_update_relay_team(
           { relay_team_id: props.relayTeam.id ?? 0 },
           {
-            bib_number: values.bib_num,
-            name: values.team,
+            bib_number: values.bib_number,
+            name: values.name,
           },
         );
 
@@ -673,21 +684,21 @@ function RelayTeamInformation(props: {
         <Box sx={{ pl: 2 }}>
           <EditableRowStackTextField
             label={"Bib #:"}
-            data={formik.values.bib_num.toString()}
+            data={formik.values.bib_number?.toString()}
             editing={isEditing}
-            id={"bib_num"}
+            id={"bib_number"}
             onChange={formik.handleChange}
-            error={formik.errors.bib_num}
+            error={formik.errors.bib_number}
           />
         </Box>
         <Box sx={{ pl: 2 }}>
           <EditableRowStackTextField
             label={"Team Name:"}
-            data={formik.values.team}
+            data={formik.values.name}
             editing={isEditing}
-            id={"team"}
+            id={"name"}
             onChange={formik.handleChange}
-            error={formik.errors.team}
+            error={formik.errors.name}
           />
         </Box>
         <Grid container direction={"row"} gap={2}>

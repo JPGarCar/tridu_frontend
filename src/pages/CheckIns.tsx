@@ -41,19 +41,21 @@ function CreateCheckInDialog(props: {
 
   const { getApiClient } = useApiServiceContext();
 
-  const CheckInCreateSchema = Yup.object({
-    name: Yup.string().required(),
-    positive_action: Yup.string().required(),
-    negative_action: Yup.string().required(),
-    depends_on: Yup.object().notRequired(),
-  });
+  const CheckInCreateSchema: Yup.ObjectSchema<Components.Schemas.CreateCheckInSchema> =
+    Yup.object({
+      name: Yup.string().required(),
+      positive_action: Yup.string().required(),
+      negative_action: Yup.string().required(),
+      depends_on: Yup.lazy(() =>
+        CheckInCreateSchema.default(null).notRequired(),
+      ).optional(),
+    });
 
-  const formik = useFormik<Components.Schemas.CheckInSchema>({
+  const formik = useFormik<Components.Schemas.CreateCheckInSchema>({
     initialValues: {
       name: "",
       positive_action: "Check-In",
       negative_action: "Check-Out",
-      //@ts-expect-error We know it can be null, issue with Schema creator.
       depends_on: null,
     },
     validationSchema: CheckInCreateSchema,
@@ -306,6 +308,7 @@ function CheckinInformationForm(props: {
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: CheckinPatchSchema,
+    enableReinitialize: true,
     onSubmit: async (values) => {
       const changedValues = getChangedValues(values, initialValues);
 
