@@ -42,7 +42,7 @@ const Admin = () => {
     const api = await getApiClient();
     const response = await api.race_api_race_api_get_race_participations({
       race_id: race_id,
-      limit: undefined,
+      limit: -1,
       active: true,
     });
 

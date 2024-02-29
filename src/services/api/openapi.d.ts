@@ -730,9 +730,17 @@ declare namespace Components {
          */
         export interface RaceTypeBibInfoSchema {
             /**
-             * Checkins
+             * Smallest Bib
              */
-            checkins?: /* CheckInSchema */ CheckInSchema[];
+            smallest_bib: number;
+            /**
+             * Largest Bib
+             */
+            largest_bib: number;
+            /**
+             * Count
+             */
+            count: number;
             /**
              * ID
              */
@@ -749,22 +757,6 @@ declare namespace Components {
              * Ftt Allowed
              */
             ftt_allowed?: number;
-            /**
-             * Needs Swim Time
-             */
-            needs_swim_time?: boolean;
-            /**
-             * Smallest Bib
-             */
-            smallest_bib: number;
-            /**
-             * Largest Bib
-             */
-            largest_bib: number;
-            /**
-             * Count
-             */
-            count: number;
         }
         /**
          * RaceTypeSchema
@@ -1606,7 +1598,7 @@ declare namespace Paths {
         }
         export type RequestBody = /* PatchParticipantSchema */ Components.Schemas.PatchParticipantSchema;
         namespace Responses {
-            export type $201 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+            export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
             export type $404 = /**
              * ErrorObjectSchema
              * Schema for the error object as described in decisions_api.md
@@ -2378,7 +2370,7 @@ export interface OperationMethods {
   /**
    * race_api_race_api_get_race_participations - Get Race Participations
    * 
-   * Returns all the normal and Relay Participants for this race.
+   * Returns all the normal and Relay Participants for this race. A limit of -1 will return all participations.
    */
   'race_api_race_api_get_race_participations'(
     parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipations.QueryParameters & Paths.RaceApiRaceApiGetRaceParticipations.PathParameters>,
@@ -2594,7 +2586,7 @@ export interface OperationMethods {
     parameters: Parameters<Paths.ParticipantsApiParticipantApiUpdateParticipant.PathParameters>,
     data?: Paths.ParticipantsApiParticipantApiUpdateParticipant.RequestBody,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ParticipantsApiParticipantApiUpdateParticipant.Responses.$201>
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiUpdateParticipant.Responses.$200>
   /**
    * participants_api_comment_api_get_all_participant_comments - Get All Participant Comments
    */
@@ -2954,7 +2946,7 @@ export interface PathsDictionary {
     /**
      * race_api_race_api_get_race_participations - Get Race Participations
      * 
-     * Returns all the normal and Relay Participants for this race.
+     * Returns all the normal and Relay Participants for this race. A limit of -1 will return all participations.
      */
     'get'(
       parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipations.QueryParameters & Paths.RaceApiRaceApiGetRaceParticipations.PathParameters>,
@@ -3208,7 +3200,7 @@ export interface PathsDictionary {
       parameters: Parameters<Paths.ParticipantsApiParticipantApiUpdateParticipant.PathParameters>,
       data?: Paths.ParticipantsApiParticipantApiUpdateParticipant.RequestBody,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ParticipantsApiParticipantApiUpdateParticipant.Responses.$201>
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiUpdateParticipant.Responses.$200>
   }
   ['/api/participants/comments/']: {
     /**
