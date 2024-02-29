@@ -27,17 +27,35 @@ const Admin = () => {
         race_id: race_id,
       });
 
-    if (response.data) {
-      const flattenedObjs = response.data.map((participant) =>
-        flatten(participant),
-      );
+    const flattenedObjs = response.data.map((participant) =>
+      flatten(participant),
+    );
 
-      const csv = Papa.unparse(flattenedObjs);
-      const file = new File([csv], "InvalidSwimTimeParticipants.csv", {
-        type: "text/csv;charset=utf-8",
-      });
-      saveAs(file);
-    }
+    const csv = Papa.unparse(flattenedObjs);
+    const file = new File([csv], "InvalidSwimTimeParticipants.csv", {
+      type: "text/csv;charset=utf-8",
+    });
+    saveAs(file);
+  };
+
+  const downloadParticipantEmailInfo = async () => {
+    const api = await getApiClient();
+    const response = await api.race_api_race_api_get_race_participations({
+      race_id: race_id,
+      limit: undefined,
+    });
+
+    const flattenedObjs = response.data.map((participant) => ({
+      FirstName: participant.user.first_name,
+      LastName: participant.user.last_name,
+      Email: participant.user.email,
+    }));
+
+    const csv = Papa.unparse(flattenedObjs);
+    const file = new File([csv], "ParticipantsEmailInfo.csv", {
+      type: "text/csv;charset=utf-8",
+    });
+    saveAs(file);
   };
 
   return (
@@ -62,6 +80,16 @@ const Admin = () => {
             variant={"contained"}
           >
             Download Invalid Swim Time Participants
+          </Button>
+        </Grid>
+        <Grid>
+          <Button
+            onClick={() => {
+              void downloadParticipantEmailInfo();
+            }}
+            variant={"contained"}
+          >
+            Download Participant Email Info
           </Button>
         </Grid>
       </Grid>
