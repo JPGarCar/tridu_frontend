@@ -21,7 +21,7 @@ import {
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
+import { useSnackbar } from "notistack";
 import { useState } from "react";
 import { Components } from "../services/api/openapi";
 import CustomCard from "../components/CustomCard.tsx";
@@ -232,7 +232,7 @@ function AutoScheduleDialog(props: {
   raceId: number;
 }) {
   const { getApiClient } = useApiServiceContext();
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [goodToSchedule, setGoodToSchedule] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
@@ -245,10 +245,12 @@ function AutoScheduleDialog(props: {
       });
 
       if (response.data) {
-        pushAlert("Auto scheduling successful!", "success");
+        enqueueSnackbar("Auto scheduling successful!", { variant: "success" });
         props.handleClose();
       } else {
-        pushAlert("There was an error, please check in with Admin!", "error");
+        enqueueSnackbar("There was an error, please check in with Admin!", {
+          variant: "error",
+        });
       }
     }
   };
@@ -487,7 +489,7 @@ function HeatInformationForm(props: {
   heat: Components.Schemas.HeatSchema;
   onHeatUpdate: (arg0: Components.Schemas.HeatSchema) => void;
 }) {
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const { getApiClient } = useApiServiceContext();
 
@@ -536,7 +538,7 @@ function HeatInformationForm(props: {
   const handleEditButton = () => {
     if (isEditing) {
       formik.resetForm();
-      pushAlert("Changes canceled!", "warning");
+      enqueueSnackbar("Changes canceled!", { variant: "warning" });
     }
     setIsEditing((prevState) => !prevState);
   };

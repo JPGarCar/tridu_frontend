@@ -29,7 +29,7 @@ import {
   EditableRowStackSwitch,
   EditableRowStackTextField,
 } from "../components/EditableRowComponents.tsx";
-import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
+import { useSnackbar } from "notistack";
 import { CommentCard } from "../components/Comments.tsx";
 import * as Yup from "yup";
 import CustomCard from "../components/CustomCard.tsx";
@@ -37,7 +37,7 @@ import { useApiServiceContext } from "../context/ApiContext.tsx";
 import getChangedValues from "../services/helpers.ts";
 
 function ParticipantPICard(props: { userId: string }) {
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const { getApiClient } = useApiServiceContext();
 
@@ -110,7 +110,7 @@ function ParticipantPICard(props: { userId: string }) {
         formikHelpers.resetForm();
         queryClient.setQueryData(["getUserById", props.userId], response.data);
         setIsEditing(false);
-        pushAlert("Edits saved successfully!", "success");
+        enqueueSnackbar("Edits saved successfully!", { variant: "success" });
       }
     },
   });
@@ -118,7 +118,7 @@ function ParticipantPICard(props: { userId: string }) {
   const handleEditButton = () => {
     if (isEditing) {
       formik.resetForm();
-      pushAlert("Changes canceled!", "warning");
+      enqueueSnackbar("Changes canceled!", { variant: "warning" });
     }
     setIsEditing((prevState) => !prevState);
   };
@@ -304,7 +304,7 @@ function CommentInput(props: {
   participant_id: number;
   onCommentSubmit: () => void;
 }) {
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const { getApiClient } = useApiServiceContext();
 
@@ -326,7 +326,7 @@ function CommentInput(props: {
       props.onCommentSubmit();
       formikHelpers.setSubmitting(false);
       formikHelpers.resetForm();
-      pushAlert("Comment added!", "success");
+      enqueueSnackbar("Comment added!", { variant: "success" });
     },
   });
 
@@ -358,7 +358,7 @@ function ParticipantInformation(props: {
   setParticipant: (arg0: Components.Schemas.ParticipantSchema) => void;
   participant: Components.Schemas.ParticipantSchema;
 }) {
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const { getApiClient } = useApiServiceContext();
 
@@ -440,7 +440,7 @@ function ParticipantInformation(props: {
           changedValues,
         );
 
-      pushAlert("Edits saved successfully!", "success");
+      enqueueSnackbar("Edits saved successfully!", { variant: "success" });
       props.setParticipant(response.data);
       setIsEditing(false);
     },
@@ -475,7 +475,7 @@ function ParticipantInformation(props: {
   const handleEditButton = () => {
     if (isEditing) {
       formik.resetForm();
-      pushAlert("Changes canceled!", "warning");
+      enqueueSnackbar("Changes canceled!", { variant: "warning" });
     }
     setIsEditing((prevState) => !prevState);
   };
@@ -607,7 +607,7 @@ function RelayTeamInformation(props: {
   relayTeam: Components.Schemas.RelayTeamSchema;
   setRelayTeam: (arg0: Components.Schemas.RelayTeamSchema) => void;
 }) {
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const { getApiClient } = useApiServiceContext();
 
@@ -638,7 +638,7 @@ function RelayTeamInformation(props: {
           },
         );
 
-      pushAlert("Edits saved successfully!", "success");
+      enqueueSnackbar("Edits saved successfully!", { variant: "success" });
       props.setRelayTeam(response.data);
       setIsEditing(false);
     },
@@ -649,7 +649,7 @@ function RelayTeamInformation(props: {
   const handleEditButton = () => {
     if (isEditing) {
       formik.resetForm();
-      pushAlert("Changes canceled!", "warning");
+      enqueueSnackbar("Changes canceled!", { variant: "warning" });
     }
     setIsEditing((prevState) => !prevState);
   };
@@ -745,7 +745,7 @@ function RelayTeamParticipantInformation(props: {
   ) => void;
   relayParticipant: Components.Schemas.RelayParticipantSchema;
 }) {
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const { getApiClient } = useApiServiceContext();
 
@@ -784,7 +784,7 @@ function RelayTeamParticipantInformation(props: {
           changedValues,
         );
 
-      pushAlert("Edits saved successfully!", "success");
+      enqueueSnackbar("Edits saved successfully!", { variant: "success" });
       props.setRelayParticipant(response.data);
       setIsEditing(false);
     },
@@ -795,7 +795,7 @@ function RelayTeamParticipantInformation(props: {
   const handleEditButton = () => {
     if (isEditing) {
       formik.resetForm();
-      pushAlert("Changes canceled!", "warning");
+      enqueueSnackbar("Changes canceled!", { variant: "warning" });
     }
     setIsEditing((prevState) => !prevState);
   };
@@ -879,7 +879,7 @@ function RaceTypeField<T>(props: {
     initialData: () => [props.raceType],
   });
 
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const formik = useFormik({
     initialValues: {
@@ -896,7 +896,9 @@ function RaceTypeField<T>(props: {
 
         setIsEditing(false);
         formikHelpers.setSubmitting(false);
-        pushAlert("Race type edit saved successfully!", "success");
+        enqueueSnackbar("Race type edit saved successfully!", {
+          variant: "success",
+        });
       }
 
       return null;
@@ -906,7 +908,7 @@ function RaceTypeField<T>(props: {
   const handleEditButton = () => {
     if (isEditing) {
       formik.resetForm();
-      pushAlert("Changes canceled!", "warning");
+      enqueueSnackbar("Changes canceled!", { variant: "warning" });
     }
     setIsEditing((prevState) => !prevState);
   };
@@ -1044,7 +1046,7 @@ function RaceHeatField<T>(props: {
     initialData: () => (props.heat == null ? [] : [props.heat]),
   });
 
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const formik = useFormik({
     initialValues: {
@@ -1061,7 +1063,7 @@ function RaceHeatField<T>(props: {
 
         formikHelpers.setSubmitting(false);
         setIsEditing(false);
-        pushAlert("Heat saved successfully!", "success");
+        enqueueSnackbar("Heat saved successfully!", { variant: "success" });
       }
     },
   });
@@ -1086,14 +1088,14 @@ function RaceHeatField<T>(props: {
   const handleEditButton = () => {
     if (isEditing) {
       formik.resetForm();
-      pushAlert("Changes canceled!", "warning");
+      enqueueSnackbar("Changes canceled!", { variant: "warning" });
     }
     setIsEditing((prevState) => !prevState);
   };
 
   const handleRemoveButton = async () => {
     await props.onRemoveHeat();
-    pushAlert("Removed from heat!", "success");
+    enqueueSnackbar("Removed from heat!", { variant: "success" });
   };
 
   return (

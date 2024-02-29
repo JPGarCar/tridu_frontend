@@ -2,15 +2,15 @@ import { ApiServiceProps } from "../../@types/api-service";
 import { Client } from "./openapi";
 import axios, { AxiosError } from "axios";
 import { OpenAPIClientAxios } from "openapi-client-axios";
-import { SnackbarServiceProps } from "../../@types/snackbar_service";
 import { AuthServiceProps } from "../../@types/auth-service";
 import { getErrorObjectSchema } from "./apiError.ts";
 
 import definition from "./../../assets/openapi-runtime.json";
+import { ProviderContext } from "notistack";
 
 export function useApiService(
   authService: AuthServiceProps,
-  snackBarService: SnackbarServiceProps,
+  snackBarService: ProviderContext,
 ): ApiServiceProps {
   const api = new OpenAPIClientAxios({
     definition: definition,
@@ -61,10 +61,14 @@ export function useApiService(
             }
 
             authService.logout();
-            snackBarService.pushAlert("You must log in again!", "warning");
+            snackBarService.enqueueSnackbar("You must log in again!", {
+              variant: "warning",
+            });
           } catch (error) {
             authService.logout();
-            snackBarService.pushAlert("You must log in again!", "warning");
+            snackBarService.enqueueSnackbar("You must log in again!", {
+              variant: "warning",
+            });
           }
         } else if (
           error.response != undefined &&
@@ -74,23 +78,24 @@ export function useApiService(
           const errorObjectSchema = getErrorObjectSchema(error.response.data);
 
           if (errorObjectSchema != null) {
-            snackBarService.pushAlert(
+            snackBarService.enqueueSnackbar(
               errorObjectSchema.title + ": " + errorObjectSchema.details,
-              "warning",
-              8000,
+              { variant: "warning", autoHideDuration: 8000 },
             );
           } else {
-            snackBarService.pushAlert(error.message, "warning", 10000);
+            snackBarService.enqueueSnackbar(error.message, {
+              variant: "warning",
+              autoHideDuration: 10000,
+            });
           }
         } else if (
           error.response != undefined &&
           error.response.status >= 500
         ) {
-          snackBarService.pushAlert(
+          snackBarService.enqueueSnackbar(
             "Critical error, please contact admin ASAP! Details: " +
               error.message,
-            "error",
-            12000,
+            { variant: "warning", autoHideDuration: 12000 },
           );
         }
 

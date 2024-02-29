@@ -2,15 +2,12 @@ import React, { createContext, useContext } from "react";
 import { ApiServiceProps } from "../@types/api-service";
 import { useApiService } from "../services/api/ApiService.ts";
 import { useAuthServiceContext } from "./AuthContext.tsx";
-import { useSnackbarServiceContext } from "./SnackbarContext.tsx";
+import { useSnackbar } from "notistack";
 
 const ApiServiceContext = createContext<ApiServiceProps | null>(null);
 
 export function ApiServiceProvider(props: React.PropsWithChildren<{}>) {
-  const apiService = useApiService(
-    useAuthServiceContext(),
-    useSnackbarServiceContext(),
-  );
+  const apiService = useApiService(useAuthServiceContext(), useSnackbar());
 
   return (
     <ApiServiceContext.Provider value={apiService}>

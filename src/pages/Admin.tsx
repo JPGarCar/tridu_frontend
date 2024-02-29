@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Unstable_Grid2";
 import { Box, Button, Typography } from "@mui/material";
-import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
+import { useSnackbar } from "notistack";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
 import Papa from "papaparse";
 import { saveAs } from "file-saver";
@@ -9,7 +9,7 @@ import { flatten } from "flat";
 const race_id = 1;
 
 const Admin = () => {
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const { getApiClient } = useApiServiceContext();
 
@@ -17,7 +17,7 @@ const Admin = () => {
     const api = await getApiClient();
     const response = await api.accounts_api_admin_action_clean_gender();
 
-    pushAlert(response.data.toString(), "info");
+    enqueueSnackbar(response.data.toString(), { variant: "info" });
   };
 
   const downloadInvalidSwimTimeParticipants = async () => {

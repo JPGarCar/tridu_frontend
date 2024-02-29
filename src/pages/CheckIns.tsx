@@ -16,7 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
+import { useSnackbar } from "notistack";
 import { useMemo, useState } from "react";
 import { Components } from "../services/api/openapi";
 import CustomCard from "../components/CustomCard.tsx";
@@ -268,7 +268,7 @@ function CheckinInformationForm(props: {
   checkin: Components.Schemas.CheckInSchema;
   onCheckinUpdate: (arg0: Components.Schemas.CheckInSchema) => void;
 }) {
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const { getApiClient } = useApiServiceContext();
 
@@ -325,7 +325,7 @@ function CheckinInformationForm(props: {
       );
 
       props.onCheckinUpdate(response.data);
-      pushAlert("CheckIn updated successfully!", "success");
+      enqueueSnackbar("CheckIn updated successfully!", { variant: "success" });
       setIsEditing(false);
     },
   });
@@ -335,7 +335,7 @@ function CheckinInformationForm(props: {
   const handleEditButton = () => {
     if (isEditing) {
       formik.resetForm();
-      pushAlert("Changes canceled!", "warning");
+      enqueueSnackbar("Changes canceled!", { variant: "warning" });
     }
     setIsEditing((prevState) => !prevState);
   };

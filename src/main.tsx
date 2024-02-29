@@ -7,9 +7,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import AuthServiceProvider from "./context/AuthContext.tsx";
-import SnackbarServiceProvider from "./context/SnackbarContext.tsx";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import ApiServiceProvider from "./context/ApiContext.tsx";
+import { SnackbarProvider } from "notistack";
 
 const queryClient = new QueryClient();
 
@@ -31,14 +31,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <QueryClientProvider client={queryClient}>
         <LocalizationProvider dateAdapter={AdapterLuxon}>
           <AuthServiceProvider>
-            <SnackbarServiceProvider>
+            <SnackbarProvider autoHideDuration={5000} preventDuplicate={true}>
               <ApiServiceProvider>
                 <ThemeProvider theme={themeLight}>
                   <CssBaseline />
                   <App />
                 </ThemeProvider>
               </ApiServiceProvider>
-            </SnackbarServiceProvider>
+            </SnackbarProvider>
           </AuthServiceProvider>
         </LocalizationProvider>
       </QueryClientProvider>

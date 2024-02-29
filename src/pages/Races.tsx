@@ -23,7 +23,7 @@ import { Components } from "../services/api/openapi";
 import { useMemo, useState } from "react";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
 import getChangedValues from "../services/helpers.ts";
-import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
+import { useSnackbar } from "notistack";
 import {
   EditableRowStackMultiSelectField,
   EditableRowStackSwitch,
@@ -106,7 +106,7 @@ function EditRaceTypeDialog(props: {
 }) {
   const { getApiClient } = useApiServiceContext();
 
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const checkinsQuery = useQuery({
     queryKey: ["checkinsQuery"],
@@ -166,9 +166,9 @@ function EditRaceTypeDialog(props: {
       );
 
       props.handleClose(response.data);
-      pushAlert(
+      enqueueSnackbar(
         `${props.raceType?.name} Race Type updated successfully!`,
-        "success",
+        { variant: "success" },
       );
     },
   });

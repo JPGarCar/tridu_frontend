@@ -2,8 +2,7 @@ import { Box, Card, IconButton, Typography } from "@mui/material";
 import { DateTime } from "luxon";
 import { Delete } from "@mui/icons-material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
-
+import { useSnackbar } from "notistack";
 function CommentCard(props: {
   comment: {
     creation_date: string;
@@ -16,13 +15,13 @@ function CommentCard(props: {
 }) {
   const dateCreated = DateTime.fromISO(props.comment.creation_date);
 
-  const { pushAlert } = useSnackbarServiceContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleOnClickDelete = async () => {
     if (props.comment.id) {
       await props.deleteCommentApiCall(props.comment.id);
 
-      pushAlert("Comment deleted.", "success");
+      enqueueSnackbar("Comment deleted.", { variant: "success" });
       props.onCommentDelete();
     }
   };
