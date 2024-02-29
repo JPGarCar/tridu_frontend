@@ -1,7 +1,9 @@
 import {
   AppBar,
   Box,
+  Button,
   ButtonBase,
+  Divider,
   IconButton,
   Menu,
   MenuItem,
@@ -13,17 +15,20 @@ import { useAuthServiceContext } from "../context/AuthContext.tsx";
 import UserSearchAutocomplete from "../components/UserSearchAutocomplete.tsx";
 import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Unstable_Grid2";
-import { MenuSharp } from "@mui/icons-material";
+import { KeyboardArrowDown, MenuSharp } from "@mui/icons-material";
 import { useState } from "react";
 
 const menuItems = [
   { title: "Heats", url: "/heats" },
-  { title: "CheckIns", url: "/checkins" },
-  { title: "Races", url: "/races" },
   { title: "Bib Numbers", url: "/bibNumbers" },
   { title: "Create Participants", url: "/participants/create" },
+];
+
+const adminMenuItems = [
   { title: "Bulk Upload", url: "/data/upload" },
-  { title: "Admin", url: "/admin" },
+  { title: "Admin Actions", url: "/admin" },
+  { title: "CheckIns", url: "/checkins" },
+  { title: "Races", url: "/races" },
 ];
 
 const PrimaryAppBar = () => {
@@ -33,11 +38,22 @@ const PrimaryAppBar = () => {
 
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
 
+  const [adminAnchorElNav, setAdminAnchorElNav] = useState<null | HTMLElement>(
+    null,
+  );
+
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
+  };
+
+  const handleAdminOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAdminAnchorElNav(event.currentTarget);
+  };
+  const handleAdminCloseNavMenu = () => {
+    setAdminAnchorElNav(null);
   };
 
   return (
@@ -75,6 +91,36 @@ const PrimaryAppBar = () => {
                     </Grid>
                   );
                 })}
+                <Button
+                  variant="contained"
+                  disableElevation
+                  onClick={handleAdminOpenNavMenu}
+                  endIcon={<KeyboardArrowDown />}
+                >
+                  Admin
+                </Button>
+                <Grid>
+                  <Menu
+                    open={Boolean(adminAnchorElNav)}
+                    anchorEl={adminAnchorElNav}
+                    onClose={handleAdminCloseNavMenu}
+                    sx={{ display: { xs: "none", md: "block" } }}
+                  >
+                    {adminMenuItems.map(({ title, url }, index) => {
+                      return (
+                        <MenuItem
+                          key={index}
+                          onClick={() => {
+                            handleCloseNavMenu();
+                            navigator(url);
+                          }}
+                        >
+                          {title}
+                        </MenuItem>
+                      );
+                    })}
+                  </Menu>
+                </Grid>
               </Grid>
               <IconButton
                 onClick={handleOpenNavMenu}
@@ -91,6 +137,20 @@ const PrimaryAppBar = () => {
                 sx={{ display: { xs: "block", md: "none" } }}
               >
                 {menuItems.map(({ title, url }, index) => {
+                  return (
+                    <MenuItem
+                      key={index}
+                      onClick={() => {
+                        handleCloseNavMenu();
+                        navigator(url);
+                      }}
+                    >
+                      {title}
+                    </MenuItem>
+                  );
+                })}
+                <Divider />
+                {adminMenuItems.map(({ title, url }, index) => {
                   return (
                     <MenuItem
                       key={index}
