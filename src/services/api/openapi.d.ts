@@ -36,6 +36,67 @@ declare namespace Components {
             items: string[];
         }
         /**
+         * CheckInSchema
+         */
+        export interface CheckInSchema {
+            /**
+             * CheckInSchema
+             */
+            depends_on?: {
+                depends_on?: any;
+                /**
+                 * ID
+                 */
+                id?: /* ID */ number | null;
+                /**
+                 * Name
+                 */
+                name: string;
+                /**
+                 * Positive Action
+                 */
+                positive_action: string;
+                /**
+                 * Negative Action
+                 */
+                negative_action: string;
+            };
+            /**
+             * ID
+             */
+            id?: /* ID */ number | null;
+            /**
+             * Name
+             */
+            name: string;
+            /**
+             * Positive Action
+             */
+            positive_action: string;
+            /**
+             * Negative Action
+             */
+            negative_action: string;
+        }
+        /**
+         * CreateCheckInSchema
+         */
+        export interface CreateCheckInSchema {
+            depends_on?: /* CheckInSchema */ CheckInSchema | null;
+            /**
+             * Name
+             */
+            name: string;
+            /**
+             * Positive Action
+             */
+            positive_action: string;
+            /**
+             * Negative Action
+             */
+            negative_action: string;
+        }
+        /**
          * CreateHeatSchema
          */
         export interface CreateHeatSchema {
@@ -177,6 +238,10 @@ declare namespace Components {
          * CreateRaceTypeSchema
          */
         export interface CreateRaceTypeSchema {
+            /**
+             * Checkins
+             */
+            checkins?: /* CheckInSchema */ CheckInSchema[];
             /**
              * Name
              */
@@ -506,6 +571,24 @@ declare namespace Components {
          */
         export type ParticipationTypes = "participant" | "relay_participant";
         /**
+         * PatchCheckInSchema
+         */
+        export interface PatchCheckInSchema {
+            depends_on?: /* CheckInSchema */ CheckInSchema | null;
+            /**
+             * Name
+             */
+            name: string;
+            /**
+             * Positive Action
+             */
+            positive_action: string;
+            /**
+             * Negative Action
+             */
+            negative_action: string;
+        }
+        /**
          * PatchHeatSchema
          */
         export interface PatchHeatSchema {
@@ -569,6 +652,10 @@ declare namespace Components {
          * PatchRaceTypeSchema
          */
         export interface PatchRaceTypeSchema {
+            /**
+             * Checkins
+             */
+            checkins?: /* CheckInSchema */ CheckInSchema[];
             /**
              * Name
              */
@@ -664,6 +751,10 @@ declare namespace Components {
          */
         export interface RaceTypeBibInfoSchema {
             /**
+             * Checkins
+             */
+            checkins?: /* CheckInSchema */ CheckInSchema[];
+            /**
              * ID
              */
             id?: /* ID */ number | null;
@@ -700,6 +791,10 @@ declare namespace Components {
          * RaceTypeSchema
          */
         export interface RaceTypeSchema {
+            /**
+             * Checkins
+             */
+            checkins?: /* CheckInSchema */ CheckInSchema[];
             /**
              * ID
              */
@@ -1052,6 +1147,96 @@ declare namespace Paths {
         export type RequestBody = /* PatchUserSchema */ Components.Schemas.PatchUserSchema;
         namespace Responses {
             export type $201 = /* UserSchema */ Components.Schemas.UserSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace CheckinsApiCreateCheckin {
+        export type RequestBody = /* CreateCheckInSchema */ Components.Schemas.CreateCheckInSchema;
+        namespace Responses {
+            export type $201 = /* CheckInSchema */ Components.Schemas.CheckInSchema;
+        }
+    }
+    namespace CheckinsApiDeleteCheckin {
+        namespace Parameters {
+            /**
+             * Check In Id
+             */
+            export type CheckInId = number;
+        }
+        export interface PathParameters {
+            check_in_id: /* Check In Id */ Parameters.CheckInId;
+        }
+        namespace Responses {
+            export interface $204 {
+            }
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace CheckinsApiGetCheckInRaceTypes {
+        namespace Parameters {
+            /**
+             * Check In Id
+             */
+            export type CheckInId = number;
+        }
+        export interface PathParameters {
+            check_in_id: /* Check In Id */ Parameters.CheckInId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema[];
+        }
+    }
+    namespace CheckinsApiGetCheckin {
+        namespace Parameters {
+            /**
+             * Check In Id
+             */
+            export type CheckInId = number;
+        }
+        export interface PathParameters {
+            check_in_id: /* Check In Id */ Parameters.CheckInId;
+        }
+        namespace Responses {
+            export type $200 = /* CheckInSchema */ Components.Schemas.CheckInSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace CheckinsApiGetCheckins {
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* CheckInSchema */ Components.Schemas.CheckInSchema[];
+        }
+    }
+    namespace CheckinsApiUpdateCheckin {
+        namespace Parameters {
+            /**
+             * Check In Id
+             */
+            export type CheckInId = number;
+        }
+        export interface PathParameters {
+            check_in_id: /* Check In Id */ Parameters.CheckInId;
+        }
+        export type RequestBody = /* PatchCheckInSchema */ Components.Schemas.PatchCheckInSchema;
+        namespace Responses {
+            export type $200 = /* CheckInSchema */ Components.Schemas.CheckInSchema;
             export type $404 = /**
              * ErrorObjectSchema
              * Schema for the error object as described in decisions_api.md
@@ -2562,6 +2747,54 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiCommentApiDeleteRelayTeamComment.Responses.$204>
+  /**
+   * checkins_api_get_checkins - Get Checkins
+   */
+  'checkins_api_get_checkins'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.CheckinsApiGetCheckins.Responses.$200>
+  /**
+   * checkins_api_create_checkin - Create Checkin
+   */
+  'checkins_api_create_checkin'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: Paths.CheckinsApiCreateCheckin.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.CheckinsApiCreateCheckin.Responses.$201>
+  /**
+   * checkins_api_get_check_in_race_types - Get Check In Race Types
+   */
+  'checkins_api_get_check_in_race_types'(
+    parameters: Parameters<Paths.CheckinsApiGetCheckInRaceTypes.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.CheckinsApiGetCheckInRaceTypes.Responses.$200>
+  /**
+   * checkins_api_get_checkin - Get Checkin
+   */
+  'checkins_api_get_checkin'(
+    parameters: Parameters<Paths.CheckinsApiGetCheckin.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.CheckinsApiGetCheckin.Responses.$200>
+  /**
+   * checkins_api_update_checkin - Update Checkin
+   */
+  'checkins_api_update_checkin'(
+    parameters: Parameters<Paths.CheckinsApiUpdateCheckin.PathParameters>,
+    data?: Paths.CheckinsApiUpdateCheckin.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.CheckinsApiUpdateCheckin.Responses.$200>
+  /**
+   * checkins_api_delete_checkin - Delete Checkin
+   */
+  'checkins_api_delete_checkin'(
+    parameters: Parameters<Paths.CheckinsApiDeleteCheckin.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.CheckinsApiDeleteCheckin.Responses.$204>
 }
 
 export interface PathsDictionary {
@@ -3158,6 +3391,60 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiCommentApiDeleteRelayTeamComment.Responses.$204>
+  }
+  ['/api/check_ins/']: {
+    /**
+     * checkins_api_get_checkins - Get Checkins
+     */
+    'get'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.CheckinsApiGetCheckins.Responses.$200>
+    /**
+     * checkins_api_create_checkin - Create Checkin
+     */
+    'post'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: Paths.CheckinsApiCreateCheckin.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.CheckinsApiCreateCheckin.Responses.$201>
+  }
+  ['/api/check_ins/{check_in_id}/race_types']: {
+    /**
+     * checkins_api_get_check_in_race_types - Get Check In Race Types
+     */
+    'get'(
+      parameters: Parameters<Paths.CheckinsApiGetCheckInRaceTypes.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.CheckinsApiGetCheckInRaceTypes.Responses.$200>
+  }
+  ['/api/check_ins/{check_in_id}']: {
+    /**
+     * checkins_api_delete_checkin - Delete Checkin
+     */
+    'delete'(
+      parameters: Parameters<Paths.CheckinsApiDeleteCheckin.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.CheckinsApiDeleteCheckin.Responses.$204>
+    /**
+     * checkins_api_update_checkin - Update Checkin
+     */
+    'patch'(
+      parameters: Parameters<Paths.CheckinsApiUpdateCheckin.PathParameters>,
+      data?: Paths.CheckinsApiUpdateCheckin.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.CheckinsApiUpdateCheckin.Responses.$200>
+    /**
+     * checkins_api_get_checkin - Get Checkin
+     */
+    'get'(
+      parameters: Parameters<Paths.CheckinsApiGetCheckin.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.CheckinsApiGetCheckin.Responses.$200>
   }
 }
 

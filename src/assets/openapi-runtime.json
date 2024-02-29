@@ -892,6 +892,78 @@
         ],
         "responses": {}
       }
+    },
+    "/api/check_ins/": {
+      "get": {
+        "operationId": "checkins_api_get_checkins",
+        "parameters": [],
+        "responses": {}
+      },
+      "post": {
+        "operationId": "checkins_api_create_checkin",
+        "parameters": [],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/check_ins/{check_in_id}/race_types": {
+      "get": {
+        "operationId": "checkins_api_get_check_in_race_types",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "check_in_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/check_ins/{check_in_id}": {
+      "delete": {
+        "operationId": "checkins_api_delete_checkin",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "check_in_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      },
+      "patch": {
+        "operationId": "checkins_api_update_checkin",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "check_in_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      },
+      "get": {
+        "operationId": "checkins_api_get_checkin",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "check_in_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
     }
   },
   "components": {},

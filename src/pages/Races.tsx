@@ -20,11 +20,14 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { Components } from "../services/api/openapi";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
 import getChangedValues from "../services/helpers.ts";
 import { useSnackbarServiceContext } from "../context/SnackbarContext.tsx";
-import { EditableRowStackSwitch } from "../components/EditableRowComponents.tsx";
+import {
+  EditableRowStackMultiSelectField,
+  EditableRowStackSwitch,
+} from "../components/EditableRowComponents.tsx";
 
 function CreateRaceTypeDialog(props: {
   isOpen: boolean;
@@ -105,27 +108,49 @@ function EditRaceTypeDialog(props: {
 
   const { pushAlert } = useSnackbarServiceContext();
 
+  const checkinsQuery = useQuery({
+    queryKey: ["checkinsQuery"],
+    queryFn: () =>
+      getApiClient().then((apiClient) =>
+        apiClient.checkins_api_get_checkins().then((res) => res.data),
+      ),
+  });
+
+  const checkinOptions = useMemo(() => {
+    if (checkinsQuery.data) {
+      return checkinsQuery.data.map((checkin) => ({
+        key: checkin.name,
+        value: checkin.id ?? -1,
+      }));
+    }
+    return null;
+  }, [checkinsQuery.data]);
+
   const RaceTypePatchSchema = Yup.object({
     name: Yup.string().required(),
     participants_allowed: Yup.number().default(0).min(0),
     ftt_allowed: Yup.number().default(0).min(0),
     needs_swim_time: Yup.boolean().required().default(true),
+    checkins: Yup.array().of(Yup.object()).notRequired(),
   });
 
-  const initialValues =
-    props.raceType == null
+  const initialValues: Components.Schemas.RaceTypeSchema = useMemo(() => {
+    return props.raceType == null
       ? {
           name: "",
           participants_allowed: 0,
           ftt_allowed: 0,
           needs_swim_time: true,
+          checkins: [],
         }
       : {
           name: props.raceType.name,
           participants_allowed: props.raceType.participants_allowed,
           ftt_allowed: props.raceType.ftt_allowed,
           needs_swim_time: props.raceType.needs_swim_time,
+          checkins: props.raceType.checkins ?? [],
         };
+  }, [props.raceType]);
 
   const formik = useFormik({
     initialValues: initialValues,
@@ -148,51 +173,81 @@ function EditRaceTypeDialog(props: {
     },
   });
 
+  const getMultiSelectValues = () => {
+    return formik.values.checkins?.map((checkin) => checkin.id ?? -1) ?? [];
+  };
+
   return (
     <Dialog
       open={props.isOpen}
       onClose={() => {
         props.handleClose(null);
       }}
+      fullWidth={true}
+      maxWidth={"lg"}
     >
       <DialogTitle>Update Race Type</DialogTitle>
       <form onSubmit={formik.handleSubmit}>
         <DialogContent>
-          <Stack spacing={2}>
-            <TextField
-              label={"Name"}
-              value={formik.values.name}
-              onChange={formik.handleChange}
-              id={"name"}
-              error={formik.errors.name != undefined}
-              helperText={formik.errors.name ?? ""}
-            />
-            <TextField
-              label={"Participants Allowed"}
-              type={"number"}
-              value={formik.values.participants_allowed}
-              onChange={formik.handleChange}
-              id={"participants_allowed"}
-              error={formik.errors.participants_allowed != undefined}
-              helperText={formik.errors.participants_allowed ?? ""}
-            />
-            <TextField
-              label={"FTT Participants Allowed"}
-              type={"number"}
-              value={formik.values.ftt_allowed}
-              onChange={formik.handleChange}
-              id={"ftt_allowed"}
-              error={formik.errors.ftt_allowed != undefined}
-              helperText={formik.errors.ftt_allowed ?? ""}
-            />
-            <EditableRowStackSwitch
-              label={"Needs Swim Time"}
-              checked={formik.values.needs_swim_time}
-              editing={true}
-              id={"needs_swim_time"}
-              onChange={formik.handleChange}
-            />
-          </Stack>
+          <Grid container columnSpacing={2}>
+            <Grid>
+              <Stack spacing={2}>
+                <TextField
+                  label={"Name"}
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
+                  id={"name"}
+                  error={formik.errors.name != undefined}
+                  helperText={formik.errors.name ?? ""}
+                />
+                <TextField
+                  label={"Participants Allowed"}
+                  type={"number"}
+                  value={formik.values.participants_allowed}
+                  onChange={formik.handleChange}
+                  id={"participants_allowed"}
+                  error={formik.errors.participants_allowed != undefined}
+                  helperText={formik.errors.participants_allowed ?? ""}
+                />
+                <TextField
+                  label={"FTT Participants Allowed"}
+                  type={"number"}
+                  value={formik.values.ftt_allowed}
+                  onChange={formik.handleChange}
+                  id={"ftt_allowed"}
+                  error={formik.errors.ftt_allowed != undefined}
+                  helperText={formik.errors.ftt_allowed ?? ""}
+                />
+                <EditableRowStackSwitch
+                  label={"Needs Swim Time"}
+                  checked={formik.values.needs_swim_time}
+                  editing={true}
+                  id={"needs_swim_time"}
+                  onChange={formik.handleChange}
+                />
+              </Stack>
+            </Grid>
+            <Grid>
+              <EditableRowStackMultiSelectField
+                label={"Check Ins"}
+                value={getMultiSelectValues()}
+                valueLabel={null}
+                editing={true}
+                id={"checkins"}
+                error={undefined}
+                options={checkinOptions}
+                onChange={(event) => {
+                  void formik.setFieldValue(
+                    "checkins",
+                    checkinsQuery.data?.filter((checkin) =>
+                      //@ts-expect-error We know its right
+                      event.target.value?.includes(checkin.id),
+                    ) ?? [],
+                  );
+                }}
+              />
+            </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button

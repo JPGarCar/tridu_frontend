@@ -16,6 +16,7 @@ import DataUpload from "./pages/dataUpload/DataUpload.tsx";
 import Races from "./pages/Races.tsx";
 import Admin from "./pages/Admin.tsx";
 import BibNumbers from "./pages/BibNumbers.tsx";
+import Checkins from "./pages/CheckIns.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,6 +25,7 @@ const router = createBrowserRouter(
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/heats" element={<Heats />} />
+        <Route path="/checkins" element={<Checkins />} />
         <Route path="/races" element={<Races />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/bibNumbers" element={<BibNumbers />} />

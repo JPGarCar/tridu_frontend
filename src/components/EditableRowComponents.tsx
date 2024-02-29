@@ -1,7 +1,11 @@
 import { ChangeEventHandler, ReactNode } from "react";
 import {
+  Box,
+  Checkbox,
+  Chip,
   FormControl,
   InputLabel,
+  ListItemText,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -85,6 +89,79 @@ function EditableRowStackSelectField<T extends number | string>(props: {
                 return (
                   <MenuItem key={value} value={value}>
                     {key}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        )
+      ) : (
+        <Typography>{props.valueLabel}</Typography>
+      )}
+    </Stack>
+  );
+}
+
+function EditableRowStackMultiSelectField<T extends number | string>(props: {
+  label: string;
+  value: T[] | null | undefined;
+  valueLabel: string | null | undefined;
+  editing: boolean;
+  id: string;
+  error: string | undefined;
+  options: { key: string; value: T }[] | null;
+  onChange:
+    | ((event: SelectChangeEvent<T[] | null>, child: ReactNode) => void)
+    | undefined;
+}) {
+  const isError = props.error != undefined;
+
+  const renderValues = (selected: T[]) => {
+    return (
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+        {selected.map((value) => (
+          <Chip
+            key={value}
+            label={
+              props.options?.find((option) => option.value == value)?.key ?? ""
+            }
+          />
+        ))}
+      </Box>
+    );
+  };
+
+  return (
+    <Stack direction={"row"} spacing={2} alignItems={"center"}>
+      <Typography>{props.label}</Typography>
+      {props.editing ? (
+        props.options == null ? (
+          <Skeleton variant={"text"} />
+        ) : (
+          <FormControl>
+            <InputLabel id={`label-for-${props.id}`}>{props.label}</InputLabel>
+            <Select
+              name={props.id}
+              id={props.id}
+              labelId={`label-for-${props.id}`}
+              error={isError}
+              label={props.label}
+              value={props.value}
+              //@ts-expect-error We know we will get a list of T
+              renderValue={renderValues}
+              onChange={props.onChange}
+              variant="outlined"
+              size={"small"}
+              sx={{ minWidth: 100 }}
+              multiple
+            >
+              {props.options.map(({ key, value }) => {
+                return (
+                  <MenuItem key={value} value={value}>
+                    <Checkbox
+                      checked={(props.value?.indexOf(value) ?? -2) > -1}
+                    />
+                    <ListItemText primary={key} />
                   </MenuItem>
                 );
               })}
@@ -198,4 +275,5 @@ export {
   EditableRowStackSelectField,
   EditableRowStackNumberField,
   EditableRowStackTimeField,
+  EditableRowStackMultiSelectField,
 };
