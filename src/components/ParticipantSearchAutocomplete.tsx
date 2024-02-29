@@ -39,7 +39,12 @@ const ParticipantSearchAutocomplete = () => {
 
   return (
     <Autocomplete
-      sx={{ my: 1 }}
+      sx={{
+        my: 1,
+        "& .MuiOutlinedInput-root": {
+          paddingRight: "12px!important",
+        },
+      }}
       filterOptions={(x) => x}
       options={options}
       inputValue={inputValue}
