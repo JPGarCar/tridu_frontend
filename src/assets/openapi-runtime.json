@@ -266,6 +266,11 @@
           },
           {
             "in": "query",
+            "name": "active",
+            "required": false
+          },
+          {
+            "in": "query",
             "name": "limit",
             "required": false
           },

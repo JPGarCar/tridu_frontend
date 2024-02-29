@@ -39,28 +39,7 @@ declare namespace Components {
          * CheckInSchema
          */
         export interface CheckInSchema {
-            /**
-             * CheckInSchema
-             */
-            depends_on?: {
-                depends_on?: any;
-                /**
-                 * ID
-                 */
-                id?: /* ID */ number | null;
-                /**
-                 * Name
-                 */
-                name: string;
-                /**
-                 * Positive Action
-                 */
-                positive_action: string;
-                /**
-                 * Negative Action
-                 */
-                negative_action: string;
-            };
+            depends_on?: /* CheckInSchema */ CheckInSchema | null;
             /**
              * ID
              */
@@ -578,15 +557,15 @@ declare namespace Components {
             /**
              * Name
              */
-            name: string;
+            name?: /* Name */ string | null;
             /**
              * Positive Action
              */
-            positive_action: string;
+            positive_action?: /* Positive Action */ string | null;
             /**
              * Negative Action
              */
-            negative_action: string;
+            negative_action?: /* Negative Action */ string | null;
         }
         /**
          * PatchHeatSchema
@@ -2116,6 +2095,10 @@ declare namespace Paths {
     namespace RaceApiRaceApiGetRaceParticipations {
         namespace Parameters {
             /**
+             * Active
+             */
+            export type Active = boolean;
+            /**
              * Bib Number
              */
             export type BibNumber = number;
@@ -2137,6 +2120,7 @@ declare namespace Paths {
         }
         export interface QueryParameters {
             bib_number?: /* Bib Number */ Parameters.BibNumber;
+            active?: /* Active */ Parameters.Active;
             limit?: /* Limit */ Parameters.Limit;
             offset?: /* Offset */ Parameters.Offset;
         }

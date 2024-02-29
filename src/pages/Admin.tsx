@@ -43,6 +43,7 @@ const Admin = () => {
     const response = await api.race_api_race_api_get_race_participations({
       race_id: race_id,
       limit: undefined,
+      active: true,
     });
 
     const flattenedObjs = response.data.map((participant) => ({
