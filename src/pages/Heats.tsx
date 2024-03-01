@@ -430,55 +430,51 @@ function HeatListCard(props: {
         ) : heatsQuery.data === undefined ? (
           <div>Error...</div>
         ) : (
-          heatsQuery.data
-            .sort((a, b) => {
-              return a.name.localeCompare(b.name);
-            })
-            .map((heat) => {
-              return (
-                <Card
-                  sx={
-                    heat.id === props.activeHeatId
-                      ? {
-                          border: 2,
-                          borderColor: "success.main",
+          heatsQuery.data.map((heat) => {
+            return (
+              <Card
+                sx={
+                  heat.id === props.activeHeatId
+                    ? {
+                        border: 2,
+                        borderColor: "success.main",
+                      }
+                    : {}
+                }
+                key={heat.id}
+              >
+                <CardContent>
+                  <Grid container>
+                    <Grid
+                      xs={10}
+                      onClick={() => {
+                        if (heat.id) {
+                          props.setActiveHeatId(heat.id);
                         }
-                      : {}
-                  }
-                  key={heat.id}
-                >
-                  <CardContent>
-                    <Grid container>
-                      <Grid
-                        xs={10}
+                      }}
+                    >
+                      <Typography
+                        variant={"body1"}
+                      >{`${heat.race_type.name} ${heat.termination} - ${heat.participant_count}/${heat.ideal_capacity}`}</Typography>
+                      <Typography variant={"caption"}>
+                        {getFormattedHeatStartDateTime(heat.start_datetime)} |{" "}
+                        {heat.pool} Pool
+                      </Typography>
+                    </Grid>
+                    <Grid xs>
+                      <IconButton
                         onClick={() => {
-                          if (heat.id) {
-                            props.setActiveHeatId(heat.id);
-                          }
+                          void handleHeatDelete(heat.id ?? -1);
                         }}
                       >
-                        <Typography
-                          variant={"body1"}
-                        >{`${heat.race_type.name} ${heat.termination} - ${heat.participant_count}/${heat.ideal_capacity}`}</Typography>
-                        <Typography variant={"caption"}>
-                          {getFormattedHeatStartDateTime(heat.start_datetime)} |{" "}
-                          {heat.pool} Pool
-                        </Typography>
-                      </Grid>
-                      <Grid xs>
-                        <IconButton
-                          onClick={() => {
-                            void handleHeatDelete(heat.id ?? -1);
-                          }}
-                        >
-                          <DeleteSharp color={"error"} />
-                        </IconButton>
-                      </Grid>
+                        <DeleteSharp color={"error"} />
+                      </IconButton>
                     </Grid>
-                  </CardContent>
-                </Card>
-              );
-            })
+                  </Grid>
+                </CardContent>
+              </Card>
+            );
+          })
         )}
       </Stack>
     </CustomCard>

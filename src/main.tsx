@@ -16,6 +16,7 @@ import {
 import ApiServiceProvider from "./context/ApiContext.tsx";
 import { closeSnackbar, SnackbarProvider } from "notistack";
 import { CloseOutlined } from "@mui/icons-material";
+import { ConfirmProvider } from "material-ui-confirm";
 
 const queryClient = new QueryClient();
 
@@ -47,8 +48,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             >
               <ApiServiceProvider>
                 <ThemeProvider theme={themeLight}>
-                  <CssBaseline />
-                  <App />
+                  <ConfirmProvider>
+                    <CssBaseline />
+                    <App />
+                  </ConfirmProvider>
                 </ThemeProvider>
               </ApiServiceProvider>
             </SnackbarProvider>
