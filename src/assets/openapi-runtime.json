@@ -248,6 +248,33 @@
           }
         ],
         "responses": {}
+      },
+      "patch": {
+        "operationId": "race_api_race_api_patch_race_participants",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "race_type_id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "heat_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
       }
     },
     "/api/races/{race_id}/participations": {

@@ -121,7 +121,7 @@ declare namespace Components {
             /**
              * Pool
              */
-            pool?: string;
+            pool?: /* Pool */ string | null;
             /**
              * Race
              */
@@ -418,6 +418,23 @@ declare namespace Components {
              * Country
              */
             country: string;
+        }
+        /**
+         * MassPatchParticipantSchema
+         */
+        export interface MassPatchParticipantSchema {
+            /**
+             * Is First Time Triathlete
+             */
+            is_ftt?: /* Is First Time Triathlete */ boolean | null;
+            /**
+             * Team Name
+             */
+            team?: /* Team Name */ string | null;
+            /**
+             * Waiver Signed
+             */
+            waiver_signed?: /* Waiver Signed */ boolean | null;
         }
         /**
          * PagedParticipantCommentSchema
@@ -2263,6 +2280,36 @@ declare namespace Paths {
             export type $200 = /* RaceSchema */ Components.Schemas.RaceSchema[];
         }
     }
+    namespace RaceApiRaceApiPatchRaceParticipants {
+        namespace Parameters {
+            /**
+             * Heat Id
+             */
+            export type HeatId = number;
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+            /**
+             * Race Type Id
+             */
+            export type RaceTypeId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        export interface QueryParameters {
+            race_type_id: /* Race Type Id */ Parameters.RaceTypeId;
+            heat_id: /* Heat Id */ Parameters.HeatId;
+        }
+        export type RequestBody = /* MassPatchParticipantSchema */ Components.Schemas.MassPatchParticipantSchema;
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = number;
+        }
+    }
     namespace RaceApiRaceTypeApiCreateRaceType {
         export type RequestBody = /* CreateRaceTypeSchema */ Components.Schemas.CreateRaceTypeSchema;
         namespace Responses {
@@ -2461,6 +2508,14 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipants.Responses.$200>
+  /**
+   * race_api_race_api_patch_race_participants - Patch Race Participants
+   */
+  'race_api_race_api_patch_race_participants'(
+    parameters: Parameters<Paths.RaceApiRaceApiPatchRaceParticipants.QueryParameters & Paths.RaceApiRaceApiPatchRaceParticipants.PathParameters>,
+    data?: Paths.RaceApiRaceApiPatchRaceParticipants.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiRaceApiPatchRaceParticipants.Responses.$200>
   /**
    * race_api_race_api_get_race_participations - Get Race Participations
    * 
@@ -3055,6 +3110,14 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipants.Responses.$200>
+    /**
+     * race_api_race_api_patch_race_participants - Patch Race Participants
+     */
+    'patch'(
+      parameters: Parameters<Paths.RaceApiRaceApiPatchRaceParticipants.QueryParameters & Paths.RaceApiRaceApiPatchRaceParticipants.PathParameters>,
+      data?: Paths.RaceApiRaceApiPatchRaceParticipants.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiRaceApiPatchRaceParticipants.Responses.$200>
   }
   ['/api/races/{race_id}/participations']: {
     /**

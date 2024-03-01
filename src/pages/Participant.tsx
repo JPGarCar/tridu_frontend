@@ -1645,9 +1645,9 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
               {relayParticipantQuery.data.team.name}{" "}
               {relayParticipantQuery.data.team.bib_number}
             </Typography>
-            {relayParticipantQuery.data.is_active ? null : (
+            {relayParticipantQuery.data.team.is_active ? null : (
               <Alert sx={{ m: 2 }} icon={<Error />} severity={"error"}>
-                Inactive participant! Participant will not show up on heat or
+                Inactive Relay Team! Participant will not show up on heat or
                 other exports.
               </Alert>
             )}
@@ -1674,7 +1674,7 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
               <Grid xs={6} sx={{ py: 2, px: { xs: 1, md: 4 } }}>
                 <RelayTeamInformation
                   relayTeam={relayParticipantQuery.data.team}
-                  setRelayTeam={setRelayTeam}
+                  setRelayTeam={setRelayTeamHandler}
                 />
                 {relayTeam == undefined ? (
                   <Skeleton />

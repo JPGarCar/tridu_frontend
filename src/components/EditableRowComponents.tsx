@@ -52,7 +52,9 @@ function EditableRowStackTextField(props: {
   );
 }
 
-function EditableRowStackSelectField<T extends number | string>(props: {
+function EditableRowStackSelectField<
+  T extends number | string | undefined,
+>(props: {
   label: string;
   value: T | null | undefined;
   valueLabel: string | null | undefined;

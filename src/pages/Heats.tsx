@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useSnackbar } from "notistack";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Components } from "../services/api/openapi";
 import CustomCard from "../components/CustomCard.tsx";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -45,6 +45,7 @@ import getChangedValues from "../services/helpers.ts";
 const PoolOptions = [
   { key: "RECREATION", value: "Recreation" },
   { key: "COMPETITIVE", value: "Competitive" },
+  { key: "NONE", value: undefined },
 ];
 
 function CreateHeatDialog(props: {
@@ -53,6 +54,8 @@ function CreateHeatDialog(props: {
   raceId: number;
 }) {
   const queryClient = useQueryClient();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const { getApiClient } = useApiServiceContext();
 
@@ -65,7 +68,7 @@ function CreateHeatDialog(props: {
     color: Yup.string(),
     startDateTime: Yup.date().required("Required!"),
     idealCapacity: Yup.number().required("Required!").min(0, "Min value is 0!"),
-    pool: Yup.string().required("Required!"),
+    pool: Yup.string().notRequired(),
   });
 
   const formik = useFormik({
@@ -76,10 +79,10 @@ function CreateHeatDialog(props: {
       startDateTime: DateTime.now(),
       color: "",
       idealCapacity: 0,
-      pool: "",
+      pool: null,
     },
     validationSchema: HeatFormCreateSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values, formikHelpers) => {
       const api = await getApiClient();
       const response = await api.heats_api_create_heat(null, {
         race_id: values.raceId,
@@ -98,6 +101,8 @@ function CreateHeatDialog(props: {
           return oldData;
         },
       );
+      enqueueSnackbar("Heat created!", { variant: "success" });
+      formikHelpers.resetForm();
       props.handleClose();
     },
   });
@@ -345,6 +350,8 @@ function HeatListCard(props: {
 
   const queryClient = useQueryClient();
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const { getApiClient } = useApiServiceContext();
 
   const heatsQuery = useQuery({
@@ -378,6 +385,7 @@ function HeatListCard(props: {
         return oldData.filter((value) => value.id != heatId);
       },
     );
+    enqueueSnackbar("Heat deleted!", { variant: "success" });
   };
 
   return (
@@ -424,59 +432,61 @@ function HeatListCard(props: {
         </Grid>
       </Grid>
       <Divider />
-      <Stack spacing={2} sx={{ mt: 2 }}>
-        {heatsQuery.isLoading ? (
-          <Skeleton variant={"rectangular"} />
-        ) : heatsQuery.data === undefined ? (
-          <div>Error...</div>
-        ) : (
-          heatsQuery.data.map((heat) => {
-            return (
-              <Card
-                sx={
-                  heat.id === props.activeHeatId
-                    ? {
-                        border: 2,
-                        borderColor: "success.main",
-                      }
-                    : {}
-                }
-                key={heat.id}
-              >
-                <CardContent>
-                  <Grid container>
-                    <Grid
-                      xs={10}
-                      onClick={() => {
-                        if (heat.id) {
-                          props.setActiveHeatId(heat.id);
+      <Box sx={{ maxHeight: "70vh", overflow: "auto" }}>
+        <Stack spacing={2} sx={{ mt: 2 }}>
+          {heatsQuery.isLoading ? (
+            <Skeleton variant={"rectangular"} />
+          ) : heatsQuery.data === undefined ? (
+            <div>Error...</div>
+          ) : (
+            heatsQuery.data.map((heat) => {
+              return (
+                <Card
+                  sx={
+                    heat.id === props.activeHeatId
+                      ? {
+                          border: 2,
+                          borderColor: "success.main",
                         }
-                      }}
-                    >
-                      <Typography
-                        variant={"body1"}
-                      >{`${heat.race_type.name} ${heat.termination} - ${heat.participant_count}/${heat.ideal_capacity}`}</Typography>
-                      <Typography variant={"caption"}>
-                        {getFormattedHeatStartDateTime(heat.start_datetime)} |{" "}
-                        {heat.pool} Pool
-                      </Typography>
-                    </Grid>
-                    <Grid xs>
-                      <IconButton
+                      : {}
+                  }
+                  key={heat.id}
+                >
+                  <CardContent>
+                    <Grid container>
+                      <Grid
+                        xs={10}
                         onClick={() => {
-                          void handleHeatDelete(heat.id ?? -1);
+                          if (heat.id) {
+                            props.setActiveHeatId(heat.id);
+                          }
                         }}
                       >
-                        <DeleteSharp color={"error"} />
-                      </IconButton>
+                        <Typography
+                          variant={"body1"}
+                        >{`${heat.race_type.name} ${heat.termination} - ${heat.participant_count}/${heat.ideal_capacity}`}</Typography>
+                        <Typography variant={"caption"}>
+                          {getFormattedHeatStartDateTime(heat.start_datetime)} |{" "}
+                          {heat.pool} Pool
+                        </Typography>
+                      </Grid>
+                      <Grid xs>
+                        <IconButton
+                          onClick={() => {
+                            void handleHeatDelete(heat.id ?? -1);
+                          }}
+                        >
+                          <DeleteSharp color={"error"} />
+                        </IconButton>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            );
-          })
-        )}
-      </Stack>
+                  </CardContent>
+                </Card>
+              );
+            })
+          )}
+        </Stack>
+      </Box>
     </CustomCard>
   );
 }
@@ -494,16 +504,18 @@ function HeatInformationForm(props: {
     color: Yup.string(),
     start_datetime: Yup.date().required(),
     ideal_capacity: Yup.number().required().min(0, "Min value is 0!"),
-    pool: Yup.string().required(),
+    pool: Yup.string().notRequired(),
   });
 
-  const initalValues = {
-    termination: props.heat.termination,
-    color: props.heat.color,
-    start_datetime: DateTime.fromISO(props.heat.start_datetime),
-    ideal_capacity: props.heat.ideal_capacity,
-    pool: props.heat.pool,
-  };
+  const initalValues = useMemo(() => {
+    return {
+      termination: props.heat.termination,
+      color: props.heat.color,
+      start_datetime: DateTime.fromISO(props.heat.start_datetime),
+      ideal_capacity: props.heat.ideal_capacity,
+      pool: props.heat.pool,
+    };
+  }, [props.heat]);
 
   const formik = useFormik({
     initialValues: initalValues,
@@ -715,6 +727,19 @@ function HeatInformationCard(props: { heatId: number }) {
 
   const handelHeatUpdate = (heat: Components.Schemas.HeatSchema) => {
     queryClient.setQueryData(["getHeatQuery", heat.id], heat);
+    queryClient.setQueryData(
+      ["heatsQuery"],
+      (oldHeats: Components.Schemas.HeatSchema[]) => {
+        const index = oldHeats.findIndex(
+          (heatFromList) => heatFromList.id == heat.id,
+        );
+        const newHeats = oldHeats;
+        if (index > -1) {
+          newHeats[index] = heat;
+        }
+        return newHeats;
+      },
+    );
   };
 
   return heatQuery.isLoading ? (
