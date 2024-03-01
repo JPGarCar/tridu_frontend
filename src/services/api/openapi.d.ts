@@ -383,7 +383,7 @@ declare namespace Components {
             /**
              * Pool
              */
-            pool?: string;
+            pool?: /* Pool */ string | null;
         }
         /**
          * Input
@@ -427,10 +427,6 @@ declare namespace Components {
              * Is First Time Triathlete
              */
             is_ftt?: /* Is First Time Triathlete */ boolean | null;
-            /**
-             * Team Name
-             */
-            team?: /* Team Name */ string | null;
             /**
              * Waiver Signed
              */
