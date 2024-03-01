@@ -364,7 +364,7 @@ function ParticipantInformation(props: {
 
   const swimTimeCreator = (swimTime: string | null): string => {
     if (swimTime == null) {
-      return "N/A";
+      return "";
     }
 
     const duration = Duration.fromISO(swimTime).shiftTo("minutes", "seconds");
