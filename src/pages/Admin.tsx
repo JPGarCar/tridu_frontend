@@ -55,7 +55,6 @@ function RaceParticipantMassPatch() {
 
       const api = await getApiClient();
       const response = await api.race_api_race_api_patch_race_participants(
-        //@ts-expect-error Unknown error
         {
           race_id: values.race?.id ?? -1,
           race_type_id: values.race_type?.id ?? undefined,
@@ -236,6 +235,44 @@ const Admin = () => {
     saveAs(file);
   };
 
+  const downloadAllParticipantInfo = async () => {
+    const api = await getApiClient();
+    const response =
+      await api.race_api_race_api_get_race_participant_download_info({
+        race_id: race_id,
+        active: true,
+      });
+
+    const flattenedObjs = response.data.map((participant) =>
+      flatten(participant),
+    );
+
+    const csv = Papa.unparse(flattenedObjs);
+    const file = new File([csv], "ParticipantInfo.csv", {
+      type: "text/csv;charset=utf-8",
+    });
+    saveAs(file);
+  };
+
+  const downloadAllRelayTeamInfo = async () => {
+    const api = await getApiClient();
+    const response =
+      await api.race_api_race_api_get_race_relay_team_download_info({
+        race_id: race_id,
+        active: true,
+      });
+
+    const flattenedObjs = response.data.map((participant) =>
+      flatten(participant),
+    );
+
+    const csv = Papa.unparse(flattenedObjs);
+    const file = new File([csv], "RelayTeamInfo.csv", {
+      type: "text/csv;charset=utf-8",
+    });
+    saveAs(file);
+  };
+
   return (
     <Box sx={{ m: 2 }}>
       <Typography>Actions</Typography>
@@ -258,6 +295,26 @@ const Admin = () => {
             variant={"contained"}
           >
             Download Invalid Swim Time Participants
+          </Button>
+        </Grid>
+        <Grid>
+          <Button
+            onClick={() => {
+              void downloadAllParticipantInfo();
+            }}
+            variant={"contained"}
+          >
+            Download All Participant Info
+          </Button>
+        </Grid>
+        <Grid>
+          <Button
+            onClick={() => {
+              void downloadAllRelayTeamInfo();
+            }}
+            variant={"contained"}
+          >
+            Download All Relay Team Info
           </Button>
         </Grid>
         <Grid>

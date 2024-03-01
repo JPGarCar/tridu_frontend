@@ -238,6 +238,11 @@
           },
           {
             "in": "query",
+            "name": "active",
+            "required": false
+          },
+          {
+            "in": "query",
             "name": "limit",
             "required": false
           },
@@ -260,12 +265,12 @@
           {
             "in": "query",
             "name": "race_type_id",
-            "required": true
+            "required": false
           },
           {
             "in": "query",
             "name": "heat_id",
-            "required": true
+            "required": false
           }
         ],
         "responses": {},
@@ -275,6 +280,42 @@
           },
           "required": true
         }
+      }
+    },
+    "/api/races/{race_id}/participants_download": {
+      "get": {
+        "operationId": "race_api_race_api_get_race_participant_download_info",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "active",
+            "required": false
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/races/{race_id}/Relay_team_download": {
+      "get": {
+        "operationId": "race_api_race_api_get_race_relay_team_download_info",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "active",
+            "required": false
+          }
+        ],
+        "responses": {}
       }
     },
     "/api/races/{race_id}/participations": {

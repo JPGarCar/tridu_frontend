@@ -72,6 +72,31 @@ declare namespace Components {
             date_changed: string; // date-time
         }
         /**
+         * CheckinLessRaceTypeSchema
+         */
+        export interface CheckinLessRaceTypeSchema {
+            /**
+             * ID
+             */
+            id?: /* ID */ number | null;
+            /**
+             * Name
+             */
+            name: string;
+            /**
+             * Participants Allowed
+             */
+            participants_allowed?: number;
+            /**
+             * Ftt Allowed
+             */
+            ftt_allowed?: number;
+            /**
+             * Needs Swim Time
+             */
+            needs_swim_time?: boolean;
+        }
+        /**
          * CreateCheckInSchema
          */
         export interface CreateCheckInSchema {
@@ -322,6 +347,68 @@ declare namespace Components {
              * Gender
              */
             gender?: string;
+        }
+        /**
+         * DownloadInfoParticipantSchema
+         */
+        export interface DownloadInfoParticipantSchema {
+            origin?: /* LocationSchema */ LocationSchema | null;
+            race_type: /* CheckinLessRaceTypeSchema */ CheckinLessRaceTypeSchema;
+            user: /* UserSchema */ UserSchema;
+            /**
+             * ID
+             */
+            id?: /* ID */ number | null;
+            /**
+             * Bib Number
+             */
+            bib_number: number;
+            /**
+             * Is First Time Triathlete
+             */
+            is_ftt?: boolean;
+            /**
+             * Team Name
+             */
+            team?: /* Team Name */ string | null;
+            /**
+             * Swim Time
+             */
+            swim_time?: /* Swim Time */ string /* duration */ | null;
+            /**
+             * Is Active
+             */
+            is_active?: boolean;
+            /**
+             * Location
+             */
+            location?: /* Location */ string | null;
+            /**
+             * Waiver Signed
+             */
+            waiver_signed?: boolean;
+        }
+        /**
+         * DownloadInfoRelayTeamSchema
+         */
+        export interface DownloadInfoRelayTeamSchema {
+            race_type: /* RaceTypeSchema */ RaceTypeSchema;
+            /**
+             * ID
+             */
+            id?: /* ID */ number | null;
+            /**
+             * Is Active
+             */
+            is_active?: boolean;
+            /**
+             * Bib Number
+             */
+            bib_number: number;
+            /**
+             * Relay Team Name
+             */
+            name: string;
         }
         /**
          * ErrorObjectSchema
@@ -2126,8 +2213,36 @@ declare namespace Paths {
             export type $200 = /* HeatSchema */ Components.Schemas.HeatSchema[];
         }
     }
+    namespace RaceApiRaceApiGetRaceParticipantDownloadInfo {
+        namespace Parameters {
+            /**
+             * Active
+             */
+            export type Active = boolean;
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        export interface QueryParameters {
+            active?: /* Active */ Parameters.Active;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* DownloadInfoParticipantSchema */ Components.Schemas.DownloadInfoParticipantSchema[];
+        }
+    }
     namespace RaceApiRaceApiGetRaceParticipants {
         namespace Parameters {
+            /**
+             * Active
+             */
+            export type Active = boolean;
             /**
              * Bib Number
              */
@@ -2150,6 +2265,7 @@ declare namespace Paths {
         }
         export interface QueryParameters {
             bib_number?: /* Bib Number */ Parameters.BibNumber;
+            active?: /* Active */ Parameters.Active;
             limit?: /* Limit */ Parameters.Limit;
             offset?: /* Offset */ Parameters.Offset;
         }
@@ -2251,6 +2367,30 @@ declare namespace Paths {
             export type $200 = string[];
         }
     }
+    namespace RaceApiRaceApiGetRaceRelayTeamDownloadInfo {
+        namespace Parameters {
+            /**
+             * Active
+             */
+            export type Active = boolean;
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        export interface QueryParameters {
+            active?: /* Active */ Parameters.Active;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* DownloadInfoRelayTeamSchema */ Components.Schemas.DownloadInfoRelayTeamSchema[];
+        }
+    }
     namespace RaceApiRaceApiGetRaceStats {
         namespace Parameters {
             /**
@@ -2295,8 +2435,8 @@ declare namespace Paths {
             race_id: /* Race Id */ Parameters.RaceId;
         }
         export interface QueryParameters {
-            race_type_id: /* Race Type Id */ Parameters.RaceTypeId;
-            heat_id: /* Heat Id */ Parameters.HeatId;
+            race_type_id?: /* Race Type Id */ Parameters.RaceTypeId;
+            heat_id?: /* Heat Id */ Parameters.HeatId;
         }
         export type RequestBody = /* MassPatchParticipantSchema */ Components.Schemas.MassPatchParticipantSchema;
         namespace Responses {
@@ -2512,6 +2652,22 @@ export interface OperationMethods {
     data?: Paths.RaceApiRaceApiPatchRaceParticipants.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RaceApiRaceApiPatchRaceParticipants.Responses.$200>
+  /**
+   * race_api_race_api_get_race_participant_download_info - Get Race Participant Download Info
+   */
+  'race_api_race_api_get_race_participant_download_info'(
+    parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipantDownloadInfo.QueryParameters & Paths.RaceApiRaceApiGetRaceParticipantDownloadInfo.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipantDownloadInfo.Responses.$200>
+  /**
+   * race_api_race_api_get_race_relay_team_download_info - Get Race Relay Team Download Info
+   */
+  'race_api_race_api_get_race_relay_team_download_info'(
+    parameters: Parameters<Paths.RaceApiRaceApiGetRaceRelayTeamDownloadInfo.QueryParameters & Paths.RaceApiRaceApiGetRaceRelayTeamDownloadInfo.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.RaceApiRaceApiGetRaceRelayTeamDownloadInfo.Responses.$200>
   /**
    * race_api_race_api_get_race_participations - Get Race Participations
    * 
@@ -3114,6 +3270,26 @@ export interface PathsDictionary {
       data?: Paths.RaceApiRaceApiPatchRaceParticipants.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.RaceApiRaceApiPatchRaceParticipants.Responses.$200>
+  }
+  ['/api/races/{race_id}/participants_download']: {
+    /**
+     * race_api_race_api_get_race_participant_download_info - Get Race Participant Download Info
+     */
+    'get'(
+      parameters: Parameters<Paths.RaceApiRaceApiGetRaceParticipantDownloadInfo.QueryParameters & Paths.RaceApiRaceApiGetRaceParticipantDownloadInfo.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiRaceApiGetRaceParticipantDownloadInfo.Responses.$200>
+  }
+  ['/api/races/{race_id}/Relay_team_download']: {
+    /**
+     * race_api_race_api_get_race_relay_team_download_info - Get Race Relay Team Download Info
+     */
+    'get'(
+      parameters: Parameters<Paths.RaceApiRaceApiGetRaceRelayTeamDownloadInfo.QueryParameters & Paths.RaceApiRaceApiGetRaceRelayTeamDownloadInfo.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.RaceApiRaceApiGetRaceRelayTeamDownloadInfo.Responses.$200>
   }
   ['/api/races/{race_id}/participations']: {
     /**
