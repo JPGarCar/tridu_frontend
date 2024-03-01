@@ -131,7 +131,7 @@ function ParticipantPICard(props: { userId: string }) {
     <CustomCard title={"Personal Info"}>
       <form onSubmit={formik.handleSubmit}>
         <CardContent>
-          <Stack spacing={2} sx={{ ml: 2 }}>
+          <Stack spacing={2}>
             <EditableRowStackTextField
               label={"First Name:"}
               data={formik.values.first_name}
@@ -1241,7 +1241,7 @@ function CheckinActionCard(props: {
 
   const handleChange = async (
     _event: React.MouseEvent<HTMLElement>,
-    newValue: boolean,
+    newValue: boolean | null,
   ) => {
     if (newValue !== null && newValue !== value) {
       setSendingRequest(true);
@@ -1281,13 +1281,13 @@ function CheckinActionCard(props: {
               exclusive
               onChange={handleChange}
             >
-              <ToggleButton value={false} disabled={sendingRequest!}>
+              <ToggleButton value={false} disabled={sendingRequest}>
                 {props.checkin.negative_action}
               </ToggleButton>
               <ToggleButton
                 value={true}
                 color={"success"}
-                disabled={sendingRequest!}
+                disabled={sendingRequest}
               >
                 {props.checkin.positive_action}
               </ToggleButton>
