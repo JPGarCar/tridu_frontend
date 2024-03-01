@@ -47,15 +47,12 @@ const UploadCSVFileStep = (props: {
   useEffect(() => {
     if (file) {
       // check headers first
-      console.log(file);
       Papa.parse<string[]>(file, {
         header: false,
         preview: 1,
         complete: (results) => {
           const errors = [];
           const warnings = [];
-
-          console.log(results);
 
           if (results.data.length == 0) {
             errors.push("Empty CSV file was provided try again!");

@@ -14,13 +14,15 @@ import {
   OutlinedInput,
   Skeleton,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Components } from "../services/api/openapi";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { Error, Send } from "@mui/icons-material";
 import { DateTime, Duration } from "luxon";
@@ -146,28 +148,26 @@ function ParticipantPICard(props: { userId: string }) {
               onChange={formik.handleChange}
               error={formik.errors.last_name}
             />
-            <Stack direction={"row"} spacing={4}>
-              <EditableRowStackTextField
-                label={"DOB (Y-M-D):"}
-                data={formik.values.date_of_birth}
-                id={"date_of_birth"}
-                editing={isEditing}
-                onChange={formik.handleChange}
-                error={formik.errors.date_of_birth}
-              />
-              <EditableRowStackTextField
-                label={"Age:"}
-                data={Math.abs(
-                  DateTime.fromISO(formik.values.date_of_birth ?? "").minus({
-                    year: DateTime.now().year,
-                  }).year,
-                ).toString()}
-                editing={false}
-                id={"age"}
-                onChange={formik.handleChange}
-                error={undefined}
-              />
-            </Stack>
+            <EditableRowStackTextField
+              label={"DOB (Y-M-D):"}
+              data={formik.values.date_of_birth}
+              id={"date_of_birth"}
+              editing={isEditing}
+              onChange={formik.handleChange}
+              error={formik.errors.date_of_birth}
+            />
+            <EditableRowStackTextField
+              label={"Age:"}
+              data={Math.abs(
+                DateTime.fromISO(formik.values.date_of_birth ?? "").minus({
+                  year: DateTime.now().year,
+                }).year,
+              ).toString()}
+              editing={false}
+              id={"age"}
+              onChange={formik.handleChange}
+              error={undefined}
+            />
             <EditableRowStackSelectField
               label={"Gender:"}
               value={formik.values.gender}
@@ -680,8 +680,8 @@ function RelayTeamInformation(props: {
 
   return (
     <form onSubmit={formik.handleSubmit}>
-      <Stack spacing={2} sx={{ m: 2 }}>
-        <Box sx={{ pl: 2 }}>
+      <Stack spacing={2}>
+        <Box>
           <EditableRowStackTextField
             label={"Bib #:"}
             data={formik.values.bib_number?.toString()}
@@ -691,7 +691,7 @@ function RelayTeamInformation(props: {
             error={formik.errors.bib_number}
           />
         </Box>
-        <Box sx={{ pl: 2 }}>
+        <Box>
           <EditableRowStackTextField
             label={"Team Name:"}
             data={formik.values.name}
@@ -802,8 +802,8 @@ function RelayTeamParticipantInformation(props: {
 
   return (
     <form onSubmit={formik.handleSubmit}>
-      <Grid container flexDirection={"column"} sx={{ m: 2 }} gap={2}>
-        <Grid xs sx={{ ml: 2 }}>
+      <Grid container flexDirection={"column"} gap={2}>
+        <Grid xs>
           <Stack spacing={2}>
             <EditableRowStackTextField
               label={"City:"}
@@ -1225,6 +1225,116 @@ function RelayTeamRaceHeat(props: {
   );
 }
 
+function CheckinActionCard(props: {
+  checkin: Components.Schemas.CheckInSchema;
+  participantCheckinValue: boolean;
+  onChangeCheckinValue: (
+    checkin_id: number,
+    value: boolean,
+  ) => Promise<boolean>;
+}) {
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [value, setValue] = useState<boolean>(props.participantCheckinValue);
+
+  const [sendingRequest, setSendingRequest] = useState(false);
+
+  const handleChange = async (
+    _event: React.MouseEvent<HTMLElement>,
+    newValue: boolean,
+  ) => {
+    if (newValue !== null && newValue !== value) {
+      setSendingRequest(true);
+      const changeSuccessful = await props.onChangeCheckinValue(
+        props.checkin.id ?? -1,
+        newValue,
+      );
+
+      if (changeSuccessful) {
+        setValue(newValue);
+        enqueueSnackbar("Changed Successful!", {
+          variant: "success",
+          autoHideDuration: 3000,
+        });
+      }
+      setSendingRequest(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardContent>
+        <Grid
+          container
+          columnSpacing={4}
+          alignContent={"center"}
+          justifyContent={"space-between"}
+          alignItems={"center"}
+        >
+          <Grid>
+            <Typography>{props.checkin.name}</Typography>
+          </Grid>
+          <Grid>
+            <ToggleButtonGroup
+              color={"primary"}
+              value={value}
+              exclusive
+              onChange={handleChange}
+            >
+              <ToggleButton value={false} disabled={sendingRequest!}>
+                {props.checkin.negative_action}
+              </ToggleButton>
+              <ToggleButton
+                value={true}
+                color={"success"}
+                disabled={sendingRequest!}
+              >
+                {props.checkin.positive_action}
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CheckInList(props: {
+  instanceId: number;
+  instanceCheckins: Components.Schemas.CheckInUserBaseSchema[];
+  availableCheckins: Components.Schemas.CheckInSchema[] | undefined;
+  onChangeCheckinValue: (
+    checkin_id: number,
+    value: boolean,
+  ) => Promise<boolean>;
+}) {
+  if (props.availableCheckins === undefined) {
+    return <Typography>No CheckIns available.</Typography>;
+  }
+
+  return (
+    <Box sx={{ p: 2 }} textAlign={"center"}>
+      <Typography variant={"h5"}>CheckIns</Typography>
+      <Stack spacing={2}>
+        {props.availableCheckins.map((checkin, index) => {
+          return (
+            <CheckinActionCard
+              key={index}
+              checkin={checkin}
+              participantCheckinValue={
+                props.instanceCheckins.find(
+                  (checkinUser) => checkinUser.check_in.id === checkin.id,
+                )?.is_checked_in ?? false
+              }
+              onChangeCheckinValue={props.onChangeCheckinValue}
+            />
+          );
+        })}
+      </Stack>
+    </Box>
+  );
+}
+
 function ParticipantRaceCard(props: { participantId: number }) {
   const { getApiClient } = useApiServiceContext();
 
@@ -1274,6 +1384,25 @@ function ParticipantRaceCard(props: { participantId: number }) {
     });
   };
 
+  const handleOnChangeCheckinValue = async (
+    checkin_id: number,
+    value: boolean,
+  ) => {
+    try {
+      const api = await getApiClient();
+      const response =
+        await api.participants_api_participant_api_checkin_participant({
+          participant_id: props.participantId,
+          checkin_id: checkin_id,
+          value: value,
+        });
+      setParticipant(response.data);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <Card
       variant={"outlined"}
@@ -1312,16 +1441,32 @@ function ParticipantRaceCard(props: { participantId: number }) {
               participant={participantQuery.data}
             />
             <Divider flexItem />
-            <Grid sx={{ m: 2 }}>
-              <ParticipantRaceType
-                setParticipant={setParticipant}
-                participant={participantQuery.data}
-              />
-              <ParticipantRaceHeat
-                setParticipant={setParticipant}
-                participant={participantQuery.data}
-              />
+            <Grid
+              sx={{ m: 2 }}
+              container
+              columnGap={2}
+              justifyContent={"space-around"}
+            >
+              <Grid>
+                <ParticipantRaceType
+                  setParticipant={setParticipant}
+                  participant={participantQuery.data}
+                />
+              </Grid>
+              <Grid>
+                <ParticipantRaceHeat
+                  setParticipant={setParticipant}
+                  participant={participantQuery.data}
+                />
+              </Grid>
             </Grid>
+            <Divider flexItem />
+            <CheckInList
+              instanceId={props.participantId}
+              instanceCheckins={participantQuery.data.checkins ?? []}
+              availableCheckins={participantQuery.data.race_type.checkins}
+              onChangeCheckinValue={handleOnChangeCheckinValue}
+            />
           </Grid>
         )}
         <Divider orientation={"vertical"} flexItem />
@@ -1429,6 +1574,15 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
     });
   };
 
+  const [relayTeam, setRelayTeam] =
+    useState<Components.Schemas.RelayTeamSchema | null>(null);
+
+  useEffect(() => {
+    if (relayParticipantQuery.data != undefined) {
+      setRelayTeam(relayParticipantQuery.data.team);
+    }
+  }, [relayParticipantQuery.data]);
+
   const setRelayParticipant = (
     participant: Components.Schemas.RelayParticipantSchema,
   ) => {
@@ -1438,14 +1592,39 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
     );
   };
 
-  const setRelayTeam = (relayTeam: Components.Schemas.RelayTeamSchema) => {
+  const setRelayTeamHandler = (
+    relayTeam: Components.Schemas.RelayTeamSchema,
+  ) => {
     const relayParticipant = relayParticipantQuery.data;
 
-    if (relayParticipant) {
-      relayParticipant.team = relayTeam;
+    setRelayTeam(relayTeam);
 
+    if (relayParticipant != undefined) {
+      relayParticipant.team = relayTeam;
       setRelayParticipant(relayParticipant);
     }
+  };
+
+  const handleOnChangeCheckinValue = async (
+    checkin_id: number,
+    value: boolean,
+  ) => {
+    if (relayTeam != undefined) {
+      try {
+        const api = await getApiClient();
+        const response =
+          await api.participants_api_relay_team_api_checkin_relay_team({
+            relay_team_id: relayTeam.id ?? -1,
+            checkin_id: checkin_id,
+            value: value,
+          });
+        setRelayTeam(response.data);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+    return false;
   };
 
   return (
@@ -1484,34 +1663,33 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
           <>Error...</>
         ) : (
           <Grid xs>
-            <Grid container direction={"row"}>
-              <Grid flexGrow={1}>
+            <Grid container direction={"row"} gap={2} wrap={"nowrap"}>
+              <Grid xs={6} sx={{ py: 2, px: { xs: 1, md: 4 } }}>
                 <RelayTeamParticipantInformation
                   setRelayParticipant={setRelayParticipant}
                   relayParticipant={relayParticipantQuery.data}
                 />
               </Grid>
               <Divider orientation={"vertical"} flexItem />
-              <Grid flexGrow={1}>
+              <Grid xs={6} sx={{ py: 2, px: { xs: 1, md: 4 } }}>
                 <RelayTeamInformation
                   relayTeam={relayParticipantQuery.data.team}
                   setRelayTeam={setRelayTeam}
                 />
-              </Grid>
-            </Grid>
-            <Divider flexItem />
-            <Grid sx={{ m: 2 }} container gap={4} spacing={2}>
-              <Grid>
-                <RelayTeamRaceType
-                  setRelayTeam={setRelayTeam}
-                  relayTeam={relayParticipantQuery.data.team}
-                />
-              </Grid>
-              <Grid>
-                <RelayTeamRaceHeat
-                  setRelayTeam={setRelayTeam}
-                  relayTeam={relayParticipantQuery.data.team}
-                />
+                {relayTeam == undefined ? (
+                  <Skeleton />
+                ) : (
+                  <>
+                    <RelayTeamRaceType
+                      setRelayTeam={setRelayTeamHandler}
+                      relayTeam={relayTeam}
+                    />
+                    <RelayTeamRaceHeat
+                      setRelayTeam={setRelayTeamHandler}
+                      relayTeam={relayTeam}
+                    />
+                  </>
+                )}
               </Grid>
             </Grid>
             <Divider flexItem />
@@ -1534,6 +1712,7 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
                         return (
                           <Card>
                             <ButtonBase
+                              sx={{ width: "100%", justifyContent: "start" }}
                               onClick={() => {
                                 navigate(
                                   `/participants/${relayTeamParticipant.user.id}`,
@@ -1552,12 +1731,25 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
                 )}
               </Box>
             </Grid>
+            <Divider flexItem />
+            <Grid>
+              {relayTeam == undefined ? (
+                <Skeleton />
+              ) : (
+                <CheckInList
+                  instanceId={relayTeam.id ?? -1}
+                  instanceCheckins={relayTeam.checkins ?? []}
+                  availableCheckins={relayTeam.race_type.checkins}
+                  onChangeCheckinValue={handleOnChangeCheckinValue}
+                />
+              )}
+            </Grid>
           </Grid>
         )}
         <Divider orientation={"vertical"} flexItem />
         <Grid
           container
-          xs={4}
+          xs={3}
           flexDirection={"column"}
           alignContent={"stretch"}
         >
@@ -1618,7 +1810,7 @@ const Participant = () => {
   return (
     <Box sx={{ height: "100%", px: 5 }}>
       <Grid container spacing={4} sx={{ height: "100%", mt: 2 }}>
-        <Grid xs={4}>
+        <Grid xs={3}>
           <Stack spacing={2}>
             <ParticipantPICard userId={userId ?? ""} />
             <ParticipantRaceListCard

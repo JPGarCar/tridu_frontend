@@ -58,6 +58,20 @@ declare namespace Components {
             negative_action: string;
         }
         /**
+         * CheckInUserBaseSchema
+         */
+        export interface CheckInUserBaseSchema {
+            check_in: /* CheckInSchema */ CheckInSchema;
+            /**
+             * Is Checked In
+             */
+            is_checked_in?: boolean;
+            /**
+             * Date Changed
+             */
+            date_changed: string; // date-time
+        }
+        /**
          * CreateCheckInSchema
          */
         export interface CreateCheckInSchema {
@@ -488,6 +502,10 @@ declare namespace Components {
             heat?: /* HeatSchema */ HeatSchema | null;
             user: /* UserSchema */ UserSchema;
             /**
+             * Checkins
+             */
+            checkins?: /* CheckInUserBaseSchema */ CheckInUserBaseSchema[];
+            /**
              * ID
              */
             id?: /* ID */ number | null;
@@ -878,6 +896,10 @@ declare namespace Components {
             race: /* RaceSchema */ RaceSchema;
             race_type: /* RaceTypeSchema */ RaceTypeSchema;
             heat?: /* HeatSchema */ HeatSchema | null;
+            /**
+             * Checkins
+             */
+            checkins?: /* CheckInUserBaseSchema */ CheckInUserBaseSchema[];
             /**
              * ID
              */
@@ -1432,6 +1454,42 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
+    namespace ParticipantsApiParticipantApiCheckinParticipant {
+        namespace Parameters {
+            /**
+             * Checkin Id
+             */
+            export type CheckinId = number;
+            /**
+             * Participant Id
+             */
+            export type ParticipantId = number;
+            /**
+             * Value
+             */
+            export type Value = boolean;
+        }
+        export interface PathParameters {
+            participant_id: /* Participant Id */ Parameters.ParticipantId;
+            checkin_id: /* Checkin Id */ Parameters.CheckinId;
+        }
+        export interface QueryParameters {
+            value?: /* Value */ Parameters.Value;
+        }
+        namespace Responses {
+            export type $200 = /* ParticipantSchema */ Components.Schemas.ParticipantSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
     namespace ParticipantsApiParticipantApiCreateParticipantBulk {
         /**
          * Participantschemas
@@ -1678,6 +1736,42 @@ declare namespace Paths {
         export type RequestBody = /* RaceTypeSchema */ Components.Schemas.RaceTypeSchema;
         namespace Responses {
             export type $201 = /* RelayTeamSchema */ Components.Schemas.RelayTeamSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace ParticipantsApiRelayTeamApiCheckinRelayTeam {
+        namespace Parameters {
+            /**
+             * Checkin Id
+             */
+            export type CheckinId = number;
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+            /**
+             * Value
+             */
+            export type Value = boolean;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+            checkin_id: /* Checkin Id */ Parameters.CheckinId;
+        }
+        export interface QueryParameters {
+            value?: /* Value */ Parameters.Value;
+        }
+        namespace Responses {
+            export type $200 = /* RelayTeamSchema */ Components.Schemas.RelayTeamSchema;
             export type $404 = /**
              * ErrorObjectSchema
              * Schema for the error object as described in decisions_api.md
@@ -2556,6 +2650,16 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiParticipantApiDeactivateParticipant.Responses.$201>
   /**
+   * participants_api_participant_api_checkin_participant - Checkin Participant
+   * 
+   * By default, it will flip the value, but if value is in URL, set that value.
+   */
+  'participants_api_participant_api_checkin_participant'(
+    parameters: Parameters<Paths.ParticipantsApiParticipantApiCheckinParticipant.QueryParameters & Paths.ParticipantsApiParticipantApiCheckinParticipant.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiParticipantApiCheckinParticipant.Responses.$200>
+  /**
    * participants_api_participant_api_get_participant_comments - Get Participant Comments
    */
   'participants_api_participant_api_get_participant_comments'(
@@ -2659,6 +2763,16 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ParticipantsApiRelayTeamApiReactivateRelayTeam.Responses.$201>
+  /**
+   * participants_api_relay_team_api_checkin_relay_team - Checkin Relay Team
+   * 
+   * By default, it will flip the value, but if value is in URL, set that value.
+   */
+  'participants_api_relay_team_api_checkin_relay_team'(
+    parameters: Parameters<Paths.ParticipantsApiRelayTeamApiCheckinRelayTeam.QueryParameters & Paths.ParticipantsApiRelayTeamApiCheckinRelayTeam.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ParticipantsApiRelayTeamApiCheckinRelayTeam.Responses.$200>
   /**
    * participants_api_relay_team_api_get_relay_team_participants - Get Relay Team Participants
    */
@@ -3166,6 +3280,18 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiParticipantApiDeactivateParticipant.Responses.$201>
   }
+  ['/api/participants/{participant_id}/checkins/{checkin_id}']: {
+    /**
+     * participants_api_participant_api_checkin_participant - Checkin Participant
+     * 
+     * By default, it will flip the value, but if value is in URL, set that value.
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiParticipantApiCheckinParticipant.QueryParameters & Paths.ParticipantsApiParticipantApiCheckinParticipant.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiParticipantApiCheckinParticipant.Responses.$200>
+  }
   ['/api/participants/{participant_id}/comments']: {
     /**
      * participants_api_participant_api_get_participant_comments - Get Participant Comments
@@ -3289,6 +3415,18 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ParticipantsApiRelayTeamApiReactivateRelayTeam.Responses.$201>
+  }
+  ['/api/relay_teams/{relay_team_id}/checkins/{checkin_id}']: {
+    /**
+     * participants_api_relay_team_api_checkin_relay_team - Checkin Relay Team
+     * 
+     * By default, it will flip the value, but if value is in URL, set that value.
+     */
+    'patch'(
+      parameters: Parameters<Paths.ParticipantsApiRelayTeamApiCheckinRelayTeam.QueryParameters & Paths.ParticipantsApiRelayTeamApiCheckinRelayTeam.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ParticipantsApiRelayTeamApiCheckinRelayTeam.Responses.$200>
   }
   ['/api/relay_teams/{relay_team_id}/participants']: {
     /**

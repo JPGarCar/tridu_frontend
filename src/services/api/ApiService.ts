@@ -8,20 +8,23 @@ import { getErrorObjectSchema } from "./apiError.ts";
 import definition from "./../../assets/openapi-runtime.json";
 import { ProviderContext } from "notistack";
 
+const api = new OpenAPIClientAxios({
+  definition: definition,
+  withServer: {
+    url: `${import.meta.env.VITE_API_URL}`,
+  },
+});
+
 export function useApiService(
   authService: AuthServiceProps,
   snackBarService: ProviderContext,
 ): ApiServiceProps {
-  const api = new OpenAPIClientAxios({
-    definition: definition,
-    withServer: {
-      url: `${import.meta.env.VITE_API_URL}`,
-    },
-  });
   const getApiClient = async (): Promise<Client> => {
     const client = await api.getClient<Client>();
 
     // thanks https://blog.theashishmaurya.me/handling-jwt-access-and-refresh-token-using-axios-in-react-app
+
+    client.interceptors.request.clear();
 
     // add auth token
     client.interceptors.request.use(
@@ -34,6 +37,8 @@ export function useApiService(
       },
       (error: AxiosError) => Promise.reject(error),
     );
+
+    client.interceptors.response.clear();
 
     // refresh token if error is 401
     client.interceptors.response.use(
@@ -76,7 +81,6 @@ export function useApiService(
           error.response.status < 500
         ) {
           const errorObjectSchema = getErrorObjectSchema(error.response.data);
-
           if (errorObjectSchema != null) {
             snackBarService.enqueueSnackbar(
               errorObjectSchema.title + ": " + errorObjectSchema.details,

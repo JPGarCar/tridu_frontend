@@ -1,5 +1,6 @@
 import { ChangeEventHandler, ReactNode } from "react";
 import {
+  Alert,
   Box,
   Checkbox,
   Chip,
@@ -146,8 +147,7 @@ function EditableRowStackMultiSelectField<T extends number | string>(props: {
               labelId={`label-for-${props.id}`}
               error={isError}
               label={props.label}
-              value={props.value}
-              //@ts-expect-error We know we will get a list of T
+              value={props.value ?? ""}
               renderValue={renderValues}
               onChange={props.onChange}
               variant="outlined"
@@ -263,7 +263,15 @@ function EditableRowStackSwitch(props: {
           size={"small"}
         />
       ) : (
-        <Typography>{props.checked ? "Yes" : "No"}</Typography>
+        <Typography>
+          {props.checked ? (
+            <Alert icon={false} severity={"success"}>
+              Yes
+            </Alert>
+          ) : (
+            <Alert severity={"error"}>No</Alert>
+          )}
+        </Typography>
       )}
     </Stack>
   );

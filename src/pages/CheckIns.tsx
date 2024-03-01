@@ -280,19 +280,23 @@ function CheckinInformationForm(props: {
       ),
   });
 
-  const CheckinPatchSchema = Yup.object({
-    name: Yup.string().required(),
-    positive_action: Yup.string().required(),
-    negative_action: Yup.string().required(),
-    depends_on: Yup.object().notRequired(),
-  });
+  //@ts-expect-error Unknown error here
+  const CheckinPatchSchema: Yup.ObjectSchema<Components.Schemas.PatchCheckInSchema> =
+    Yup.object({
+      name: Yup.string().required(),
+      positive_action: Yup.string().required(),
+      negative_action: Yup.string().required(),
+      depends_on: Yup.lazy(() =>
+        CheckinPatchSchema.default(null).notRequired(),
+      ).optional(),
+    });
 
   const initialValues = useMemo(() => {
     return {
       name: props.checkin.name,
       positive_action: props.checkin.positive_action,
       negative_action: props.checkin.negative_action,
-      depends_on: props.checkin.depends_on?.id,
+      depends_on: props.checkin.depends_on ?? null,
     };
   }, [props.checkin]);
 
@@ -312,15 +316,9 @@ function CheckinInformationForm(props: {
     onSubmit: async (values) => {
       const changedValues = getChangedValues(values, initialValues);
 
-      if ("depends_on" in changedValues && changedValues.depends_on) {
-        // @ts-expect-error We must return an object not an ID
-        changedValues.depends_on = getCheckInOption(changedValues.depends_on);
-      }
-
       const api = await getApiClient();
       const response = await api.checkins_api_update_checkin(
         { check_in_id: props.checkin.id ?? -1 },
-        //@ts-expect-error we know we changed the value to a CheckInSchema above
         changedValues,
       );
 
@@ -338,12 +336,6 @@ function CheckinInformationForm(props: {
       enqueueSnackbar("Changes canceled!", { variant: "warning" });
     }
     setIsEditing((prevState) => !prevState);
-  };
-
-  const getCheckInOption = (check_in_id: number) => {
-    if (checkinsQuery.data != undefined) {
-      return checkinsQuery.data.find((check_in) => check_in.id == check_in_id);
-    }
   };
 
   return (
@@ -375,18 +367,29 @@ function CheckinInformationForm(props: {
               error={formik.errors.negative_action}
               onChange={formik.handleChange}
             />
-            <EditableRowStackSelectField
-              label={"Depends On: "}
-              value={formik.values.depends_on}
-              valueLabel={
-                getCheckInOption(formik.values.depends_on ?? -1)?.name
-              }
-              editing={isEditing}
-              id={"depends_on"}
-              error={formik.errors.depends_on}
-              onChange={formik.handleChange}
-              options={options}
-            />
+            {checkinsQuery.isLoading ? (
+              <Skeleton />
+            ) : checkinsQuery.isError || checkinsQuery.data === undefined ? (
+              <>Error...</>
+            ) : (
+              <EditableRowStackSelectField
+                label={"Depends On:"}
+                value={formik.values.depends_on?.id ?? -1}
+                valueLabel={formik.values.depends_on?.name ?? ""}
+                editing={isEditing}
+                id={"depends_on"}
+                error={formik.errors.depends_on}
+                options={options}
+                onChange={(event) => {
+                  void formik.setFieldValue(
+                    "depends_on",
+                    checkinsQuery.data.find(
+                      (checkin) => checkin.id === event.target.value,
+                    ),
+                  );
+                }}
+              />
+            )}
           </Stack>
         </Grid>
         <Grid>

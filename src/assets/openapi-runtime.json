@@ -576,6 +576,29 @@
         "responses": {}
       }
     },
+    "/api/participants/{participant_id}/checkins/{checkin_id}": {
+      "patch": {
+        "operationId": "participants_api_participant_api_checkin_participant",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "checkin_id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "value",
+            "required": false
+          }
+        ],
+        "responses": {}
+      }
+    },
     "/api/participants/{participant_id}/comments": {
       "get": {
         "operationId": "participants_api_participant_api_get_participant_comments",
@@ -768,6 +791,29 @@
             "in": "path",
             "name": "relay_team_id",
             "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/relay_teams/{relay_team_id}/checkins/{checkin_id}": {
+      "patch": {
+        "operationId": "participants_api_relay_team_api_checkin_relay_team",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "checkin_id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "value",
+            "required": false
           }
         ],
         "responses": {}
