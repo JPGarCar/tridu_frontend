@@ -7,9 +7,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import AuthServiceProvider from "./context/AuthContext.tsx";
-import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+import {
+  createTheme,
+  CssBaseline,
+  IconButton,
+  ThemeProvider,
+} from "@mui/material";
 import ApiServiceProvider from "./context/ApiContext.tsx";
-import { SnackbarProvider } from "notistack";
+import { closeSnackbar, SnackbarProvider } from "notistack";
+import { CloseOutlined } from "@mui/icons-material";
 
 const queryClient = new QueryClient();
 
@@ -31,7 +37,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <QueryClientProvider client={queryClient}>
         <LocalizationProvider dateAdapter={AdapterLuxon}>
           <AuthServiceProvider>
-            <SnackbarProvider autoHideDuration={5000} preventDuplicate={true}>
+            <SnackbarProvider
+              autoHideDuration={5000}
+              action={(snackbarId) => (
+                <IconButton onClick={() => closeSnackbar(snackbarId)}>
+                  <CloseOutlined />
+                </IconButton>
+              )}
+            >
               <ApiServiceProvider>
                 <ThemeProvider theme={themeLight}>
                   <CssBaseline />
