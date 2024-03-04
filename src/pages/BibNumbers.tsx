@@ -1,7 +1,7 @@
 import Grid from "@mui/material/Unstable_Grid2";
 import { useQuery } from "@tanstack/react-query";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
-import { Container, Skeleton, Stack, Typography } from "@mui/material";
+import { Box, Container, Skeleton, Stack, Typography } from "@mui/material";
 import CustomCard from "../components/CustomCard.tsx";
 
 const BibNumbers = () => {
@@ -19,6 +19,9 @@ const BibNumbers = () => {
 
   return (
     <Container maxWidth={"xl"} sx={{ py: 2 }}>
+      <Box textAlign={"center"}>
+        <Typography>In use bib numbers by active participants only.</Typography>
+      </Box>
       <Grid container gap={2}>
         {raceTypesQuery.isLoading ? (
           <Skeleton />
@@ -36,7 +39,7 @@ const BibNumbers = () => {
                     <Typography>
                       Largest Bib #: {raceType.largest_bib}
                     </Typography>
-                    <Typography>Total Count: {raceType.count}</Typography>
+                    <Typography>Count: {raceType.count}</Typography>
                   </Stack>
                 </CustomCard>
               </Grid>
