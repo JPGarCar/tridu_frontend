@@ -41,6 +41,7 @@ import { TimePicker } from "@mui/x-date-pickers";
 import { DeleteSharp } from "@mui/icons-material";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
 import getChangedValues from "../services/helpers.ts";
+import { useConfirm } from "material-ui-confirm";
 
 const PoolOptions = [
   { key: "RECREATION", value: "Recreation" },
@@ -274,13 +275,14 @@ function AutoScheduleDialog(props: {
     }
   };
 
+  const handleCloseDialog = () => {
+    props.handleClose();
+    setGoodToSchedule(false);
+    setErrors([]);
+  };
+
   return (
-    <Dialog
-      open={props.isOpen}
-      onClose={() => {
-        props.handleClose();
-      }}
-    >
+    <Dialog open={props.isOpen} onClose={handleCloseDialog}>
       <DialogTitle>Heat Auto Schedule Wizzard</DialogTitle>
       <DialogContent>
         <Typography>
@@ -320,13 +322,7 @@ function AutoScheduleDialog(props: {
         ) : null}
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={() => {
-            props.handleClose();
-          }}
-        >
-          Cancel
-        </Button>
+        <Button onClick={handleCloseDialog}>Cancel</Button>
         <Button
           type={"button"}
           color={"success"}
@@ -351,6 +347,8 @@ function HeatListCard(props: {
   const queryClient = useQueryClient();
 
   const { enqueueSnackbar } = useSnackbar();
+
+  const confirm = useConfirm();
 
   const { getApiClient } = useApiServiceContext();
 
@@ -473,7 +471,19 @@ function HeatListCard(props: {
                       <Grid xs>
                         <IconButton
                           onClick={() => {
-                            void handleHeatDelete(heat.id ?? -1);
+                            confirm({
+                              title: `Delete Heat: ${heat.race_type.name} ${heat.name}`,
+                              description:
+                                "Are you sure you want to delete this Heat?",
+                              confirmationText: "Delete",
+                              confirmationButtonProps: { color: "error" },
+                            })
+                              .then(() => {
+                                void handleHeatDelete(heat.id ?? -1);
+                              })
+                              .catch(() => {
+                                // do nothing
+                              });
                           }}
                         >
                           <DeleteSharp color={"error"} />

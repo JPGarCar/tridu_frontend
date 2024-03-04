@@ -37,6 +37,7 @@ import * as Yup from "yup";
 import CustomCard from "../components/CustomCard.tsx";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
 import getChangedValues from "../services/helpers.ts";
+import { useConfirm } from "material-ui-confirm";
 
 function ParticipantPICard(props: { userId: string }) {
   const { enqueueSnackbar } = useSnackbar();
@@ -362,6 +363,8 @@ function ParticipantInformation(props: {
 
   const { getApiClient } = useApiServiceContext();
 
+  const confirm = useConfirm();
+
   const swimTimeCreator = (swimTime: string | null): string => {
     if (swimTime == null) {
       return "";
@@ -582,7 +585,18 @@ function ParticipantInformation(props: {
             <Button
               color={"error"}
               onClick={() => {
-                void deactivateParticipant();
+                confirm({
+                  title: "Deactivate Participant",
+                  description: `Are you sure you want to deactivate ${props.participant.user.first_name} ${props.participant.user.last_name}?`,
+                  confirmationText: "De-Activate",
+                  confirmationButtonProps: { color: "error" },
+                })
+                  .then(() => {
+                    void deactivateParticipant();
+                  })
+                  .catch(() => {
+                    // do nothing
+                  });
               }}
             >
               De-Activate
@@ -608,6 +622,8 @@ function RelayTeamInformation(props: {
   setRelayTeam: (arg0: Components.Schemas.RelayTeamSchema) => void;
 }) {
   const { enqueueSnackbar } = useSnackbar();
+
+  const confirm = useConfirm();
 
   const { getApiClient } = useApiServiceContext();
 
@@ -717,7 +733,16 @@ function RelayTeamInformation(props: {
               <Button
                 color={"error"}
                 onClick={() => {
-                  void deactivateRelayTeam();
+                  confirm({
+                    title: "Deactivate Relay Team",
+                    description: `Are you sure you want to deactivate ${props.relayTeam.name}?`,
+                    confirmationText: "De-Activate",
+                    confirmationButtonProps: { color: "error" },
+                  })
+                    .then(() => void deactivateRelayTeam())
+                    .catch(() => {
+                      // do nothing
+                    });
                 }}
               >
                 De-Activate
@@ -1029,6 +1054,8 @@ function RaceHeatField<T>(props: {
 }) {
   const { getApiClient } = useApiServiceContext();
 
+  const confirm = useConfirm();
+
   const [isEditing, setIsEditing] = useState(false);
 
   const raceHeatsQuery = useQuery({
@@ -1120,7 +1147,18 @@ function RaceHeatField<T>(props: {
       ) : (
         <Button
           onClick={() => {
-            void handleRemoveButton();
+            confirm({
+              title: "Remove Participant from Heat",
+              description: `Are you sure you want to remove this participant from heat ${props.heat?.name}`,
+              confirmationText: "Remove",
+              confirmationButtonProps: { color: "warning" },
+            })
+              .then(() => {
+                void handleRemoveButton();
+              })
+              .catch(() => {
+                // do nothing
+              });
           }}
           color={"warning"}
         >
@@ -1252,10 +1290,15 @@ function CheckinActionCard(props: {
 
       if (changeSuccessful) {
         setValue(newValue);
-        enqueueSnackbar("Changed Successful!", {
-          variant: "success",
-          autoHideDuration: 3000,
-        });
+        enqueueSnackbar(
+          newValue
+            ? `${props.checkin.name} ${props.checkin.positive_action} completed!`
+            : `${props.checkin.name} ${props.checkin.negative_action} complete!`,
+          {
+            variant: "success",
+            autoHideDuration: 3000,
+          },
+        );
       }
       setSendingRequest(false);
     }
@@ -1279,7 +1322,9 @@ function CheckinActionCard(props: {
               color={"primary"}
               value={value}
               exclusive
-              onChange={handleChange}
+              onChange={(event, value: boolean | null) => {
+                void handleChange(event, value);
+              }}
             >
               <ToggleButton value={false} disabled={sendingRequest}>
                 {props.checkin.negative_action}

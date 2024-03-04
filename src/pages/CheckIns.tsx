@@ -31,6 +31,7 @@ import { useNavigate } from "react-router-dom";
 import { DeleteSharp } from "@mui/icons-material";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
 import getChangedValues from "../services/helpers.ts";
+import { useConfirm } from "material-ui-confirm";
 
 function CreateCheckInDialog(props: {
   isOpen: boolean;
@@ -163,6 +164,8 @@ function CheckInListCard(props: {
 
   const { getApiClient } = useApiServiceContext();
 
+  const confirm = useConfirm();
+
   const checkinsQuery = useQuery({
     queryKey: ["checkinsQuery"],
     queryFn: () =>
@@ -173,7 +176,7 @@ function CheckInListCard(props: {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleHeatDelete = async (checkinId: number) => {
+  const handleCheckinDelete = async (checkinId: number) => {
     const api = await getApiClient();
     await api.checkins_api_delete_checkin({ check_in_id: checkinId });
 
@@ -247,7 +250,19 @@ function CheckInListCard(props: {
                     <Grid xs>
                       <IconButton
                         onClick={() => {
-                          void handleHeatDelete(checkin.id ?? -1);
+                          confirm({
+                            title: `Delete CheckIn: ${checkin.name}`,
+                            description:
+                              "Are you sure you want to delete this CheckIn?",
+                            confirmationText: "Delete",
+                            confirmationButtonProps: { color: "error" },
+                          })
+                            .then(() => {
+                              void handleCheckinDelete(checkin.id ?? -1);
+                            })
+                            .catch(() => {
+                              // do nothing
+                            });
                         }}
                       >
                         <DeleteSharp color={"error"} />

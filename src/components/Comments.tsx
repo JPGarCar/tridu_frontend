@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 import { Delete } from "@mui/icons-material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useSnackbar } from "notistack";
+import { useConfirm } from "material-ui-confirm";
 function CommentCard(props: {
   comment: {
     creation_date: string;
@@ -16,6 +17,8 @@ function CommentCard(props: {
   const dateCreated = DateTime.fromISO(props.comment.creation_date);
 
   const { enqueueSnackbar } = useSnackbar();
+
+  const confirm = useConfirm();
 
   const handleOnClickDelete = async () => {
     if (props.comment.id) {
@@ -42,7 +45,18 @@ function CommentCard(props: {
         <IconButton
           size={"small"}
           onClick={() => {
-            void handleOnClickDelete();
+            confirm({
+              title: "Delete Comment",
+              description: "Are you sure you want to delete this comment?",
+              confirmationText: "Delete",
+              confirmationButtonProps: { color: "error" },
+            })
+              .then(() => {
+                void handleOnClickDelete();
+              })
+              .catch(() => {
+                // nothing
+              });
           }}
         >
           <Delete fontSize={"small"} />

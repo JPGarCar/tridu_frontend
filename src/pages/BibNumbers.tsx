@@ -36,7 +36,7 @@ const BibNumbers = () => {
                     <Typography>
                       Largest Bib #: {raceType.largest_bib}
                     </Typography>
-                    <Typography>Count: {raceType.count}</Typography>
+                    <Typography>Total Count: {raceType.count}</Typography>
                   </Stack>
                 </CustomCard>
               </Grid>

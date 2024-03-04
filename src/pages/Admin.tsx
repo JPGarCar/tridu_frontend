@@ -22,6 +22,7 @@ import { Components } from "../services/api/openapi";
 import { useQuery } from "@tanstack/react-query";
 
 import * as Yup from "yup";
+import { useConfirm } from "material-ui-confirm";
 
 const race_id = 1;
 
@@ -29,6 +30,8 @@ function RaceParticipantMassPatch() {
   const { getApiClient } = useApiServiceContext();
 
   const { enqueueSnackbar } = useSnackbar();
+
+  const confirm = useConfirm();
 
   const schema = Yup.object({
     race: Yup.object().required(),
@@ -175,7 +178,34 @@ function RaceParticipantMassPatch() {
           />
         </Grid>
         <Grid>
-          <Button variant="contained" type={"submit"} color={"success"}>
+          <Button
+            variant="contained"
+            color={"success"}
+            onClick={() => {
+              void formik
+                .validateForm()
+                .then((errors) => {
+                  if (Object.keys(errors).length === 0) {
+                    confirm({
+                      title: "Confirm Change",
+                      description:
+                        "Are you sure you want to do this change? This is not reversible.",
+                      confirmationText: "Change",
+                      confirmationButtonProps: { color: "success" },
+                    })
+                      .then(() => {
+                        void formik.submitForm();
+                      })
+                      .catch(() => {
+                        // do nothing
+                      });
+                  }
+                })
+                .catch(() => {
+                  // do nothing
+                });
+            }}
+          >
             Change
           </Button>
         </Grid>
