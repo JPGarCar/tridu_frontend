@@ -303,6 +303,17 @@ const Admin = () => {
     saveAs(file);
   };
 
+  const transferHeatsToWetbagSystem = async () => {
+    const api = await getApiClient();
+    const response = await api.wetbags_api_transfer_heats_to_wetbag_system({
+      race_id: race_id,
+    });
+
+    enqueueSnackbar(`${response.data} heats transferred to Wetbag system.`, {
+      variant: "success",
+    });
+  };
+
   return (
     <Box sx={{ m: 2 }}>
       <Typography>Actions</Typography>
@@ -355,6 +366,16 @@ const Admin = () => {
             variant={"contained"}
           >
             Download Participant Email Info
+          </Button>
+        </Grid>
+        <Grid>
+          <Button
+            onClick={() => {
+              void transferHeatsToWetbagSystem();
+            }}
+            variant={"contained"}
+          >
+            Transfer Heats to Wetbag System
           </Button>
         </Grid>
         <Grid>

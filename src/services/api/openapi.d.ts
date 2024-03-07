@@ -2730,6 +2730,23 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
+    namespace WetbagsApiTransferHeatsToWetbagSystem {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = number;
+        }
+    }
     namespace WetbagsApiUpdateParticipantWetbag {
         namespace Parameters {
             /**
@@ -3357,6 +3374,14 @@ export interface OperationMethods {
     data?: Paths.WetbagsApiUpdateParticipantWetbag.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.WetbagsApiUpdateParticipantWetbag.Responses.$200>
+  /**
+   * wetbags_api_transfer_heats_to_wetbag_system - Transfer Heats To Wetbag System
+   */
+  'wetbags_api_transfer_heats_to_wetbag_system'(
+    parameters: Parameters<Paths.WetbagsApiTransferHeatsToWetbagSystem.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.WetbagsApiTransferHeatsToWetbagSystem.Responses.$200>
   /**
    * wetbags_api_can_relay_team_have_wetbag - Can Relay Team Have Wetbag
    */
@@ -4111,6 +4136,16 @@ export interface PathsDictionary {
       data?: Paths.WetbagsApiUpdateParticipantWetbag.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.WetbagsApiUpdateParticipantWetbag.Responses.$200>
+  }
+  ['/api/wetbags/heats/transfer/{race_id}']: {
+    /**
+     * wetbags_api_transfer_heats_to_wetbag_system - Transfer Heats To Wetbag System
+     */
+    'post'(
+      parameters: Parameters<Paths.WetbagsApiTransferHeatsToWetbagSystem.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.WetbagsApiTransferHeatsToWetbagSystem.Responses.$200>
   }
   ['/api/wetbags/relay_team/{relay_team_id}/can_have_wetbag']: {
     /**

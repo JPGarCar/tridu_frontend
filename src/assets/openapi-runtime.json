@@ -1116,6 +1116,19 @@
         }
       }
     },
+    "/api/wetbags/heats/transfer/{race_id}": {
+      "post": {
+        "operationId": "wetbags_api_transfer_heats_to_wetbag_system",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
     "/api/wetbags/relay_team/{relay_team_id}/can_have_wetbag": {
       "get": {
         "operationId": "wetbags_api_can_relay_team_have_wetbag",
