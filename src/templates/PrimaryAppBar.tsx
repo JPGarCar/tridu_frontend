@@ -16,7 +16,7 @@ import UserSearchAutocomplete from "../components/UserSearchAutocomplete.tsx";
 import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Unstable_Grid2";
 import { KeyboardArrowDown, MenuSharp } from "@mui/icons-material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const menuItems = [
   { title: "Heats", url: "/heats" },
@@ -32,7 +32,7 @@ const adminMenuItems = [
 ];
 
 const PrimaryAppBar = () => {
-  const { isLoggedIn } = useAuthServiceContext();
+  const { isLoggedIn, loggedInUser } = useAuthServiceContext();
 
   const navigator = useNavigate();
 
@@ -41,6 +41,16 @@ const PrimaryAppBar = () => {
   const [adminAnchorElNav, setAdminAnchorElNav] = useState<null | HTMLElement>(
     null,
   );
+
+  const isStaff = useMemo(() => {
+    if (loggedInUser != null) {
+      return (
+        (loggedInUser.is_staff ?? false) || (loggedInUser.is_superuser ?? false)
+      );
+    }
+
+    return false;
+  }, [loggedInUser]);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -75,7 +85,7 @@ const PrimaryAppBar = () => {
               <Typography variant="h6">TriDu App</Typography>
             </ButtonBase>
           </Grid>
-          {isLoggedIn ? (
+          {isLoggedIn && isStaff ? (
             <>
               <Grid display={{ xs: "none", md: "flex" }} spacing={2} container>
                 {menuItems.map(({ title, url }, index) => {

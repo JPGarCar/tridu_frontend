@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { useApiServiceContext } from "../context/ApiContext.tsx";
 import ParticipantSearchAutocomplete from "../components/ParticipantSearchAutocomplete.tsx";
 import { ChangeEvent, useMemo, useState } from "react";
+import { useAuthServiceContext } from "../context/AuthContext.tsx";
 
 const refetchInterval = 60000; // 60 seconds
 const perPageCount = 10;
@@ -206,15 +207,13 @@ function InvalidSwiMTimeParticipantsListCard(props: { race_id: number }) {
   );
 }
 
-const Dashboard = () => {
-  const race_id = 1;
-
+function StaffDashboard(props: { race_id: number }) {
   const navigate = useNavigate();
 
   const { getApiClient } = useApiServiceContext();
 
   const recentEditedParticipantsQuery = useQuery({
-    queryKey: ["recentEditedParticipantsQuery", race_id],
+    queryKey: ["recentEditedParticipantsQuery", props.race_id],
     queryFn: () =>
       getApiClient()
         .then((api) =>
@@ -225,16 +224,157 @@ const Dashboard = () => {
   });
 
   const raceStatsQuery = useQuery({
-    queryKey: ["raceStatsQuery", race_id],
+    queryKey: ["raceStatsQuery", props.race_id],
     queryFn: () =>
       getApiClient()
         .then((api) =>
           api.race_api_race_api_get_race_stats({
-            race_id: race_id,
+            race_id: props.race_id,
           }),
         )
         .then((res) => res.data),
   });
+
+  return (
+    <Grid container columnSpacing={2} rowSpacing={2}>
+      <Grid xs={9}>
+        <CustomCard title={"Race Stats"}>
+          {raceStatsQuery.isLoading ? (
+            <Skeleton />
+          ) : raceStatsQuery.isError || raceStatsQuery.data == undefined ? (
+            <>Error...</>
+          ) : (
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableCell>Race Type</TableCell>
+                  <TableCell>Allowed</TableCell>
+                  <TableCell>Registered</TableCell>
+                  <TableCell>Open Spots</TableCell>
+                  <TableCell>FTT Allowed</TableCell>
+                  <TableCell>FTT Registered</TableCell>
+                  <TableCell>FTT Open Spots</TableCell>
+                </TableHead>
+                <TableBody>
+                  {raceStatsQuery.data.map((stat) => {
+                    const allowedLeft = stat.allowed - stat.registered;
+                    const fttAllowedLeft =
+                      stat.ftt_allowed - stat.ftt_registered;
+
+                    const greenBackground = {
+                      backgroundColor: "lightgreen",
+                      border: 1,
+                    };
+                    const yellowBackground = {
+                      backgroundColor: "lightyellow",
+                      border: 1,
+                    };
+                    const redBackground = {
+                      backgroundColor: "lightsalmon",
+                      border: 1,
+                    };
+
+                    const normalColor =
+                      allowedLeft == 0
+                        ? greenBackground
+                        : allowedLeft > 0
+                          ? yellowBackground
+                          : redBackground;
+
+                    const fttColor =
+                      fttAllowedLeft == 0
+                        ? greenBackground
+                        : fttAllowedLeft > 0
+                          ? yellowBackground
+                          : redBackground;
+
+                    return (
+                      <TableRow key={stat.race_type.id}>
+                        <TableCell component="th" scope={"row"}>
+                          {stat.race_type.name}
+                        </TableCell>
+                        <TableCell sx={normalColor}>{stat.allowed}</TableCell>
+                        <TableCell sx={normalColor}>
+                          {stat.registered}
+                        </TableCell>
+                        <TableCell sx={normalColor}>{allowedLeft}</TableCell>
+                        <TableCell sx={fttColor}>{stat.ftt_allowed}</TableCell>
+                        <TableCell sx={fttColor}>
+                          {stat.ftt_registered}
+                        </TableCell>
+                        <TableCell sx={fttColor}>{fttAllowedLeft}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </CustomCard>
+      </Grid>
+      <Grid xs={3}>
+        <CustomCard title={"Recently Edited Participants"}>
+          {recentEditedParticipantsQuery.isLoading ? (
+            <Skeleton />
+          ) : recentEditedParticipantsQuery.isError ||
+            recentEditedParticipantsQuery.data == undefined ? (
+            <>Error...</>
+          ) : (
+            <Stack spacing={1.5}>
+              {recentEditedParticipantsQuery.data.length == 0 ? (
+                <Container>No Participants Recently Edited</Container>
+              ) : (
+                recentEditedParticipantsQuery.data.map((participant) => {
+                  return (
+                    <Card key={participant.id}>
+                      <ButtonBase
+                        sx={{ width: "100%" }}
+                        onClick={() => {
+                          navigate(`/participants/${participant.user.id}`);
+                        }}
+                      >
+                        <Box sx={{ m: 1.5 }}>
+                          <Typography>
+                            {participant.bib_number} |{" "}
+                            {participant.user.first_name}{" "}
+                            {participant.user.last_name}
+                          </Typography>
+                        </Box>
+                      </ButtonBase>
+                    </Card>
+                  );
+                })
+              )}
+            </Stack>
+          )}
+        </CustomCard>
+      </Grid>
+      <Grid>
+        <InactiveParticipantsListCard race_id={props.race_id} />
+      </Grid>
+      <Grid>
+        <InvalidSwiMTimeParticipantsListCard race_id={props.race_id} />
+      </Grid>
+    </Grid>
+  );
+}
+
+const Dashboard = () => {
+  const race_id = 1;
+
+  const { getApiClient } = useApiServiceContext();
+
+  const { loggedInUser } = useAuthServiceContext();
+
+  const isStaff = useMemo(() => {
+    if (loggedInUser != null) {
+      return (
+        (loggedInUser.is_staff ?? false) || (loggedInUser.is_superuser ?? false)
+      );
+    }
+
+    return false;
+  }, [loggedInUser]);
 
   const raceQuery = useQuery({
     queryKey: ["race"],
@@ -262,129 +402,7 @@ const Dashboard = () => {
           <ParticipantSearchAutocomplete />
         </Grid>
       </Grid>
-
-      <Grid container columnSpacing={2} rowSpacing={2}>
-        <Grid xs={9}>
-          <CustomCard title={"Race Stats"}>
-            {raceStatsQuery.isLoading ? (
-              <Skeleton />
-            ) : raceStatsQuery.isError || raceStatsQuery.data == undefined ? (
-              <>Error...</>
-            ) : (
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableCell>Race Type</TableCell>
-                    <TableCell>Allowed</TableCell>
-                    <TableCell>Registered</TableCell>
-                    <TableCell>Open Spots</TableCell>
-                    <TableCell>FTT Allowed</TableCell>
-                    <TableCell>FTT Registered</TableCell>
-                    <TableCell>FTT Open Spots</TableCell>
-                  </TableHead>
-                  <TableBody>
-                    {raceStatsQuery.data.map((stat) => {
-                      const allowedLeft = stat.allowed - stat.registered;
-                      const fttAllowedLeft =
-                        stat.ftt_allowed - stat.ftt_registered;
-
-                      const greenBackground = {
-                        backgroundColor: "lightgreen",
-                        border: 1,
-                      };
-                      const yellowBackground = {
-                        backgroundColor: "lightyellow",
-                        border: 1,
-                      };
-                      const redBackground = {
-                        backgroundColor: "lightsalmon",
-                        border: 1,
-                      };
-
-                      const normalColor =
-                        allowedLeft == 0
-                          ? greenBackground
-                          : allowedLeft > 0
-                            ? yellowBackground
-                            : redBackground;
-
-                      const fttColor =
-                        fttAllowedLeft == 0
-                          ? greenBackground
-                          : fttAllowedLeft > 0
-                            ? yellowBackground
-                            : redBackground;
-
-                      return (
-                        <TableRow key={stat.race_type.id}>
-                          <TableCell component="th" scope={"row"}>
-                            {stat.race_type.name}
-                          </TableCell>
-                          <TableCell sx={normalColor}>{stat.allowed}</TableCell>
-                          <TableCell sx={normalColor}>
-                            {stat.registered}
-                          </TableCell>
-                          <TableCell sx={normalColor}>{allowedLeft}</TableCell>
-                          <TableCell sx={fttColor}>
-                            {stat.ftt_allowed}
-                          </TableCell>
-                          <TableCell sx={fttColor}>
-                            {stat.ftt_registered}
-                          </TableCell>
-                          <TableCell sx={fttColor}>{fttAllowedLeft}</TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </CustomCard>
-        </Grid>
-        <Grid xs={3}>
-          <CustomCard title={"Recently Edited Participants"}>
-            {recentEditedParticipantsQuery.isLoading ? (
-              <Skeleton />
-            ) : recentEditedParticipantsQuery.isError ||
-              recentEditedParticipantsQuery.data == undefined ? (
-              <>Error...</>
-            ) : (
-              <Stack spacing={1.5}>
-                {recentEditedParticipantsQuery.data.length == 0 ? (
-                  <Container>No Participants Recently Edited</Container>
-                ) : (
-                  recentEditedParticipantsQuery.data.map((participant) => {
-                    return (
-                      <Card key={participant.id}>
-                        <ButtonBase
-                          sx={{ width: "100%" }}
-                          onClick={() => {
-                            navigate(`/participants/${participant.user.id}`);
-                          }}
-                        >
-                          <Box sx={{ m: 1.5 }}>
-                            <Typography>
-                              {participant.bib_number} |{" "}
-                              {participant.user.first_name}{" "}
-                              {participant.user.last_name}
-                            </Typography>
-                          </Box>
-                        </ButtonBase>
-                      </Card>
-                    );
-                  })
-                )}
-              </Stack>
-            )}
-          </CustomCard>
-        </Grid>
-        <Grid>
-          <InactiveParticipantsListCard race_id={race_id} />
-        </Grid>
-        <Grid>
-          <InvalidSwiMTimeParticipantsListCard race_id={race_id} />
-        </Grid>
-      </Grid>
+      {isStaff ? <StaffDashboard race_id={race_id} /> : <></>}
     </Stack>
   );
 };

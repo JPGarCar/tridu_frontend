@@ -1421,9 +1421,9 @@ function WetBagActions(props: {
         void handleChange(event, value);
       }}
     >
-      {options.map((option) => {
+      {options.map((option, index) => {
         return (
-          <ToggleButton value={option} disabled={sendingRequest}>
+          <ToggleButton value={option} disabled={sendingRequest} key={index}>
             {option}
           </ToggleButton>
         );
@@ -2051,9 +2051,9 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
                         (relayTeamParticipant) =>
                           relayTeamParticipant.id != props.relayParticipantId,
                       )
-                      .map((relayTeamParticipant) => {
+                      .map((relayTeamParticipant, index) => {
                         return (
-                          <Card>
+                          <Card key={index}>
                             <ButtonBase
                               sx={{ width: "100%", justifyContent: "start" }}
                               onClick={() => {

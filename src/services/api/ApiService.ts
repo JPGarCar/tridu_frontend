@@ -50,8 +50,15 @@ export function useApiService(
           return Promise.reject(error);
         }
 
-        if (error.response != undefined && error.response.status === 401) {
+        if (
+          error.response != undefined &&
+          error.response.status === 401 &&
+          // @ts-expect-error we expect an error
+          !originalRequest._retry
+        ) {
           try {
+            // @ts-expect-error we expect an error
+            originalRequest._retry = true;
             const refreshToken = localStorage.getItem("jwt_refreshToken");
             const response = await axios.post(
               `${import.meta.env.VITE_API_URL}/api/token/refresh/`,

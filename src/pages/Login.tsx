@@ -11,7 +11,7 @@ const loginSchema = Yup.object({
 });
 
 const Login = () => {
-  const { login, isLoggedIn } = useAuthServiceContext();
+  const { login, isLoggedIn, loggedInUser } = useAuthServiceContext();
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -39,7 +39,7 @@ const Login = () => {
     },
   });
 
-  if (isLoggedIn) {
+  if (isLoggedIn && loggedInUser != null) {
     return <Navigate to={"/"} />;
   }
 
