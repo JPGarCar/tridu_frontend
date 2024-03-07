@@ -66,7 +66,10 @@ function CreateHeatDialog(props: {
     termination: Yup.string()
       .required("Required!")
       .length(1, "Length must be 1!"),
-    color: Yup.string(),
+    color: Yup.string().matches(
+      /^#(?:[0-9a-fA-F]{3}){1,2}$/,
+      "Must be a valid HEX code like #RRGGBB",
+    ),
     startDateTime: Yup.date().required("Required!"),
     idealCapacity: Yup.number().required("Required!").min(0, "Min value is 0!"),
     pool: Yup.string().notRequired(),
@@ -511,7 +514,10 @@ function HeatInformationForm(props: {
 
   const HeatFormSchema = Yup.object({
     termination: Yup.string().length(1, "Length must be 1!"),
-    color: Yup.string(),
+    color: Yup.string().matches(
+      /^#(?:[0-9a-fA-F]{3}){1,2}$/,
+      "Must be a valid HEX code like #RRGGBB",
+    ),
     start_datetime: Yup.date().required(),
     ideal_capacity: Yup.number().required().min(0, "Min value is 0!"),
     pool: Yup.string().notRequired(),

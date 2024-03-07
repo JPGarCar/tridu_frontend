@@ -1083,6 +1083,90 @@
         ],
         "responses": {}
       }
+    },
+    "/api/wetbags/": {
+      "post": {
+        "operationId": "wetbags_api_create_participant_wetbag",
+        "parameters": [],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/wetbags/{wetbag_id}/update": {
+      "patch": {
+        "operationId": "wetbags_api_update_participant_wetbag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wetbag_id",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/wetbags/relay_team/{relay_team_id}/can_have_wetbag": {
+      "get": {
+        "operationId": "wetbags_api_can_relay_team_have_wetbag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/wetbags/relay_team/{relay_team_id}": {
+      "get": {
+        "operationId": "wetbags_api_get_relay_team_wetbag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relay_team_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/wetbags/{participant_id}/can_have_wetbag": {
+      "get": {
+        "operationId": "wetbags_api_can_participant_have_wetbag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/wetbags/{participant_id}": {
+      "get": {
+        "operationId": "wetbags_api_get_participant_wetbag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "participant_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
     }
   },
   "components": {},

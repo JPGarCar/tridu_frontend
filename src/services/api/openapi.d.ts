@@ -72,31 +72,6 @@ declare namespace Components {
             date_changed: string; // date-time
         }
         /**
-         * CheckinLessRaceTypeSchema
-         */
-        export interface CheckinLessRaceTypeSchema {
-            /**
-             * ID
-             */
-            id?: /* ID */ number | null;
-            /**
-             * Name
-             */
-            name: string;
-            /**
-             * Participants Allowed
-             */
-            participants_allowed?: number;
-            /**
-             * Ftt Allowed
-             */
-            ftt_allowed?: number;
-            /**
-             * Needs Swim Time
-             */
-            needs_swim_time?: boolean;
-        }
-        /**
          * CreateCheckInSchema
          */
         export interface CreateCheckInSchema {
@@ -132,11 +107,11 @@ declare namespace Components {
             start_datetime: string; // date-time
             /**
              * HEX Color Code
-             * Color hex code with #
+             * Color hex code with 0x including opacity.
              */
             color?: /**
              * HEX Color Code
-             * Color hex code with #
+             * Color hex code with 0x including opacity.
              */
             string | null;
             /**
@@ -349,58 +324,97 @@ declare namespace Components {
             gender?: string;
         }
         /**
-         * DownloadInfoParticipantSchema
+         * CreateWetbagSchema
          */
-        export interface DownloadInfoParticipantSchema {
-            origin?: /* LocationSchema */ LocationSchema | null;
-            race_type: /* CheckinLessRaceTypeSchema */ CheckinLessRaceTypeSchema;
-            user: /* UserSchema */ UserSchema;
+        export interface CreateWetbagSchema {
             /**
-             * ID
+             * Participant Id
              */
-            id?: /* ID */ number | null;
+            participant_id: number;
+            /**
+             * Race Id
+             */
+            race_id: number;
             /**
              * Bib Number
              */
             bib_number: number;
             /**
-             * Is First Time Triathlete
+             * Heat Id
              */
-            is_ftt?: boolean;
+            heat_id: number;
+            /**
+             * WetbagStatus
+             * Possible states of a wetbag.
+             */
+            status?: "Never Received" | "Received" | "Requested" | "Picked Up";
+        }
+        /**
+         * DownloadHeatSchema
+         */
+        export interface DownloadHeatSchema {
+            race_type: /* DownloadRaceTypeSchema */ DownloadRaceTypeSchema;
+            /**
+             * Name
+             */
+            name: string;
+            /**
+             * Participant Count
+             */
+            participant_count: number;
+            /**
+             * Avg Swim Time
+             */
+            avg_swim_time: string;
+            /**
+             * Start Time
+             */
+            start_time: string;
+            /**
+             * HEX Color Code
+             * Color hex code with 0x including opacity.
+             */
+            color: string;
+            /**
+             * Ideal Capacity
+             */
+            ideal_capacity?: number;
+            /**
+             * Pool
+             */
+            pool?: /* Pool */ string | null;
+        }
+        /**
+         * DownloadInfoParticipantSchema
+         */
+        export interface DownloadInfoParticipantSchema {
+            origin?: /* DownloadLocationSchema */ DownloadLocationSchema | null;
+            race_type: /* DownloadRaceTypeSchema */ DownloadRaceTypeSchema;
+            user: /* DownloadUserSchema */ DownloadUserSchema;
+            heat?: /* DownloadHeatSchema */ DownloadHeatSchema | null;
+            /**
+             * Swim Time
+             */
+            swim_time?: /* Swim Time */ string | null;
+            /**
+             * Bib Number
+             */
+            bib_number: number;
             /**
              * Team Name
              */
             team?: /* Team Name */ string | null;
             /**
-             * Swim Time
-             */
-            swim_time?: /* Swim Time */ string /* duration */ | null;
-            /**
-             * Is Active
-             */
-            is_active?: boolean;
-            /**
              * Location
              */
             location?: /* Location */ string | null;
-            /**
-             * Waiver Signed
-             */
-            waiver_signed?: boolean;
         }
         /**
          * DownloadInfoRelayTeamSchema
          */
         export interface DownloadInfoRelayTeamSchema {
-            race_type: /* RaceTypeSchema */ RaceTypeSchema;
-            /**
-             * ID
-             */
-            id?: /* ID */ number | null;
-            /**
-             * Is Active
-             */
-            is_active?: boolean;
+            race_type: /* DownloadRaceTypeSchema */ DownloadRaceTypeSchema;
+            heat?: /* DownloadHeatSchema */ DownloadHeatSchema | null;
             /**
              * Bib Number
              */
@@ -409,6 +423,57 @@ declare namespace Components {
              * Relay Team Name
              */
             name: string;
+        }
+        /**
+         * DownloadLocationSchema
+         */
+        export interface DownloadLocationSchema {
+            /**
+             * City
+             */
+            city: string;
+            /**
+             * Province
+             */
+            province: string;
+            /**
+             * Country
+             */
+            country: string;
+        }
+        /**
+         * DownloadRaceTypeSchema
+         */
+        export interface DownloadRaceTypeSchema {
+            /**
+             * Name
+             */
+            name: string;
+        }
+        /**
+         * DownloadUserSchema
+         */
+        export interface DownloadUserSchema {
+            /**
+             * First Name
+             */
+            first_name?: /* First Name */ string | null;
+            /**
+             * Last Name
+             */
+            last_name?: /* Last Name */ string | null;
+            /**
+             * Email Address
+             */
+            email?: /* Email Address */ string | null;
+            /**
+             * Date Of Birth
+             */
+            date_of_birth?: /* Date Of Birth */ string /* date */ | null;
+            /**
+             * Gender
+             */
+            gender?: string;
         }
         /**
          * ErrorObjectSchema
@@ -460,7 +525,7 @@ declare namespace Components {
             start_datetime: string; // date-time
             /**
              * HEX Color Code
-             * Color hex code with #
+             * Color hex code with 0x including opacity.
              */
             color: string;
             /**
@@ -699,11 +764,11 @@ declare namespace Components {
             start_datetime?: /* Start Datetime */ string /* date-time */ | null;
             /**
              * HEX Color Code
-             * Color hex code with #
+             * Color hex code with 0x including opacity.
              */
             color?: /**
              * HEX Color Code
-             * Color hex code with #
+             * Color hex code with 0x including opacity.
              */
             string | null;
             /**
@@ -1018,6 +1083,20 @@ declare namespace Components {
             name: string;
         }
         /**
+         * UpdateWetbagSchema
+         */
+        export interface UpdateWetbagSchema {
+            status?: /**
+             * WetbagStatus
+             * Possible states of a wetbag.
+             */
+            WetbagStatus | null;
+            /**
+             * Heat Id
+             */
+            heat_id?: /* Heat Id */ number | null;
+        }
+        /**
          * UserSchema
          */
         export interface UserSchema {
@@ -1070,6 +1149,53 @@ declare namespace Components {
              */
             is_superuser?: boolean;
         }
+        /**
+         * WetbagSchema
+         */
+        export interface WetbagSchema {
+            /**
+             * Participant Id
+             */
+            participant_id: number;
+            /**
+             * Race Id
+             */
+            race_id: number;
+            /**
+             * Bib Number
+             */
+            bib_number: number;
+            /**
+             * Heat Id
+             */
+            heat_id: number;
+            /**
+             * Color
+             */
+            color: string;
+            /**
+             * Requested Datetime
+             */
+            requested_datetime: string; // date-time
+            /**
+             * Changed Datetime
+             */
+            changed_datetime: string; // date-time
+            status: /**
+             * WetbagStatus
+             * Possible states of a wetbag.
+             */
+            WetbagStatus;
+            /**
+             * Id
+             */
+            id: string;
+        }
+        /**
+         * WetbagStatus
+         * Possible states of a wetbag.
+         */
+        export type WetbagStatus = "Never Received" | "Received" | "Requested" | "Picked Up";
     }
 }
 declare namespace Paths {
@@ -2501,6 +2627,129 @@ declare namespace Paths {
             Components.Schemas.ErrorObjectSchema;
         }
     }
+    namespace WetbagsApiCanParticipantHaveWetbag {
+        namespace Parameters {
+            /**
+             * Participant Id
+             */
+            export type ParticipantId = number;
+        }
+        export interface PathParameters {
+            participant_id: /* Participant Id */ Parameters.ParticipantId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = boolean;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace WetbagsApiCanRelayTeamHaveWetbag {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = boolean;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace WetbagsApiCreateParticipantWetbag {
+        export type RequestBody = /* CreateWetbagSchema */ Components.Schemas.CreateWetbagSchema;
+        namespace Responses {
+            export type $200 = /* WetbagSchema */ Components.Schemas.WetbagSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace WetbagsApiGetParticipantWetbag {
+        namespace Parameters {
+            /**
+             * Participant Id
+             */
+            export type ParticipantId = number;
+        }
+        export interface PathParameters {
+            participant_id: /* Participant Id */ Parameters.ParticipantId;
+        }
+        namespace Responses {
+            export type $200 = /* WetbagSchema */ Components.Schemas.WetbagSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace WetbagsApiGetRelayTeamWetbag {
+        namespace Parameters {
+            /**
+             * Relay Team Id
+             */
+            export type RelayTeamId = number;
+        }
+        export interface PathParameters {
+            relay_team_id: /* Relay Team Id */ Parameters.RelayTeamId;
+        }
+        namespace Responses {
+            export type $200 = /* WetbagSchema */ Components.Schemas.WetbagSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+            export type $409 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace WetbagsApiUpdateParticipantWetbag {
+        namespace Parameters {
+            /**
+             * Wetbag Id
+             */
+            export type WetbagId = string;
+        }
+        export interface PathParameters {
+            wetbag_id: /* Wetbag Id */ Parameters.WetbagId;
+        }
+        export type RequestBody = /* UpdateWetbagSchema */ Components.Schemas.UpdateWetbagSchema;
+        namespace Responses {
+            export type $200 = /* WetbagSchema */ Components.Schemas.WetbagSchema;
+            export type $404 = /**
+             * ErrorObjectSchema
+             * Schema for the error object as described in decisions_api.md
+             */
+            Components.Schemas.ErrorObjectSchema;
+        }
+    }
 }
 
 export interface OperationMethods {
@@ -3092,6 +3341,54 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CheckinsApiDeleteCheckin.Responses.$204>
+  /**
+   * wetbags_api_create_participant_wetbag - Create Participant Wetbag
+   */
+  'wetbags_api_create_participant_wetbag'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: Paths.WetbagsApiCreateParticipantWetbag.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.WetbagsApiCreateParticipantWetbag.Responses.$200>
+  /**
+   * wetbags_api_update_participant_wetbag - Update Participant Wetbag
+   */
+  'wetbags_api_update_participant_wetbag'(
+    parameters: Parameters<Paths.WetbagsApiUpdateParticipantWetbag.PathParameters>,
+    data?: Paths.WetbagsApiUpdateParticipantWetbag.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.WetbagsApiUpdateParticipantWetbag.Responses.$200>
+  /**
+   * wetbags_api_can_relay_team_have_wetbag - Can Relay Team Have Wetbag
+   */
+  'wetbags_api_can_relay_team_have_wetbag'(
+    parameters: Parameters<Paths.WetbagsApiCanRelayTeamHaveWetbag.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.WetbagsApiCanRelayTeamHaveWetbag.Responses.$200>
+  /**
+   * wetbags_api_get_relay_team_wetbag - Get Relay Team Wetbag
+   */
+  'wetbags_api_get_relay_team_wetbag'(
+    parameters: Parameters<Paths.WetbagsApiGetRelayTeamWetbag.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.WetbagsApiGetRelayTeamWetbag.Responses.$200>
+  /**
+   * wetbags_api_can_participant_have_wetbag - Can Participant Have Wetbag
+   */
+  'wetbags_api_can_participant_have_wetbag'(
+    parameters: Parameters<Paths.WetbagsApiCanParticipantHaveWetbag.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.WetbagsApiCanParticipantHaveWetbag.Responses.$200>
+  /**
+   * wetbags_api_get_participant_wetbag - Get Participant Wetbag
+   */
+  'wetbags_api_get_participant_wetbag'(
+    parameters: Parameters<Paths.WetbagsApiGetParticipantWetbag.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.WetbagsApiGetParticipantWetbag.Responses.$200>
 }
 
 export interface PathsDictionary {
@@ -3794,6 +4091,66 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.CheckinsApiGetCheckin.Responses.$200>
+  }
+  ['/api/wetbags/']: {
+    /**
+     * wetbags_api_create_participant_wetbag - Create Participant Wetbag
+     */
+    'post'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: Paths.WetbagsApiCreateParticipantWetbag.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.WetbagsApiCreateParticipantWetbag.Responses.$200>
+  }
+  ['/api/wetbags/{wetbag_id}/update']: {
+    /**
+     * wetbags_api_update_participant_wetbag - Update Participant Wetbag
+     */
+    'patch'(
+      parameters: Parameters<Paths.WetbagsApiUpdateParticipantWetbag.PathParameters>,
+      data?: Paths.WetbagsApiUpdateParticipantWetbag.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.WetbagsApiUpdateParticipantWetbag.Responses.$200>
+  }
+  ['/api/wetbags/relay_team/{relay_team_id}/can_have_wetbag']: {
+    /**
+     * wetbags_api_can_relay_team_have_wetbag - Can Relay Team Have Wetbag
+     */
+    'get'(
+      parameters: Parameters<Paths.WetbagsApiCanRelayTeamHaveWetbag.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.WetbagsApiCanRelayTeamHaveWetbag.Responses.$200>
+  }
+  ['/api/wetbags/relay_team/{relay_team_id}']: {
+    /**
+     * wetbags_api_get_relay_team_wetbag - Get Relay Team Wetbag
+     */
+    'get'(
+      parameters: Parameters<Paths.WetbagsApiGetRelayTeamWetbag.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.WetbagsApiGetRelayTeamWetbag.Responses.$200>
+  }
+  ['/api/wetbags/{participant_id}/can_have_wetbag']: {
+    /**
+     * wetbags_api_can_participant_have_wetbag - Can Participant Have Wetbag
+     */
+    'get'(
+      parameters: Parameters<Paths.WetbagsApiCanParticipantHaveWetbag.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.WetbagsApiCanParticipantHaveWetbag.Responses.$200>
+  }
+  ['/api/wetbags/{participant_id}']: {
+    /**
+     * wetbags_api_get_participant_wetbag - Get Participant Wetbag
+     */
+    'get'(
+      parameters: Parameters<Paths.WetbagsApiGetParticipantWetbag.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.WetbagsApiGetParticipantWetbag.Responses.$200>
   }
 }
 

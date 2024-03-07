@@ -6,6 +6,7 @@ import {
   Card,
   CardActions,
   CardContent,
+  Container,
   Divider,
   FormControl,
   IconButton,
@@ -1380,6 +1381,302 @@ function CheckInList(props: {
   );
 }
 
+function WetBagActions(props: {
+  wetbag: Components.Schemas.WetbagSchema;
+  onChangedValue: (arg0: Components.Schemas.WetbagStatus) => Promise<boolean>;
+}) {
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [value, setValue] = useState<string>(props.wetbag.status);
+
+  const [sendingRequest, setSendingRequest] = useState(false);
+
+  const options = ["Never Received", "Received", "Requested", "Picked Up"];
+
+  const handleChange = async (
+    _event: React.MouseEvent<HTMLElement>,
+    newValue: Components.Schemas.WetbagStatus | null,
+  ) => {
+    if (newValue !== null && newValue !== value) {
+      setSendingRequest(true);
+      const changeSuccessful = await props.onChangedValue(newValue);
+
+      if (changeSuccessful) {
+        setValue(newValue);
+        enqueueSnackbar(`Wet Bag has is now ${newValue}`, {
+          variant: "success",
+          autoHideDuration: 3000,
+        });
+      }
+      setSendingRequest(false);
+    }
+  };
+
+  return (
+    <ToggleButtonGroup
+      color={"primary"}
+      value={value}
+      exclusive
+      onChange={(event, value: Components.Schemas.WetbagStatus | null) => {
+        void handleChange(event, value);
+      }}
+    >
+      {options.map((option) => {
+        return (
+          <ToggleButton value={option} disabled={sendingRequest}>
+            {option}
+          </ToggleButton>
+        );
+      })}
+    </ToggleButtonGroup>
+  );
+}
+
+function ParticipantWetBagActionCard(props: {
+  participantId: number;
+  bibNumber: number;
+  heatId: number | undefined;
+}) {
+  const { getApiClient } = useApiServiceContext();
+
+  const queryClient = useQueryClient();
+
+  const participantCanHaveWetBag = useQuery({
+    queryKey: [
+      "getParticipantCanHaveWetBag",
+      props.participantId,
+      props.bibNumber,
+      props.heatId,
+    ],
+    queryFn: () =>
+      getApiClient()
+        .then((api) =>
+          api.wetbags_api_can_participant_have_wetbag({
+            participant_id: props.participantId,
+          }),
+        )
+        .then((res) => res.data),
+  });
+
+  const participantWetBagQuery = useQuery({
+    queryKey: [
+      "getParticipantWetBag",
+      props.participantId,
+      props.bibNumber,
+      props.heatId,
+    ],
+    queryFn: () =>
+      getApiClient()
+        .then((api) =>
+          api.wetbags_api_get_participant_wetbag({
+            participant_id: props.participantId,
+          }),
+        )
+        .then((res) => res.data),
+    enabled:
+      participantCanHaveWetBag.data != undefined &&
+      participantCanHaveWetBag.data,
+  });
+  const handleChangedValue = async (
+    newValue: Components.Schemas.WetbagStatus,
+  ) => {
+    if (participantWetBagQuery.data == undefined) {
+      return false;
+    }
+
+    const api = await getApiClient();
+    const response = await api.wetbags_api_update_participant_wetbag(
+      { wetbag_id: participantWetBagQuery.data.id },
+      { status: newValue },
+    );
+
+    queryClient.setQueryData(
+      [
+        "getParticipantWetBag",
+        props.participantId,
+        props.bibNumber,
+        props.heatId,
+      ],
+      () => {
+        return response.data;
+      },
+    );
+    return true;
+  };
+
+  return (
+    <Container sx={{ py: 2 }}>
+      <Box textAlign={"center"} sx={{ mb: 2 }}>
+        <Typography variant={"h5"}>Wet Bag</Typography>
+      </Box>
+      {participantWetBagQuery.isLoading ||
+      participantCanHaveWetBag.isLoading ? (
+        <Skeleton />
+      ) : participantCanHaveWetBag.data == false ? (
+        <Typography>Cannot have a Wet Bag.</Typography>
+      ) : participantWetBagQuery.isError ||
+        participantWetBagQuery.data == undefined ||
+        participantCanHaveWetBag.isError ? (
+        <>Error...</>
+      ) : (
+        <Grid
+          container
+          flexDirection={"row"}
+          columnGap={3}
+          rowGap={3}
+          justifyContent={"center"}
+          alignContent={"center"}
+        >
+          <Grid>
+            <WetBagActions
+              wetbag={participantWetBagQuery.data}
+              onChangedValue={handleChangedValue}
+            />
+          </Grid>
+          <Grid>
+            <Typography>
+              Latest Change:{" "}
+              {DateTime.fromISO(
+                participantWetBagQuery.data.changed_datetime,
+              ).toLocaleString({ hour: "2-digit", minute: "2-digit" })}
+            </Typography>
+            <Typography>
+              Requested:{" "}
+              {DateTime.fromISO(
+                participantWetBagQuery.data.requested_datetime,
+              ).toLocaleString({
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })}
+            </Typography>
+          </Grid>
+        </Grid>
+      )}
+    </Container>
+  );
+}
+
+function RelayTeamWetBagActionCard(props: {
+  relayTeamId: number;
+  bibNumber: number;
+  heatId: number | undefined;
+}) {
+  const { getApiClient } = useApiServiceContext();
+
+  const queryClient = useQueryClient();
+
+  const participantCanHaveWetBag = useQuery({
+    queryKey: [
+      "getRelayTeamCanHaveWetBag",
+      props.relayTeamId,
+      props.bibNumber,
+      props.heatId,
+    ],
+    queryFn: () =>
+      getApiClient()
+        .then((api) =>
+          api.wetbags_api_can_relay_team_have_wetbag({
+            relay_team_id: props.relayTeamId,
+          }),
+        )
+        .then((res) => res.data),
+  });
+
+  const participantWetBagQuery = useQuery({
+    queryKey: [
+      "getRelayTeamWetBag",
+      props.relayTeamId,
+      props.bibNumber,
+      props.heatId,
+    ],
+    queryFn: () =>
+      getApiClient()
+        .then((api) =>
+          api.wetbags_api_get_relay_team_wetbag({
+            relay_team_id: props.relayTeamId,
+          }),
+        )
+        .then((res) => res.data),
+    enabled:
+      participantCanHaveWetBag.data != undefined &&
+      participantCanHaveWetBag.data,
+  });
+  const handleChangedValue = async (
+    newValue: Components.Schemas.WetbagStatus,
+  ) => {
+    if (participantWetBagQuery.data == undefined) {
+      return false;
+    }
+
+    const api = await getApiClient();
+    const response = await api.wetbags_api_update_participant_wetbag(
+      { wetbag_id: participantWetBagQuery.data.id },
+      { status: newValue },
+    );
+
+    queryClient.setQueryData(
+      ["getRelayTeamWetBag", props.relayTeamId, props.bibNumber],
+      () => {
+        return response.data;
+      },
+    );
+    return true;
+  };
+
+  return (
+    <Container sx={{ py: 2 }}>
+      <Box textAlign={"center"} sx={{ mb: 2 }}>
+        <Typography variant={"h5"}>Wet Bag</Typography>
+      </Box>
+      {participantWetBagQuery.isLoading ||
+      participantCanHaveWetBag.isLoading ? (
+        <Skeleton />
+      ) : participantCanHaveWetBag.data == false ? (
+        <Typography>Cannot have a Wet Bag.</Typography>
+      ) : participantWetBagQuery.isError ||
+        participantWetBagQuery.data == undefined ||
+        participantCanHaveWetBag.isError ? (
+        <>Error...</>
+      ) : (
+        <Grid
+          container
+          flexDirection={"row"}
+          columnGap={3}
+          rowGap={3}
+          justifyContent={"center"}
+          alignContent={"center"}
+        >
+          <Grid>
+            <WetBagActions
+              wetbag={participantWetBagQuery.data}
+              onChangedValue={handleChangedValue}
+            />
+          </Grid>
+          <Grid>
+            <Typography>
+              Latest Change:{" "}
+              {DateTime.fromISO(
+                participantWetBagQuery.data.changed_datetime,
+              ).toLocaleString({ hour: "2-digit", minute: "2-digit" })}
+            </Typography>
+            <Typography>
+              Requested:{" "}
+              {DateTime.fromISO(
+                participantWetBagQuery.data.requested_datetime,
+              ).toLocaleString({
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })}
+            </Typography>
+          </Grid>
+        </Grid>
+      )}
+    </Container>
+  );
+}
+
 function ParticipantRaceCard(props: { participantId: number }) {
   const { getApiClient } = useApiServiceContext();
 
@@ -1511,6 +1808,12 @@ function ParticipantRaceCard(props: { participantId: number }) {
               instanceCheckins={participantQuery.data.checkins ?? []}
               availableCheckins={participantQuery.data.race_type.checkins}
               onChangeCheckinValue={handleOnChangeCheckinValue}
+            />
+            <Divider flexItem />
+            <ParticipantWetBagActionCard
+              participantId={participantQuery.data.id ?? -1}
+              bibNumber={participantQuery.data.bib_number}
+              heatId={participantQuery.data.heat?.id ?? undefined}
             />
           </Grid>
         )}
@@ -1704,7 +2007,8 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
         {relayParticipantQuery.isLoading ? (
           <Skeleton />
         ) : relayParticipantQuery.isError ||
-          relayParticipantQuery.data == undefined ? (
+          relayParticipantQuery.data == undefined ||
+          relayTeam == null ? (
           <>Error...</>
         ) : (
           <Grid xs>
@@ -1721,20 +2025,14 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
                   relayTeam={relayParticipantQuery.data.team}
                   setRelayTeam={setRelayTeamHandler}
                 />
-                {relayTeam == undefined ? (
-                  <Skeleton />
-                ) : (
-                  <>
-                    <RelayTeamRaceType
-                      setRelayTeam={setRelayTeamHandler}
-                      relayTeam={relayTeam}
-                    />
-                    <RelayTeamRaceHeat
-                      setRelayTeam={setRelayTeamHandler}
-                      relayTeam={relayTeam}
-                    />
-                  </>
-                )}
+                <RelayTeamRaceType
+                  setRelayTeam={setRelayTeamHandler}
+                  relayTeam={relayTeam}
+                />
+                <RelayTeamRaceHeat
+                  setRelayTeam={setRelayTeamHandler}
+                  relayTeam={relayTeam}
+                />
               </Grid>
             </Grid>
             <Divider flexItem />
@@ -1778,17 +2076,19 @@ function RelayParticipantRaceCard(props: { relayParticipantId: number }) {
             </Grid>
             <Divider flexItem />
             <Grid>
-              {relayTeam == undefined ? (
-                <Skeleton />
-              ) : (
-                <CheckInList
-                  instanceId={relayTeam.id ?? -1}
-                  instanceCheckins={relayTeam.checkins ?? []}
-                  availableCheckins={relayTeam.race_type.checkins}
-                  onChangeCheckinValue={handleOnChangeCheckinValue}
-                />
-              )}
+              <CheckInList
+                instanceId={relayTeam.id ?? -1}
+                instanceCheckins={relayTeam.checkins ?? []}
+                availableCheckins={relayTeam.race_type.checkins}
+                onChangeCheckinValue={handleOnChangeCheckinValue}
+              />
             </Grid>
+            <Divider flexItem />
+            <RelayTeamWetBagActionCard
+              relayTeamId={relayTeam.id ?? -1}
+              bibNumber={relayTeam.bib_number}
+              heatId={relayTeam.heat?.id ?? undefined}
+            />
           </Grid>
         )}
         <Divider orientation={"vertical"} flexItem />
