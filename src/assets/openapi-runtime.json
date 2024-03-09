@@ -1030,6 +1030,19 @@
         }
       }
     },
+    "/api/check_ins/analytics/{race_id}": {
+      "get": {
+        "operationId": "checkins_api_get_checkin_analytics",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "race_id",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    },
     "/api/check_ins/{check_in_id}/race_types": {
       "get": {
         "operationId": "checkins_api_get_check_in_race_types",

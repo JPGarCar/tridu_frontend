@@ -4,7 +4,9 @@ import {
   Button,
   Card,
   CardContent,
+  Container,
   Skeleton,
+  Stack,
   Typography,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
@@ -214,6 +216,47 @@ function RaceParticipantMassPatch() {
   );
 }
 
+function CheckInAnalytics(props: { raceId: number }) {
+  const { getApiClient } = useApiServiceContext();
+
+  const checkInQuery = useQuery({
+    queryKey: ["getCheckIns", props.raceId],
+    queryFn: () =>
+      getApiClient()
+        .then((client) =>
+          client.checkins_api_get_checkin_analytics({ race_id: props.raceId }),
+        )
+        .then((res) => res.data),
+  });
+
+  return (
+    <Container>
+      <Typography>Check In Analytics</Typography>
+      <Stack spacing={2}>
+        {checkInQuery.isLoading ? (
+          <Skeleton />
+        ) : checkInQuery.isError || checkInQuery.data == undefined ? (
+          <>Error...</>
+        ) : (
+          checkInQuery.data.map((checkIn) => {
+            return (
+              <Card>
+                <CardContent>
+                  <Typography>{checkIn.name}</Typography>
+                  <Typography>Checked-In: {checkIn.positive_count}</Typography>
+                  <Typography>
+                    Not Checked-In: {checkIn.negative_count}
+                  </Typography>
+                </CardContent>
+              </Card>
+            );
+          })
+        )}
+      </Stack>
+    </Container>
+  );
+}
+
 const Admin = () => {
   const { enqueueSnackbar } = useSnackbar();
 
@@ -387,6 +430,9 @@ const Admin = () => {
               <RaceParticipantMassPatch />
             </CardContent>
           </Card>
+        </Grid>
+        <Grid>
+          <CheckInAnalytics raceId={race_id} />
         </Grid>
       </Grid>
     </Box>

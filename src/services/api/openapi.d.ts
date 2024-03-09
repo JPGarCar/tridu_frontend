@@ -9,6 +9,27 @@ import type {
 declare namespace Components {
     namespace Schemas {
         /**
+         * AnalyticsCheckInSchema
+         */
+        export interface AnalyticsCheckInSchema {
+            /**
+             * Positive Count
+             */
+            positive_count: number;
+            /**
+             * Negative Count
+             */
+            negative_count: number;
+            /**
+             * ID
+             */
+            id?: /* ID */ number | null;
+            /**
+             * Name
+             */
+            name: string;
+        }
+        /**
          * BulkCreateResponseSchema
          * Schema for bulk create response, allows server to respond with items created,
          * and errors limiting specific instances from being created.
@@ -1433,6 +1454,23 @@ declare namespace Paths {
              * Schema for the error object as described in decisions_api.md
              */
             Components.Schemas.ErrorObjectSchema;
+        }
+    }
+    namespace CheckinsApiGetCheckinAnalytics {
+        namespace Parameters {
+            /**
+             * Race Id
+             */
+            export type RaceId = number;
+        }
+        export interface PathParameters {
+            race_id: /* Race Id */ Parameters.RaceId;
+        }
+        namespace Responses {
+            /**
+             * Response
+             */
+            export type $200 = /* AnalyticsCheckInSchema */ Components.Schemas.AnalyticsCheckInSchema[];
         }
     }
     namespace CheckinsApiGetCheckins {
@@ -3327,6 +3365,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CheckinsApiCreateCheckin.Responses.$201>
   /**
+   * checkins_api_get_checkin_analytics - Get Checkin Analytics
+   */
+  'checkins_api_get_checkin_analytics'(
+    parameters: Parameters<Paths.CheckinsApiGetCheckinAnalytics.PathParameters>,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.CheckinsApiGetCheckinAnalytics.Responses.$200>
+  /**
    * checkins_api_get_check_in_race_types - Get Check In Race Types
    */
   'checkins_api_get_check_in_race_types'(
@@ -4080,6 +4126,16 @@ export interface PathsDictionary {
       data?: Paths.CheckinsApiCreateCheckin.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.CheckinsApiCreateCheckin.Responses.$201>
+  }
+  ['/api/check_ins/analytics/{race_id}']: {
+    /**
+     * checkins_api_get_checkin_analytics - Get Checkin Analytics
+     */
+    'get'(
+      parameters: Parameters<Paths.CheckinsApiGetCheckinAnalytics.PathParameters>,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.CheckinsApiGetCheckinAnalytics.Responses.$200>
   }
   ['/api/check_ins/{check_in_id}/race_types']: {
     /**
